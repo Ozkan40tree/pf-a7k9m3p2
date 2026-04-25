@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<title>Özel Sayfa</title>
+<link rel="icon" href="data:,">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; background: #f1f5f9; color: #0f172a; -webkit-font-smoothing: antialiased; padding-bottom: 40px; }
+
+  /* ── PAROLA EKRANI ── */
+  .lock-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+    z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px;
+  }
+  .lock-card {
+    background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 24px;
+    padding: 40px 32px; max-width: 360px; width: 100%; text-align: center; color: white;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+  .lock-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .lock-card p { color: #cbd5e1; font-size: 14px; margin-bottom: 24px; }
+  .lock-icon { font-size: 42px; margin-bottom: 16px; }
+  .lock-card input {
+    width: 100%; padding: 14px 18px; border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px; background: rgba(255, 255, 255, 0.1); color: white;
+    font-size: 16px; outline: none; transition: all 0.2s;
+  }
+  .lock-card input:focus { border-color: #60a5fa; background: rgba(255, 255, 255, 0.15); }
+  .lock-card input::placeholder { color: #94a3b8; }
+  .lock-card button {
+    width: 100%; margin-top: 12px; padding: 14px; border: none; border-radius: 12px;
+    background: linear-gradient(135deg, #3b82f6, #6366f1); color: white;
+    font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s;
+  }
+  .lock-card button:hover { transform: translateY(-1px); }
+  .lock-error { color: #fca5a5; font-size: 13px; margin-top: 12px; min-height: 18px; }
+  .hidden { display: none !important; }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: white; padding: 32px 20px;
+    border-bottom-left-radius: 28px; border-bottom-right-radius: 28px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+    position: relative; overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: -50%; right: -10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-inner { max-width: 980px; margin: 0 auto; position: relative; z-index: 2; }
+  .header-flex { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+  h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+  .subtitle { color: #94a3b8; font-size: 13px; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+  .live-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5);} 70% { box-shadow: 0 0 0 8px rgba(16,185,129,0);} }
+  .header-total { text-align: right; }
+  .header-total .label { color: #94a3b8; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
+  .header-total .value { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin: 4px 0;
+    background: linear-gradient(to right, #fff, #e2e8f0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+  .summary-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 24px; }
+  .summary-card {
+    background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 14px;
+  }
+  .summary-card .label { color: #cbd5e1; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .summary-card .val { font-size: 17px; font-weight: 700; margin-top: 4px; color: white; }
+  .green { color: #34d399; } .red { color: #f87171; }
+
+  .container { max-width: 980px; margin: -20px auto 0; padding: 0 16px; position: relative; z-index: 10; }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex; gap: 8px; margin-bottom: 24px;
+    background: white; padding: 6px; border-radius: 18px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); width: max-content;
+    margin-left: auto; margin-right: auto;
+  }
+  .tab { padding: 10px 22px; border-radius: 12px; font-weight: 600; font-size: 14px;
+    cursor: pointer; color: #64748b; transition: all 0.3s; border: none; background: transparent; }
+  .tab.active { background: #0f172a; color: white; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
+
+  /* ── SECTIONS ── */
+  .section {
+    background: white; border-radius: 18px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+    padding: 22px; margin-bottom: 18px; border: 1px solid #f1f5f9;
+  }
+  .section h3 { font-size: 17px; font-weight: 700; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+  .section h3 .subtotal { font-size: 13px; color: #64748b; font-weight: 500; background: #f8fafc; padding: 4px 10px; border-radius: 8px; }
+
+  /* ── CARDS ── */
+  .cards-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .card { border-radius: 16px; padding: 14px; border: 1px solid #e2e8f0; background: white; transition: transform 0.2s; }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.05); }
+  .card.dark { background: linear-gradient(135deg, #0f172a, #1e293b); color: white; border: none; }
+  .card .clabel { font-size: 11px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card.dark .clabel { color: #94a3b8; }
+  .card .cval { font-size: 20px; font-weight: 800; margin-top: 4px; }
+
+  /* ── BADGES ── */
+  .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+  .badge.pos { background: #d1fae5; color: #10b981; }
+  .badge.neg { background: #fee2e2; color: #ef4444; }
+  .badge.zero { background: #f1f5f9; color: #64748b; }
+
+  /* ── TABLES ── */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: right; padding: 10px 6px; font-weight: 600; color: #64748b; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
+  th:first-child { text-align: left; }
+  td { padding: 12px 6px; text-align: right; border-bottom: 1px solid #f1f5f9; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td:first-child { text-align: left; font-weight: 700; color: #0f172a; }
+  tbody tr:hover { background: #f8fafc; }
+  tfoot td { font-weight: 700; border-top: 2px solid #cbd5e1; border-bottom: none; padding-top: 14px; background: #f8fafc; }
+  .val-pos { color: #10b981; font-weight: 600; } .val-neg { color: #ef4444; font-weight: 600; } .val-zero { color: #64748b; }
+  .weight-bar { display: inline-block; width: 38px; height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; margin-right: 6px; vertical-align: middle; }
+  .weight-bar-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+
+  /* ── KRIPTO ── */
+  .kripto-row { background: linear-gradient(to right, #fffbeb, #fef3c7); border: 1px solid #fde68a; border-radius: 16px; padding: 18px; display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; }
+  .kleft { font-size: 18px; font-weight: 800; color: #d97706; }
+  .kleft small { font-weight: 500; font-size: 13px; color: #b45309; background: #fef3c7; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
+  .kitems { display: flex; flex-wrap: wrap; gap: 18px; justify-content: flex-end; }
+  .kitem .kl { font-size: 10px; color: #b45309; text-transform: uppercase; }
+  .kitem .kv { font-weight: 700; font-size: 14px; color: #78350f; font-variant-numeric: tabular-nums; }
+
+  /* ── DIST ── */
+  .dist-bar { display: flex; height: 12px; border-radius: 10px; overflow: hidden; border: 1px solid #e2e8f0; margin-top: 10px; }
+  .dist-legend { display: flex; flex-wrap: wrap; gap: 8px; }
+  .dist-legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #64748b; font-weight: 500; }
+  .dist-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* ── LOADING ── */
+  .loading { text-align: center; padding: 60px 20px; color: #64748b; }
+  .err-msg { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; border-radius: 12px; padding: 16px; margin: 16px; }
+
+  @media (max-width: 720px) {
+    .header { padding: 24px 14px; }
+    .header-total .value { font-size: 26px; }
+    h1 { font-size: 19px; }
+    .section { padding: 14px; }
+    table { font-size: 11px; }
+    th, td { padding: 8px 3px; font-size: 10px; }
+    th { font-size: 9px; }
+    .card .cval { font-size: 17px; }
+    .kitems { gap: 12px; }
+    .weight-bar { width: 24px; }
+    .tabs { width: 100%; }
+    .tab { padding: 10px 14px; font-size: 13px; flex: 1; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ PAROLA EKRANI ═══ -->
+<div class="lock-overlay" id="lock">
+  <div class="lock-card">
+    <div class="lock-icon">🔒</div>
+    <h2>Özel Sayfa</h2>
+    <p>Devam etmek için parolanızı girin</p>
+    <input type="password" id="lock-input" placeholder="Parola" autocomplete="off">
+    <button onclick="checkPassword()">Giriş</button>
+    <div class="lock-error" id="lock-err"></div>
+  </div>
+</div>
+
+<!-- ═══ ANA İÇERİK ═══ -->
+<div id="main" class="hidden">
+  <div class="header">
+    <div class="header-inner">
+      <div class="header-flex">
+        <div>
+          <h1>📊 Aile Portföy Raporu</h1>
+          <div class="subtitle"><span class="live-dot"></span> <span id="last-update"></span></div>
+        </div>
+        <div class="header-total">
+          <div class="label">Toplam Aile Varlığı</div>
+          <div class="value" id="genel-toplam">—</div>
+          <div id="genel-badge"></div>
+        </div>
+      </div>
+      <div class="summary-row" id="summary-row"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="tabs" id="tabs"></div>
+    <div id="panels"><div class="loading">Yükleniyor…</div></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// PAROLA KORUMASI
+// ═══════════════════════════════════════════════
+const PASSWORD_HASH = "ozdege15"; // Bu sadece basit bir kontrol — gerçek güvenlik için server-side gerekir
+function checkPassword() {
+  const input = document.getElementById('lock-input').value.trim().toLowerCase();
+  if (input === PASSWORD_HASH) {
+    sessionStorage.setItem('unlocked', '1');
+    showMain();
+  } else {
+    document.getElementById('lock-err').textContent = 'Parola hatalı, tekrar deneyin.';
+    document.getElementById('lock-input').value = '';
+  }
+}
+function showMain() {
+  document.getElementById('lock').classList.add('hidden');
+  document.getElementById('main').classList.remove('hidden');
+  loadData();
+}
+document.getElementById('lock-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPassword();
+});
+if (sessionStorage.getItem('unlocked') === '1') showMain();
+
+// ═══════════════════════════════════════════════
+// FORMATTERS
+// ═══════════════════════════════════════════════
+const fmt = n => Math.round(n).toLocaleString('tr-TR');
+const fmt2 = n => n.toLocaleString('tr-TR', {minimumFractionDigits:2, maximumFractionDigits:2});
+const fmt4 = n => n.toLocaleString('tr-TR', {minimumFractionDigits:2, maximumFractionDigits:4});
+const fmtP = n => (n>=0?'+':'') + n.toFixed(2) + '%';
+const badge = v => {
+  if (Math.abs(v) < 0.005) return `<span class="badge zero">0.00%</span>`;
+  return `<span class="badge ${v>=0?'pos':'neg'}">${fmtP(v)}</span>`;
+};
+const tlClass = v => v>0 ? 'val-pos' : (v<0 ? 'val-neg' : 'val-zero');
+const tlSign = v => v>0 ? '+' : '';
+const colors = ['#0f172a','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#14b8a6','#e11d48','#6366f1'];
+
+// ═══════════════════════════════════════════════
+// DATA LOADING
+// ═══════════════════════════════════════════════
+async function loadData() {
+  try {
+    const cb = '?t=' + Date.now();
+    const [portfoy, prices] = await Promise.all([
+      fetch('portfoy.json' + cb).then(r => r.json()),
+      fetch('prices.json' + cb).then(r => r.json())
+    ]);
+    render(portfoy, prices);
+  } catch (e) {
+    document.getElementById('panels').innerHTML = `<div class="err-msg">Veri yüklenemedi: ${e.message}</div>`;
+  }
+}
+
+function enrichHisse(holdings, prices) {
+  return holdings.map(h => {
+    const p = prices[h.kod] || {};
+    const guncel = p.guncel ?? h.maliyet;
+    const tm = h.adet * h.maliyet;
+    const tg = h.adet * guncel;
+    const gunlukP = p.gunluk_getiri ?? 0;
+    const oncekiFiyat = guncel / (1 + gunlukP/100);
+    const gunlukKZ = h.adet * (guncel - oncekiFiyat);
+    return {
+      ...h, guncel, tm, tg,
+      kz: tg - tm,
+      kzp: ((guncel - h.maliyet) / h.maliyet) * 100,
+      gunlukP, gunlukKZ,
+      ybb: p.yilbasi ? ((guncel - p.yilbasi) / p.yilbasi) * 100 : 0
+    };
+  });
+}
+
+function enrichFon(holdings, prices) {
+  return holdings.map(f => {
+    const p = prices[f.kod] || {};
+    const guncel = p.guncel ?? f.maliyet;
+    const onceki = p.onceki ?? guncel;
+    const tm = f.adet * f.maliyet;
+    const tg = f.adet * guncel;
+    const gunlukP = onceki ? ((guncel - onceki) / onceki) * 100 : 0;
+    const gunlukKZ = f.adet * (guncel - onceki);
+    return {
+      ...f, guncel, tm, tg,
+      kz: tg - tm,
+      kzp: ((guncel - f.maliyet) / f.maliyet) * 100,
+      gunlukP, gunlukKZ,
+      ybb: p.yilbasi ? ((guncel - p.yilbasi) / p.yilbasi) * 100 : 0
+    };
+  });
+}
+
+function enrichKripto(holdings, prices) {
+  return holdings.map(c => {
+    const p = prices[c.kod] || {};
+    const guncel_tl = p.guncel_tl ?? c.maliyet_tl;
+    const tm = c.adet * c.maliyet_tl;
+    const tg = c.adet * guncel_tl;
+    return {
+      ...c, guncel_tl, tm, tg,
+      kz: tg - tm,
+      kzp: ((guncel_tl - c.maliyet_tl) / c.maliyet_tl) * 100,
+      ybb: p.yilbasi_tl ? ((guncel_tl - p.yilbasi_tl) / p.yilbasi_tl) * 100 : 0,
+      gunlukKZ: 0
+    };
+  });
+}
+
+const sum = (arr, f) => arr.reduce((s, x) => s + x[f], 0);
+
+function weightBar(pct) {
+  return `<span class="weight-bar"><span class="weight-bar-fill" style="width:${Math.min(pct,100)}%"></span></span>${pct.toFixed(1)}%`;
+}
+
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+function renderPortfoy(name, data, prices) {
+  const hisseler = enrichHisse(data.hisseler || [], prices.hisseler || {});
+  const fonlar = enrichFon(data.fonlar || [], prices.fonlar || {});
+  const kripto = enrichKripto(data.kripto || [], prices.kripto || {});
+
+  const hisseTop = sum(hisseler, 'tg');
+  const fonTop = sum(fonlar, 'tg');
+  const kriptoTop = sum(kripto, 'tg');
+  const toplam = hisseTop + fonTop + kriptoTop;
+  const maliyet = sum(hisseler,'tm') + sum(fonlar,'tm') + sum(kripto,'tm');
+  const kz = toplam - maliyet;
+  const kzp = (toplam/maliyet - 1) * 100;
+  const gunlukKZ = sum(hisseler, 'gunlukKZ') + sum(fonlar, 'gunlukKZ');
+  const gunlukP = (toplam - gunlukKZ) > 0 ? gunlukKZ / (toplam - gunlukKZ) * 100 : 0;
+
+  const allDaily = [
+    ...hisseler.map(h => ({k:h.kod, v:h.gunlukP})),
+    ...fonlar.map(f => ({k:f.kod, v:f.gunlukP}))
+  ];
+  const best = allDaily.length ? [...allDaily].sort((a,b) => b.v - a.v)[0] : null;
+  const worst = allDaily.length ? [...allDaily].sort((a,b) => a.v - b.v)[0] : null;
+
+  let html = `
+    <div class="cards-row">
+      <div class="card dark">
+        <div class="clabel">Portföy Değeri</div>
+        <div class="cval">₺${fmt(toplam)}</div>
+      </div>
+      <div class="card">
+        <div class="clabel">Toplam K/Z</div>
+        <div class="cval ${tlClass(kz)}">${tlSign(kz)}₺${fmt(Math.abs(kz))}</div>
+        <div style="margin-top:4px">${badge(kzp)}</div>
+      </div>
+      <div class="card">
+        <div class="clabel">Günlük K/Z</div>
+        <div class="cval ${tlClass(gunlukKZ)}">${tlSign(gunlukKZ)}₺${fmt(Math.abs(gunlukKZ))}</div>
+        <div style="margin-top:4px">${badge(gunlukP)}</div>
+      </div>
+      ${best ? `<div class="card"><div class="clabel">Günün Yıldızı</div><div class="cval">${best.k}</div><div style="margin-top:4px">${badge(best.v)}</div></div>` : ''}
+      ${worst && worst.k !== best.k ? `<div class="card"><div class="clabel">Günün En Zayıfı</div><div class="cval">${worst.k}</div><div style="margin-top:4px">${badge(worst.v)}</div></div>` : ''}
+    </div>`;
+
+  // Dağılım
+  const distItems = [
+    ...hisseler.map(h => ({l:h.kod, v:h.tg})),
+    ...fonlar.map(f => ({l:f.kod, v:f.tg})),
+    ...(kriptoTop > 0 ? [{l:'BTC', v:kriptoTop}] : [])
+  ];
+  if (distItems.length > 0) {
+    const distTotal = distItems.reduce((s,x) => s+x.v, 0);
+    let barH='', legH='';
+    distItems.forEach((it, i) => {
+      const pct = it.v/distTotal*100;
+      barH += `<div style="width:${pct}%;background:${colors[i%colors.length]}"></div>`;
+      legH += `<div class="dist-legend-item"><div class="dist-dot" style="background:${colors[i%colors.length]}"></div>${it.l} ${pct.toFixed(1)}%</div>`;
+    });
+    html += `<div class="section">
+      <div class="dist-legend">${legH}</div>
+      <div class="dist-bar">${barH}</div>
+    </div>`;
+  }
+
+  // Hisseler
+  if (hisseler.length > 0) {
+    html += `<div class="section">
+      <h3>📈 Hisseler <span class="subtotal">₺${fmt(hisseTop)}</span></h3>
+      <div style="overflow-x:auto"><table><thead><tr>
+        <th>Kod</th><th>Adet</th><th>Maliyet</th><th>Güncel</th><th>Toplam ₺</th>
+        <th>Ağırlık</th><th>Günlük ₺</th><th>Günlük %</th>
+        <th>K/Z ₺</th><th>K/Z %</th><th>YBB</th>
+      </tr></thead><tbody>`;
+    hisseler.forEach(h => {
+      const w = (h.tg / hisseTop) * 100;
+      html += `<tr>
+        <td>${h.kod}</td>
+        <td>${fmt(h.adet)}</td>
+        <td>${fmt2(h.maliyet)}</td>
+        <td style="font-weight:600">${fmt2(h.guncel)}</td>
+        <td>${fmt(h.tg)}</td>
+        <td style="color:#64748b;font-size:11px">${weightBar(w)}</td>
+        <td class="${tlClass(h.gunlukKZ)}">${tlSign(h.gunlukKZ)}${fmt(Math.abs(h.gunlukKZ))}</td>
+        <td>${badge(h.gunlukP)}</td>
+        <td class="${tlClass(h.kz)}">${tlSign(h.kz)}${fmt(Math.abs(h.kz))}</td>
+        <td>${badge(h.kzp)}</td>
+        <td>${badge(h.ybb)}</td>
+      </tr>`;
+    });
+    const t_kz=sum(hisseler,'kz'), t_gk=sum(hisseler,'gunlukKZ');
+    const t_kzp = (hisseTop/sum(hisseler,'tm') - 1) * 100;
+    html += `</tbody><tfoot><tr>
+      <td>TOPLAM</td><td colspan="3"></td><td>₺${fmt(hisseTop)}</td><td>100.0%</td>
+      <td class="${tlClass(t_gk)}">${tlSign(t_gk)}${fmt(Math.abs(t_gk))}</td><td></td>
+      <td class="${tlClass(t_kz)}">${tlSign(t_kz)}${fmt(Math.abs(t_kz))}</td>
+      <td>${badge(t_kzp)}</td><td></td>
+    </tr></tfoot></table></div></div>`;
+  }
+
+  // Fonlar
+  if (fonlar.length > 0) {
+    html += `<div class="section">
+      <h3>🏦 Fonlar <span class="subtotal">₺${fmt(fonTop)}</span></h3>
+      <div style="overflow-x:auto"><table><thead><tr>
+        <th>Kod</th><th>Pay</th><th>Maliyet</th><th>Güncel</th><th>Toplam ₺</th>
+        <th>Ağırlık</th><th>Günlük ₺</th><th>Günlük %</th>
+        <th>K/Z ₺</th><th>K/Z %</th><th>YBB</th>
+      </tr></thead><tbody>`;
+    fonlar.forEach(f => {
+      const w = (f.tg / fonTop) * 100;
+      html += `<tr>
+        <td>${f.kod}</td>
+        <td>${fmt(f.adet)}</td>
+        <td>${fmt4(f.maliyet)}</td>
+        <td style="font-weight:600">${fmt4(f.guncel)}</td>
+        <td>${fmt(f.tg)}</td>
+        <td style="color:#64748b;font-size:11px">${weightBar(w)}</td>
+        <td class="${tlClass(f.gunlukKZ)}">${tlSign(f.gunlukKZ)}${fmt(Math.abs(f.gunlukKZ))}</td>
+        <td>${badge(f.gunlukP)}</td>
+        <td class="${tlClass(f.kz)}">${tlSign(f.kz)}${fmt(Math.abs(f.kz))}</td>
+        <td>${badge(f.kzp)}</td>
+        <td>${badge(f.ybb)}</td>
+      </tr>`;
+    });
+    const t_kz=sum(fonlar,'kz'), t_gk=sum(fonlar,'gunlukKZ');
+    const t_kzp = (fonTop/sum(fonlar,'tm') - 1) * 100;
+    html += `</tbody><tfoot><tr>
+      <td>TOPLAM</td><td colspan="3"></td><td>₺${fmt(fonTop)}</td><td>100.0%</td>
+      <td class="${tlClass(t_gk)}">${tlSign(t_gk)}${fmt(Math.abs(t_gk))}</td><td></td>
+      <td class="${tlClass(t_kz)}">${tlSign(t_kz)}${fmt(Math.abs(t_kz))}</td>
+      <td>${badge(t_kzp)}</td><td></td>
+    </tr></tfoot></table></div></div>`;
+  }
+
+  // Kripto
+  if (kripto.length > 0) {
+    const c = kripto[0];
+    html += `<div class="section">
+      <h3>₿ Kripto <span class="subtotal">₺${fmt(kriptoTop)}</span></h3>
+      <div class="kripto-row">
+        <div class="kleft">₿ ${c.kod}<br><small>${c.adet} ${c.kod}</small></div>
+        <div class="kitems">
+          <div class="kitem"><div class="kl">Birim Fiyat</div><div class="kv">₺${fmt(c.guncel_tl)}</div></div>
+          <div class="kitem"><div class="kl">Maliyet</div><div class="kv">₺${fmt(c.tm)}</div></div>
+          <div class="kitem"><div class="kl">Değer</div><div class="kv">₺${fmt(c.tg)}</div></div>
+          <div class="kitem"><div class="kl">K/Z</div><div class="kv ${tlClass(c.kz)}">${tlSign(c.kz)}₺${fmt(Math.abs(c.kz))}</div></div>
+          <div class="kitem"><div class="kl">Getiri</div><div class="kv">${badge(c.kzp)}</div></div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  return { html, toplam, maliyet, kz, gunlukKZ };
+}
+
+function render(portfoy, prices) {
+  const portfoyler = portfoy.portfoyler || {};
+  const rendered = {};
+  let genTop = 0, genMal = 0, genGK = 0;
+
+  for (const [name, data] of Object.entries(portfoyler)) {
+    const r = renderPortfoy(name, data, prices);
+    rendered[name] = r;
+    genTop += r.toplam;
+    genMal += r.maliyet;
+    genGK += r.gunlukKZ;
+  }
+
+  const genKZ = genTop - genMal;
+  const genKZP = genMal > 0 ? (genTop/genMal - 1) * 100 : 0;
+  const genGP = (genTop - genGK) > 0 ? genGK / (genTop - genGK) * 100 : 0;
+  const names = Object.keys(portfoyler);
+  const displayNames = { ozkan: 'Özkan', derya: 'Derya' };
+
+  const lastUpdate = prices.son_guncelleme
+    ? new Date(prices.son_guncelleme).toLocaleString('tr-TR', {dateStyle:'long', timeStyle:'short'})
+    : 'Henüz güncelleme yapılmadı';
+  document.getElementById('last-update').textContent = lastUpdate + ' • Fintables 15 dk gecikmeli';
+
+  document.getElementById('genel-toplam').textContent = '₺' + fmt(genTop);
+  document.getElementById('genel-badge').innerHTML = badge(genKZP);
+
+  const summaryHtml = `
+    <div class="summary-card"><div class="label">Toplam Maliyet</div><div class="val">₺${fmt(genMal)}</div></div>
+    <div class="summary-card"><div class="label">Net K/Z</div><div class="val ${genKZ>=0?'green':'red'}">${genKZ>=0?'+':''}₺${fmt(genKZ)}</div></div>
+    <div class="summary-card"><div class="label">Günlük Kazanç</div><div class="val ${genGK>=0?'green':'red'}">${genGK>=0?'+':''}₺${fmt(Math.abs(genGK))}</div></div>
+    ${names.map(n => `<div class="summary-card"><div class="label">${displayNames[n] || n} Varlık</div><div class="val">₺${fmt(rendered[n].toplam)}</div></div>`).join('')}
+  `;
+  document.getElementById('summary-row').innerHTML = summaryHtml;
+
+  const tabsHtml = names.map((n,i) =>
+    `<button class="tab ${i===0?'active':''}" data-panel="${n}" onclick="switchTab('${n}')">👤 ${displayNames[n] || n} • ₺${fmt(rendered[n].toplam)}</button>`
+  ).join('');
+  document.getElementById('tabs').innerHTML = tabsHtml;
+
+  const panelsHtml = names.map((n,i) =>
+    `<div id="panel-${n}" class="${i===0?'':'hidden'}">${rendered[n].html}</div>`
+  ).join('');
+  document.getElementById('panels').innerHTML = panelsHtml;
+}
+
+function switchTab(name) {
+  document.querySelectorAll('[id^="panel-"]').forEach(el => {
+    el.className = el.id === 'panel-' + name ? '' : 'hidden';
+  });
+  document.querySelectorAll('.tab').forEach(el => {
+    el.className = 'tab' + (el.dataset.panel === name ? ' active' : '');
+  });
+}
+</script>
+</body>
+</html>

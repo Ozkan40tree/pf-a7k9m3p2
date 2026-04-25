@@ -1,0 +1,37 @@
+{
+  "olusturma_tarihi": "2026-04-25",
+  "kaynak": "Google Sheets - Ozkan_Portfoy & Derya_Portfoy sekmeleri",
+  "sheets_id": "1-_HhyMYkCYgifzRvJVBzXBfdraoqcNQzxGokwAXzr9Q",
+  "aciklama": "Bu dosyayı Cowork her sabah Google Sheets'ten otomatik günceller. Manuel düzenleme önerilmez.",
+  "portfoyler": {
+    "ozkan": {
+      "hisseler": [
+        { "kod": "INFO",  "adet": 24503, "maliyet": 3.87 },
+        { "kod": "LIDFA", "adet": 40688, "maliyet": 2.56 },
+        { "kod": "ENDAE", "adet": 4144,  "maliyet": 16.89 },
+        { "kod": "GWIND", "adet": 6282,  "maliyet": 24.78 },
+        { "kod": "TRGYO", "adet": 2562,  "maliyet": 71.76 },
+        { "kod": "SAHOL", "adet": 1005,  "maliyet": 89.40 }
+      ],
+      "fonlar": [
+        { "kod": "ZBJ", "adet": 95876, "maliyet": 1.85 },
+        { "kod": "HBF", "adet": 4515,  "maliyet": 29.315282 },
+        { "kod": "TFF", "adet": 4855,  "maliyet": 25.0624 },
+        { "kod": "NAU", "adet": 12121, "maliyet": 1.954833 },
+        { "kod": "MPP", "adet": 26014, "maliyet": 18.10502 }
+      ],
+      "kripto": [
+        { "kod": "BTC", "adet": 0.065751, "maliyet_tl": 3631243 }
+      ]
+    },
+    "derya": {
+      "hisseler": [
+        { "kod": "TRGYO", "adet": 1959,  "maliyet": 79.27 },
+        { "kod": "GWIND", "adet": 5404,  "maliyet": 25.90 },
+        { "kod": "LIDFA", "adet": 29411, "maliyet": 3.40 },
+        { "kod": "INFO",  "adet": 21406, "maliyet": 3.758 },
+        { "kod": "SAHOL", "adet": 744,   "maliyet": 99.228 }
+      ]
+    }
+  }
+}
