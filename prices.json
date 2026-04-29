@@ -1,23 +1,23 @@
 {
-  "son_guncelleme": "2026-04-25T11:00:00+03:00",
-  "kaynak": "Fintables MCP",
+  "son_guncelleme": "2026-04-29T19:00:57+03:00",
+  "kaynak": "Fintables MCP + Google Sheets",
   "aciklama": "Bu dosyayı Cowork her sabah otomatik günceller. Manuel düzenlemeyin.",
   "hisseler": {
-    "INFO":  { "guncel": 3.51,   "gunluk_getiri": 0.00,  "yilbasi": 3.74 },
-    "LIDFA": { "guncel": 3.72,   "gunluk_getiri": 1.92,  "yilbasi": 2.34 },
-    "ENDAE": { "guncel": 16.14,  "gunluk_getiri": 1.89,  "yilbasi": 14.41 },
-    "GWIND": { "guncel": 26.04,  "gunluk_getiri": -0.38, "yilbasi": 23.06 },
-    "TRGYO": { "guncel": 95.10,  "gunluk_getiri": 1.17,  "yilbasi": 74.15 },
-    "SAHOL": { "guncel": 100.40, "gunluk_getiri": -0.59, "yilbasi": 86.51 }
+    "INFO":  { "guncel": 3.50,   "gunluk_getiri": 1.45,  "yilbasi": 3.74 },
+    "LIDFA": { "guncel": 3.33,   "gunluk_getiri": 1.52,  "yilbasi": 2.34 },
+    "ENDAE": { "guncel": 16.00,  "gunluk_getiri": 0.25,  "yilbasi": 14.41 },
+    "GWIND": { "guncel": 31.74,  "gunluk_getiri": 9.98,  "yilbasi": 23.06 },
+    "TRGYO": { "guncel": 96.65,  "gunluk_getiri": 0.05,  "yilbasi": 74.15 },
+    "SAHOL": { "guncel": 96.15,  "gunluk_getiri": -0.26, "yilbasi": 86.51 }
   },
   "fonlar": {
-    "ZBJ": { "guncel": 4.538766,  "onceki": 4.533928,  "yilbasi": 4.051789 },
-    "HBF": { "guncel": 52.422603, "onceki": 52.46722,  "yilbasi": 46.654753 },
-    "TFF": { "guncel": 34.554068, "onceki": 34.406176, "yilbasi": 31.753607 },
-    "NAU": { "guncel": 3.239304,  "onceki": 3.232107,  "yilbasi": 2.929137 },
-    "MPP": { "guncel": 22.45068,  "onceki": 22.551623, "yilbasi": 19.771575 }
+    "ZBJ": { "guncel": 4.572702,  "onceki": 4.567244,  "yilbasi": 4.051789 },
+    "HBF": { "guncel": 51.46552,  "onceki": 51.37717,  "yilbasi": 46.654753 },
+    "TFF": { "guncel": 35.759007, "onceki": 35.431842, "yilbasi": 31.753607 },
+    "NAU": { "guncel": 3.200628,  "onceki": 3.168002,  "yilbasi": 2.929137 },
+    "MPP": { "guncel": 22.239773, "onceki": 22.124139, "yilbasi": 19.771575 }
   },
   "kripto": {
-    "BTC": { "guncel_tl": 3330000, "yilbasi_tl": 3950000 }
+    "BTC": { "guncel_tl": 3425074, "yilbasi_tl": 3950000 }
   }
 }

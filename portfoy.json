@@ -1,6 +1,6 @@
 {
-  "olusturma_tarihi": "2026-04-25",
-  "kaynak": "Google Sheets - Ozkan_Portfoy & Derya_Portfoy sekmeleri",
+  "olusturma_tarihi": "2026-04-29",
+  "kaynak": "Google Sheets",
   "sheets_id": "1-_HhyMYkCYgifzRvJVBzXBfdraoqcNQzxGokwAXzr9Q",
   "aciklama": "Bu dosyayı Cowork her sabah Google Sheets'ten otomatik günceller. Manuel düzenleme önerilmez.",
   "portfoyler": {
@@ -31,7 +31,9 @@
         { "kod": "LIDFA", "adet": 29411, "maliyet": 3.40 },
         { "kod": "INFO",  "adet": 21406, "maliyet": 3.758 },
         { "kod": "SAHOL", "adet": 744,   "maliyet": 99.228 }
-      ]
+      ],
+      "fonlar": [],
+      "kripto": []
     }
   }
 }
