@@ -1,23 +1,70 @@
 {
-  "son_guncelleme": "2026-04-29T19:00:57+03:00",
+  "son_guncelleme": "2026-04-30T19:20:33+03:00",
   "kaynak": "Fintables MCP + Google Sheets",
-  "aciklama": "Bu dosyayı Cowork her sabah otomatik günceller. Manuel düzenlemeyin.",
+  "aciklama": "Bu dosyayı Cowork her akşam otomatik günceller. Manuel düzenlemeyin.",
   "hisseler": {
-    "INFO":  { "guncel": 3.50,   "gunluk_getiri": 1.45,  "yilbasi": 3.74 },
-    "LIDFA": { "guncel": 3.33,   "gunluk_getiri": 1.52,  "yilbasi": 2.34 },
-    "ENDAE": { "guncel": 16.00,  "gunluk_getiri": 0.25,  "yilbasi": 14.41 },
-    "GWIND": { "guncel": 31.74,  "gunluk_getiri": 9.98,  "yilbasi": 23.06 },
-    "TRGYO": { "guncel": 96.65,  "gunluk_getiri": 0.05,  "yilbasi": 74.15 },
-    "SAHOL": { "guncel": 96.15,  "gunluk_getiri": -0.26, "yilbasi": 86.51 }
+    "INFO": {
+      "guncel": 3.43,
+      "gunluk_getiri": -2.0,
+      "yilbasi": 3.74
+    },
+    "LIDFA": {
+      "guncel": 3.32,
+      "gunluk_getiri": -0.3,
+      "yilbasi": 2.34
+    },
+    "ENDAE": {
+      "guncel": 15.68,
+      "gunluk_getiri": -2.0,
+      "yilbasi": 14.41
+    },
+    "GWIND": {
+      "guncel": 30.2,
+      "gunluk_getiri": -4.85,
+      "yilbasi": 23.06
+    },
+    "TRGYO": {
+      "guncel": 98.0,
+      "gunluk_getiri": 1.4,
+      "yilbasi": 74.15
+    },
+    "SAHOL": {
+      "guncel": 95.65,
+      "gunluk_getiri": -0.52,
+      "yilbasi": 86.51
+    }
   },
   "fonlar": {
-    "ZBJ": { "guncel": 4.572702,  "onceki": 4.567244,  "yilbasi": 4.051789 },
-    "HBF": { "guncel": 51.46552,  "onceki": 51.37717,  "yilbasi": 46.654753 },
-    "TFF": { "guncel": 35.759007, "onceki": 35.431842, "yilbasi": 31.753607 },
-    "NAU": { "guncel": 3.200628,  "onceki": 3.168002,  "yilbasi": 2.929137 },
-    "MPP": { "guncel": 22.239773, "onceki": 22.124139, "yilbasi": 19.771575 }
+    "ZBJ": {
+      "guncel": 4.577318,
+      "onceki": 4.572702,
+      "yilbasi": 4.051789
+    },
+    "HBF": {
+      "guncel": 50.366121,
+      "onceki": 51.46552,
+      "yilbasi": 46.654753
+    },
+    "TFF": {
+      "guncel": 35.4304,
+      "onceki": 35.759007,
+      "yilbasi": 31.753607
+    },
+    "NAU": {
+      "guncel": 3.14604,
+      "onceki": 3.200628,
+      "yilbasi": 2.929137
+    },
+    "MPP": {
+      "guncel": 21.994252,
+      "onceki": 22.124139,
+      "yilbasi": 19.771575
+    }
   },
   "kripto": {
-    "BTC": { "guncel_tl": 3425074, "yilbasi_tl": 3950000 }
+    "BTC": {
+      "guncel_tl": 3408416,
+      "yilbasi_tl": 3950000
+    }
   }
 }
