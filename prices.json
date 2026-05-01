@@ -1,5 +1,5 @@
 {
-  "son_guncelleme": "2026-04-30T19:20:33+03:00",
+  "son_guncelleme": "2026-05-01T14:45:19+03:00",
   "kaynak": "Fintables MCP + Google Sheets",
   "aciklama": "Bu dosyayı Cowork her akşam otomatik günceller. Manuel düzenlemeyin.",
   "hisseler": {
@@ -36,28 +36,28 @@
   },
   "fonlar": {
     "ZBJ": {
-      "guncel": 4.577318,
-      "onceki": 4.572702,
+      "guncel": 4.58227,
+      "onceki": 4.577318,
       "yilbasi": 4.051789
     },
     "HBF": {
-      "guncel": 50.366121,
-      "onceki": 51.46552,
+      "guncel": 50.04015,
+      "onceki": 50.366121,
       "yilbasi": 46.654753
     },
     "TFF": {
-      "guncel": 35.4304,
-      "onceki": 35.759007,
+      "guncel": 35.555331,
+      "onceki": 35.4304,
       "yilbasi": 31.753607
     },
     "NAU": {
-      "guncel": 3.14604,
-      "onceki": 3.200628,
+      "guncel": 3.112043,
+      "onceki": 3.14604,
       "yilbasi": 2.929137
     },
     "MPP": {
-      "guncel": 21.994252,
-      "onceki": 22.124139,
+      "guncel": 21.82804,
+      "onceki": 21.994252,
       "yilbasi": 19.771575
     }
   },
