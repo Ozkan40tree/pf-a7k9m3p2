@@ -1,104 +1,43 @@
 {
-  "olusturma_tarihi": "2026-05-01",
+  "olusturma_tarihi": "2026-05-02",
   "kaynak": "Google Sheets",
   "portfoyler": {
     "ozkan": {
       "hisseler": [
-        {
-          "kod": "INFO",
-          "adet": 24503,
-          "maliyet": 3.87
-        },
-        {
-          "kod": "LIDFA",
-          "adet": 40688,
-          "maliyet": 2.56
-        },
-        {
-          "kod": "ENDAE",
-          "adet": 4144,
-          "maliyet": 16.89
-        },
-        {
-          "kod": "GWIND",
-          "adet": 6282,
-          "maliyet": 24.78
-        },
-        {
-          "kod": "TRGYO",
-          "adet": 2562,
-          "maliyet": 71.76
-        },
-        {
-          "kod": "SAHOL",
-          "adet": 1005,
-          "maliyet": 89.4
-        }
+        {"kod": "ALVES", "adet": 44413, "maliyet": 3.31},
+        {"kod": "ENDAE", "adet": 6244, "maliyet": 16.557},
+        {"kod": "GWIND", "adet": 6282, "maliyet": 24.781},
+        {"kod": "LIDFA", "adet": 40688, "maliyet": 2.564},
+        {"kod": "TRGYO", "adet": 2562, "maliyet": 71.755}
       ],
       "fonlar": [
-        {
-          "kod": "ZBJ",
-          "adet": 95876,
-          "maliyet": 1.85
-        },
-        {
-          "kod": "HBF",
-          "adet": 4515,
-          "maliyet": 29.315282
-        },
-        {
-          "kod": "TFF",
-          "adet": 4855,
-          "maliyet": 25.0624
-        },
-        {
-          "kod": "NAU",
-          "adet": 12121,
-          "maliyet": 1.954833
-        },
-        {
-          "kod": "MPP",
-          "adet": 26014,
-          "maliyet": 18.10502
-        }
+        {"kod": "ZBJ", "adet": 84423, "maliyet": 2.22},
+        {"kod": "HBF", "adet": 4515, "maliyet": 29.8066},
+        {"kod": "TFF", "adet": 4855, "maliyet": 26.76218258},
+        {"kod": "NAU", "adet": 12121, "maliyet": 1.954833},
+        {"kod": "MPP", "adet": 26014, "maliyet": 18.1055}
+      ],
+      "emeklilik": [
+        {"kod": "HES", "adet": 1334608},
+        {"kod": "AJR", "adet": 3311512}
       ],
       "kripto": [
-        {
-          "kod": "BTC",
-          "adet": 0.065751,
-          "maliyet_tl": 3631243
-        }
+        {"kod": "BTC", "adet": 0.065751, "maliyet_tl": 3631243}
       ]
     },
     "derya": {
       "hisseler": [
-        {
-          "kod": "TRGYO",
-          "adet": 1959,
-          "maliyet": 79.27
-        },
-        {
-          "kod": "GWIND",
-          "adet": 5404,
-          "maliyet": 25.9
-        },
-        {
-          "kod": "LIDFA",
-          "adet": 29411,
-          "maliyet": 3.4
-        },
-        {
-          "kod": "INFO",
-          "adet": 21406,
-          "maliyet": 3.758
-        },
-        {
-          "kod": "SAHOL",
-          "adet": 744,
-          "maliyet": 99.228
-        }
+        {"kod": "TRGYO", "adet": 1959, "maliyet": 79.27},
+        {"kod": "GWIND", "adet": 5404, "maliyet": 25.9},
+        {"kod": "LIDFA", "adet": 29411, "maliyet": 3.4},
+        {"kod": "ENDAE", "adet": 4590, "maliyet": 15.99},
+        {"kod": "ALVES", "adet": 22144, "maliyet": 3.31}
       ],
       "fonlar": [],
+      "emeklilik": [
+        {"kod": "HES", "adet": 686312},
+        {"kod": "FFC", "adet": 7299919}
+      ],
       "kripto": []
     }
   }

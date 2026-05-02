@@ -1,37 +1,32 @@
 {
-  "son_guncelleme": "2026-05-01T16:38:20+03:00",
+  "son_guncelleme": "2026-05-02T12:30:00+03:00",
   "kaynak": "Fintables MCP + Google Sheets",
   "aciklama": "Bu dosyayı Cowork her akşam otomatik günceller. Manuel düzenlemeyin.",
   "hisseler": {
-    "INFO": {
-      "guncel": 3.43,
-      "gunluk_getiri": -2.0,
-      "yilbasi": 3.74
-    },
-    "LIDFA": {
-      "guncel": 3.32,
-      "gunluk_getiri": -0.3,
-      "yilbasi": 2.34
+    "ALVES": {
+      "guncel": 3.26,
+      "onceki": 3.28,
+      "yilbasi": 2.65
     },
     "ENDAE": {
       "guncel": 15.68,
-      "gunluk_getiri": -2.0,
+      "onceki": 16.0,
       "yilbasi": 14.41
     },
     "GWIND": {
       "guncel": 30.2,
-      "gunluk_getiri": -4.85,
+      "onceki": 31.74,
       "yilbasi": 23.06
+    },
+    "LIDFA": {
+      "guncel": 3.32,
+      "onceki": 3.33,
+      "yilbasi": 2.34
     },
     "TRGYO": {
       "guncel": 98.0,
-      "gunluk_getiri": 1.4,
+      "onceki": 96.65,
       "yilbasi": 74.15
-    },
-    "SAHOL": {
-      "guncel": 95.65,
-      "gunluk_getiri": -0.52,
-      "yilbasi": 86.51
     }
   },
   "fonlar": {
@@ -59,6 +54,23 @@
       "guncel": 21.82804,
       "onceki": 21.994252,
       "yilbasi": 19.771575
+    }
+  },
+  "emeklilik": {
+    "HES": {
+      "guncel": 0.761676,
+      "onceki": 0.764824,
+      "yilbasi": 0.639175
+    },
+    "AJR": {
+      "guncel": 0.373783,
+      "onceki": 0.375204,
+      "yilbasi": 0.318759
+    },
+    "FFC": {
+      "guncel": 0.091998,
+      "onceki": 0.0907,
+      "yilbasi": 0.074622
     }
   },
   "kripto": {
