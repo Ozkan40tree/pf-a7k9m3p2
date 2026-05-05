@@ -1,81 +1,81 @@
 {
-  "son_guncelleme": "2026-05-02T12:30:00+03:00",
+  "son_guncelleme": "2026-05-05T10:30:00+03:00",
   "kaynak": "Fintables MCP + Google Sheets",
   "aciklama": "Bu dosyayı Cowork her akşam otomatik günceller. Manuel düzenlemeyin.",
   "hisseler": {
     "ALVES": {
       "guncel": 3.26,
-      "onceki": 3.28,
+      "onceki": 3.25,
       "yilbasi": 2.65
     },
     "ENDAE": {
-      "guncel": 15.68,
-      "onceki": 16.0,
+      "guncel": 16.02,
+      "onceki": 15.7,
       "yilbasi": 14.41
     },
     "GWIND": {
-      "guncel": 30.2,
-      "onceki": 31.74,
+      "guncel": 29.64,
+      "onceki": 30.46,
       "yilbasi": 23.06
     },
     "LIDFA": {
-      "guncel": 3.32,
-      "onceki": 3.33,
+      "guncel": 3.41,
+      "onceki": 3.38,
       "yilbasi": 2.34
     },
     "TRGYO": {
-      "guncel": 98.0,
-      "onceki": 96.65,
+      "guncel": 98.9,
+      "onceki": 99.15,
       "yilbasi": 74.15
     }
   },
   "fonlar": {
     "ZBJ": {
-      "guncel": 4.58227,
-      "onceki": 4.577318,
+      "guncel": 4.600703,
+      "onceki": 4.58227,
       "yilbasi": 4.051789
     },
     "HBF": {
-      "guncel": 50.04015,
-      "onceki": 50.366121,
+      "guncel": 50.289573,
+      "onceki": 50.04015,
       "yilbasi": 46.654753
     },
     "TFF": {
-      "guncel": 35.555331,
-      "onceki": 35.4304,
+      "guncel": 35.575812,
+      "onceki": 35.555331,
       "yilbasi": 31.753607
     },
     "NAU": {
-      "guncel": 3.112043,
-      "onceki": 3.14604,
+      "guncel": 3.111099,
+      "onceki": 3.112043,
       "yilbasi": 2.929137
     },
     "MPP": {
-      "guncel": 21.82804,
-      "onceki": 21.994252,
+      "guncel": 21.778334,
+      "onceki": 21.82804,
       "yilbasi": 19.771575
     }
   },
   "emeklilik": {
     "HES": {
-      "guncel": 0.761676,
-      "onceki": 0.764824,
+      "guncel": 0.765862,
+      "onceki": 0.761676,
       "yilbasi": 0.639175
     },
     "AJR": {
-      "guncel": 0.373783,
-      "onceki": 0.375204,
+      "guncel": 0.376769,
+      "onceki": 0.373783,
       "yilbasi": 0.318759
     },
     "FFC": {
-      "guncel": 0.091998,
-      "onceki": 0.0907,
+      "guncel": 0.091103,
+      "onceki": 0.091998,
       "yilbasi": 0.074622
     }
   },
   "kripto": {
     "BTC": {
-      "guncel_tl": 3408416,
+      "guncel_tl": 3536372,
       "yilbasi_tl": 3950000
     }
   }
