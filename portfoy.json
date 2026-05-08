@@ -1,12 +1,11 @@
 {
-  "olusturma_tarihi": "2026-05-07",
+  "olusturma_tarihi": "2026-05-08",
   "kaynak": "Google Sheets",
   "portfoyler": {
     "ozkan": {
       "hisseler": [
-        {"kod": "ALVES", "adet": 44413, "maliyet": 3.31},
-        {"kod": "ENDAE", "adet": 6244, "maliyet": 16.557},
-        {"kod": "GWIND", "adet": 6282, "maliyet": 24.781},
+        {"kod": "ALVES", "adet": 82291, "maliyet": 3.31},
+        {"kod": "ENDAE", "adet": 15014, "maliyet": 16.28},
         {"kod": "LIDFA", "adet": 40688, "maliyet": 2.564},
         {"kod": "TRGYO", "adet": 2562, "maliyet": 71.755}
       ],
