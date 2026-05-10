@@ -1,0 +1,62 @@
+name: Benchmark Guncelleme
+
+on:
+  schedule:
+    # Her gun TR saati 19:00 (UTC 16:00) - kapanis sonrasi
+    - cron: '0 16 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      gecmis:
+        description: '5 yillik gecmisi tek seferlik cek (sadece ilk kurulumda)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+permissions:
+  contents: write
+
+jobs:
+  guncelle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Python kur
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Bagimliliklari yukle
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Benchmark guncelleme calistir
+        env:
+          GOOGLE_SHEETS_CREDENTIALS: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS }}
+          SHEETS_ID: ${{ secrets.SHEETS_ID }}
+        run: |
+          if [ "${{ inputs.gecmis }}" = "true" ]; then
+            python scripts/benchmark_fiyat.py --gecmis
+          else
+            python scripts/benchmark_fiyat.py
+          fi
+
+      - name: Degisiklikleri commit et
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add benchmark_gecmis.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Degisiklik yok, commit atlaniyor."
+          else
+            TZ='Europe/Istanbul' git commit -m "Benchmark guncelleme $(TZ='Europe/Istanbul' date '+%Y-%m-%d %H:%M')"
+            git push origin main
+          fi

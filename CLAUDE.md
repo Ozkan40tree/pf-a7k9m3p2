@@ -87,13 +87,38 @@ Yani şunlar hepsi aynı kabul edilir:
 | AltinFonu | TEFAS kodu | adet | zorunlu | tefas-crawler |
 | YurtdisiFonu | TEFAS kodu | adet | zorunlu | tefas-crawler |
 | Emeklilik | TEFAS BES kodu | adet | boş | tefas-crawler |
-| Altin | `24ayar` | gram | boş | TCMB / canlı altın |
+| Altin | `24ayar` | gram | boş | yfinance (`GC=F` × USDTRY ÷ 31.1035) |
 | Alacak | serbest etiket | TL tutar | boş | sabit (TL) |
 | Nakit | `TL`/`USD`/`EUR` | birim sayısı | boş | yfinance kuru |
 | Kripto | `BTC` vb. | adet | TL maliyet | Yahoo Finance × USDTRY |
 
 **Maliyet boşsa:** kazanç yüzdesi hesaplanmaz, sadece güncel TL değer ve
 zaman içindeki TL değişim gösterilir.
+
+### 2.4 Sayı formatı
+
+Sheets'ten gelen sayılar şu kuralla parse edilir:
+
+- `37,86` → 37.86 (Türkçe ondalık)
+- `37.86` → 37.86 (İngilizce ondalık)
+- `1.234,56` → 1234.56 (Türkçe binlik + ondalık)
+- `1,234.56` → 1234.56 (İngilizce binlik + ondalık)
+
+Yani sen virgül de yazsan nokta da yazsan sistem doğru parse eder.
+
+### 2.5 Sheets sekme güvenliği
+
+Service account (`sheets-reader@portfoy-dashboard-ozkan.iam.gserviceaccount.com`)
+tüm dosyaya erişim hakkına sahip (Sheets'in paylaşım modeli sekme bazlı değil).
+
+**Ama Python script'leri şu sekmeleri SADECE okur:**
+- `Ozkan_Portfoy`
+- `Derya_Portfoy`
+- `TUFE`
+
+Başka sekmeler (analiz, vs.) script tarafından okunmaz. Bu kural
+`scripts/fiyat_guncelle.py` içindeki `SEKMELER` listesi ile
+sabitlenmiştir.
 
 ### 2.3 Tip-bazlı kategori grupları (dashboard ve benchmark için)
 
@@ -117,6 +142,8 @@ Repodaki canlı dosyalar:
 - `benchmark_gecmis.json` — BIST100, S&P500 (TL), Gram Altın, YAE, TÜFE
   serileri. 5 yıl geriye tek seferlik çekilir, sonra her gün son güne
   ekleme yapılır.
+- `yilbasi_fiyatlari.json` — Her yıl ilk fiyat çekiminde yılbaşı fiyatı
+  olarak kaydedilir, bir daha üzerine yazılmaz. YTD getiri hesabı için.
 
 **Tatil/hafta sonu kuralı:** Kapanış görevi cron olarak Pzt-Cum çalışır.
 Tatil günleri için akıllı kontrol: "Bugün tarihte kayıt var mı?" → varsa
@@ -130,7 +157,7 @@ atla.
 |---|---|---|
 | BIST100 | Hisse karşılaştırması | yfinance (`XU100.IS`) |
 | S&P500 (TL) | Yurtdışı hisse karşılaştırması | yfinance × USDTRY |
-| Gram Altın | Altın varlıkların karşılaştırması | TCMB / canlı altın |
+| Gram Altın | Altın varlıkların karşılaştırması | yfinance (`GC=F` × USDTRY) |
 | YAE fonu | Faiz / para piyasası karşılaştırması (ZBJ için) | tefas-crawler |
 | TÜFE | Reel getiri (1 ay+ kıyaslamalar) | TÜİK; yoksa MB PKA |
 
@@ -263,7 +290,65 @@ portföy çizgisi milat tarihinden itibaren çıkar.
 
 ---
 
-## 7. ACİL DURUM — LOCK BUG (referans)
+## 7. OTOMASYON ALTYAPISI
+
+### 7.1 Repo dosya yapısı
+
+```
+pf-a7k9m3p2/
+├── CLAUDE.md                        Bu dosya
+├── index.html                        Frontend
+├── prices.json                       Anlık fiyatlar
+├── portfoy.json                      Hesaplanmış TL değerler
+├── gecmis.json                       Günlük kapanış snapshot'ları
+├── benchmark_gecmis.json             Benchmark zaman serileri
+├── yilbasi_fiyatlari.json            YTD hesabı için
+├── robots.txt
+├── requirements.txt                  Python kütüphaneleri
+├── .gitignore                        Hassas dosya filtreleri
+├── scripts/
+│   ├── fiyat_guncelle.py             Ana fiyat scripti
+│   └── benchmark_fiyat.py            Benchmark scripti
+└── .github/
+    └── workflows/
+        ├── portfoy-guncelle.yml      4 zamanlı cron
+        └── benchmark-guncelle.yml    Günlük benchmark cron
+```
+
+### 7.2 Cron tetikleyiciler
+
+**portfoy-guncelle.yml** (Pzt-Cum):
+- 10:30 TR (intraday)
+- 12:30 TR (intraday)
+- 14:30 TR (intraday)
+- 18:35 TR (kapanış — `--kapanis` parametresi ile, gecmis.json'a yazar)
+
+**benchmark-guncelle.yml** (Pzt-Cum):
+- 19:00 TR (kapanış sonrası — benchmark_gecmis.json'a son günü ekler)
+
+### 7.3 Manuel çalıştırma
+
+GitHub Actions sayfasından `workflow_dispatch` ile manuel tetiklenir:
+- `Run workflow` → `Branch: main` → `Run workflow`
+- Ana workflow için: `kapanis` parametresi `true` yapılırsa gecmis.json'a yazar
+- Benchmark için: `gecmis` parametresi `true` yapılırsa 5 yıllık veriyi sıfırdan çeker
+
+### 7.4 GitHub Secrets (zorunlu)
+
+- `GOOGLE_SHEETS_CREDENTIALS` — Service account JSON içeriği
+- `SHEETS_ID` — Google Sheets dosya ID'si
+
+### 7.5 Veri akışı
+
+```
+Sheets okuma → fiyat çekme (yfinance + tefas-crawler)
+            → JSON yazma (prices, portfoy, gecmis)
+            → git commit + push (github-actions[bot] ile)
+```
+
+---
+
+## 8. ACİL DURUM — LOCK BUG (referans)
 
 GitHub Actions geçişi öncesi Cowork'te `.git/index.lock` sürpriz sorunu
 için manuel çözüm:
@@ -280,7 +365,7 @@ silinir, bu bölüm dosyadan çıkarılır.
 
 ---
 
-## 8. GÜVENLİK NOTU
+## 9. GÜVENLİK NOTU
 
 - Repo public (GitHub Pages için).
 - Site şifresi sadece HTML içinde basit koruma; hassas veri JSON'larda.

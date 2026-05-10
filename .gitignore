@@ -1,0 +1,26 @@
+# Hassas dosyalar - asla commit edilmez
+*.json.key
+service-account*.json
+portfoy-dashboard-ozkan-*.json
+credentials*.json
+.env
+.env.*
+notes_local.md
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Loglar
+*.log
