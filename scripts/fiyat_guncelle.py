@@ -22,6 +22,7 @@ import json
 import os
 import sys
 import time
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
@@ -318,16 +319,112 @@ def yfinance_fiyat(sembol, retries=3):
     return None
 
 
+def tcmb_kur_yedek():
+    """
+    TCMB resmi XML'den USD ve EUR kurunu cek (anlik, gun ici tek nokta).
+    URL: https://www.tcmb.gov.tr/kurlar/today.xml
+    Cikti: {"usd_try": kur, "eur_try": kur} veya None
+    Kullanilan deger: ForexSelling (Doviz Satis) - yfinance'a en yakin.
+    Not: TCMB sadece bugunku kuru verir, "onceki gun" kavrami yok.
+    """
+    try:
+        url = "https://www.tcmb.gov.tr/kurlar/today.xml"
+        r = requests.get(url, timeout=15)
+        r.raise_for_status()
+        root = ET.fromstring(r.content)
+        sonuc = {}
+        for currency in root.findall("Currency"):
+            kod = currency.get("CurrencyCode")
+            forex_sell = currency.find("ForexSelling")
+            if forex_sell is None or not forex_sell.text:
+                continue
+            try:
+                kur = float(forex_sell.text.strip())
+            except ValueError:
+                continue
+            if kod == "USD":
+                sonuc["usd_try"] = kur
+            elif kod == "EUR":
+                sonuc["eur_try"] = kur
+        if sonuc:
+            log(f"TCMB yedek basarili: {sonuc}")
+            return sonuc
+        log("TCMB yedek: XML'de USD/EUR bulunamadi.", "WARN")
+        return None
+    except Exception as e:
+        log(f"TCMB yedek hata: {e}", "WARN")
+        return None
+
+
+def coingecko_btc_yedek():
+    """
+    CoinGecko'dan BTC TRY fiyati ve 24 saatlik degisim cek.
+    URL: https://api.coingecko.com/api/v3/simple/price
+    Cikti: {"guncel": btc_tl, "onceki": btc_tl_dunku} veya None
+    24h degisim oranindan onceki deger hesaplanir:
+        onceki = guncel / (1 + change_24h/100)
+    """
+    try:
+        url = (
+            "https://api.coingecko.com/api/v3/simple/price"
+            "?ids=bitcoin&vs_currencies=try"
+            "&include_24hr_change=true"
+        )
+        r = requests.get(url, timeout=15)
+        r.raise_for_status()
+        data = r.json()
+        btc = data.get("bitcoin", {})
+        guncel = btc.get("try")
+        change_24h = btc.get("try_24h_change")
+        if guncel is None:
+            log("CoinGecko yedek: 'try' fiyati bulunamadi.", "WARN")
+            return None
+        guncel = float(guncel)
+        if change_24h is not None:
+            try:
+                onceki = guncel / (1.0 + float(change_24h) / 100.0)
+            except (ValueError, ZeroDivisionError):
+                onceki = guncel
+        else:
+            onceki = guncel
+        log(f"CoinGecko yedek basarili: BTC={guncel:,.0f} TL")
+        return {"guncel": guncel, "onceki": onceki}
+    except Exception as e:
+        log(f"CoinGecko yedek hata: {e}", "WARN")
+        return None
+
+
 def kur_cek():
-    """USDTRY ve EURTRY kurlarini cek."""
+    """
+    USDTRY ve EURTRY - birincil yfinance, yedek TCMB.
+    Donus: {"usd_try": {"guncel":x, "onceki":y, "kaynak":"yfinance|tcmb"}, ...}
+    Tamamen basarisizsa o anahtar None olur.
+    """
     sonuc = {}
+
+    # Birincil: yfinance
     for sembol, anahtar in [("USDTRY=X", "usd_try"), ("EURTRY=X", "eur_try")]:
         veri = yfinance_fiyat(sembol)
         if veri:
-            sonuc[anahtar] = veri
+            sonuc[anahtar] = {**veri, "kaynak": "yfinance"}
         else:
-            log(f"HATA: {anahtar} kuru cekilemedi.", "ERROR")
             sonuc[anahtar] = None
+
+    # Birincil basarisizsa yedek: TCMB
+    if not sonuc.get("usd_try") or not sonuc.get("eur_try"):
+        log("Kur birincil kaynak basarisiz (en az biri), TCMB yedegine donuluyor.", "WARN")
+        tcmb = tcmb_kur_yedek()
+        if tcmb:
+            for k, v in tcmb.items():
+                if not sonuc.get(k):
+                    # TCMB anlik kur veriyor, onceki=guncel olarak kullanilir
+                    sonuc[k] = {"guncel": v, "onceki": v, "kaynak": "tcmb"}
+
+    if not sonuc.get("usd_try"):
+        log("HATA: usd_try kuru hicbir kaynaktan alinamadi.", "ERROR")
+    if not sonuc.get("eur_try"):
+        log("HATA: eur_try kuru hicbir kaynaktan alinamadi.", "ERROR")
+
     return sonuc
 
 
@@ -353,16 +450,28 @@ def bist_hisse_cek(kod):
 
 
 def btc_tl_cek(usd_try_guncel, usd_try_onceki):
-    """Bitcoin TL fiyati: BTC-USD * USDTRY"""
-    if not usd_try_guncel:
-        return None
-    btc_usd = yfinance_fiyat("BTC-USD")
-    if not btc_usd:
-        return None
-    return {
-        "guncel": btc_usd["guncel"] * usd_try_guncel,
-        "onceki": btc_usd["onceki"] * usd_try_onceki,
-    }
+    """
+    Bitcoin TL fiyati - birincil yfinance (BTC-USD * USDTRY), yedek CoinGecko.
+    Donus: {"guncel":x, "onceki":y, "kaynak":"yfinance|coingecko"} veya None.
+    """
+    # Birincil: yfinance BTC-USD * USDTRY
+    if usd_try_guncel:
+        btc_usd = yfinance_fiyat("BTC-USD")
+        if btc_usd:
+            return {
+                "guncel": btc_usd["guncel"] * usd_try_guncel,
+                "onceki": btc_usd["onceki"] * usd_try_onceki,
+                "kaynak": "yfinance",
+            }
+
+    # Yedek: CoinGecko
+    log("BTC birincil kaynak basarisiz, CoinGecko yedegine donuluyor.", "WARN")
+    cg = coingecko_btc_yedek()
+    if cg:
+        return {**cg, "kaynak": "coingecko"}
+
+    log("HATA: BTC fiyati hicbir kaynaktan alinamadi.", "ERROR")
+    return None
 
 
 def tefas_fiyat_toplu(kodlar):
@@ -467,12 +576,27 @@ def prices_json_olustur(hisseler, tefas_fiyatlari, kripto, gram_altin, kurlar, y
             "yilbasi": yb.get(kod),
         }
 
+    # Kaynak durumu - yedek mantigi izi
+    usd = kurlar.get("usd_try") or {}
+    btc = kripto.get("BTC") or {}
+    kaynak_durumu = {
+        "kur_kaynak": usd.get("kaynak", "yok"),
+        "btc_kaynak": btc.get("kaynak", "yok") if btc else "yok",
+    }
+
+    # Kurlardan "kaynak" alanini cikar (frontend icin temiz JSON)
+    def _temiz_kur(k):
+        if not k:
+            return None
+        return {"guncel": k.get("guncel"), "onceki": k.get("onceki")}
+
     return {
         "son_guncelleme": datetime.now(TR_TZ).isoformat(timespec="seconds"),
-        "kaynak": "yfinance + tefas-crawler",
+        "kaynak": "yfinance + tefas-crawler (yedek: TCMB, CoinGecko)",
+        "kaynak_durumu": kaynak_durumu,
         "kurlar": {
-            "usd_try": kurlar.get("usd_try"),
-            "eur_try": kurlar.get("eur_try"),
+            "usd_try": _temiz_kur(kurlar.get("usd_try")),
+            "eur_try": _temiz_kur(kurlar.get("eur_try")),
         },
         "gram_altin_tl": gram_altin,
         "hisseler": {k: _fiyat_with_yilbasi(k, v) for k, v in hisseler.items()},
@@ -712,11 +836,12 @@ def main():
 
     kripto = {}
     if kripto_kodlari:
-        if "BTC" in kripto_kodlari and usd_g:
+        if "BTC" in kripto_kodlari:
+            # USD kuru olmasa bile CoinGecko yedegi TRY direkt verir, geciyoruz
             btc = btc_tl_cek(usd_g, usd_o)
             if btc:
                 kripto["BTC"] = btc
-                log(f"  BTC: {btc['guncel']:,.0f} TL")
+                log(f"  BTC: {btc['guncel']:,.0f} TL [{btc.get('kaynak', '?')}]")
 
     gram_altin = None
     if altin_var or True:  # her zaman cek - benchmark icin de lazim

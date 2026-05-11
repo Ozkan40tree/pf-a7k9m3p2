@@ -348,7 +348,67 @@ Sheets okuma → fiyat çekme (yfinance + tefas-crawler)
 
 ---
 
-## 8. ACİL DURUM — LOCK BUG (referans)
+## 8. YEDEKLEME STRATEJİSİ
+
+Birincil veri kaynakları (yfinance, tefas-crawler) düştüğünde script'in
+çakılmaması ve dashboard'un mümkün olduğunca canlı kalması için katmanlı
+yedek mantığı kuruldu (10 Mayıs 2026, Seçenek C).
+
+### 8.1 Katmanlı yedek tablosu
+
+| Veri | Birincil | Yedek | Yedek tipi |
+|---|---|---|---|
+| USD/TRY ve EUR/TRY | yfinance `=X` | **TCMB resmi XML** | Anlık (tek nokta) |
+| Bitcoin TL | yfinance `BTC-USD × USDTRY` | **CoinGecko API** | TRY direkt + 24h değişim |
+| BIST hisse | yfinance `.IS` | yok | — |
+| TEFAS fon/emeklilik | tefas-crawler | yok | — |
+| Gram altın | yfinance `GC=F × USDTRY ÷ 31.1035` | yok (USD kuru yedeğine bağımlı) | — |
+
+> **Not:** Hisse, TEFAS ve gram altın için ayrı yedek kurulmadı. Test
+> edilmiş kaynaklar (scraping siteleri) kırılgan olduğu için v2'ye
+> bırakıldı. Hisse veya TEFAS verisi gelmezse o satır `fiyat_eksik: true`
+> ile işaretlenir, dashboard "—" gösterir.
+
+### 8.2 Hata durumunda davranış
+
+- **Birincil çalıştı:** Normal akış, `prices.json.kaynak_durumu`
+  içinde `kur_kaynak: "yfinance"` ve `btc_kaynak: "yfinance"`.
+- **Birincil çöktü, yedek çalıştı:** Akış devam eder,
+  `kaynak_durumu` içinde `"tcmb"` veya `"coingecko"` yazar. Frontend
+  ileride bu alana bakıp uyarı gösterebilir ("Şu an TCMB resmi kurundan
+  geliyor").
+- **Birincil + yedek ikisi de çöktü:** İlgili alan `null` döner, satır
+  `fiyat_eksik: true` ile işaretlenir. **Script çakılmaz**, diğer
+  veriler normal akışla yazılır.
+
+### 8.3 TCMB sınırlamaları
+
+TCMB `today.xml` sadece **bugünkü** kuru verir, tarihsel seri vermez.
+Bu yüzden:
+- `fiyat_guncelle.py`'de TCMB tam yedek olarak çalışır (anlık fiyat
+  yeterli, `onceki = guncel` kabul edilir, günlük yüzde değişim sıfır
+  görünür ama dashboard kopmaz).
+- `benchmark_fiyat.py`'de TCMB **sınırlı yedek**: sadece bugünün tek
+  noktasını seriye ekler. Ertesi gün yfinance düzelirse 10 günlük
+  pencere kendini onarır.
+
+### 8.4 CoinGecko detayları
+
+CoinGecko ücretsiz public API, rate limit ~30 req/dakika. Script
+maksimum 4 cron × 1 BTC sorgusu = günde 4 istek yapar, limit içinde
+fazlasıyla. `try_24h_change` alanından önceki gün hesaplanır:
+`onceki = guncel / (1 + change_24h / 100)`.
+
+### 8.5 Manuel müdahale
+
+Hata mesajları log'a yazılır (`[WARN]` veya `[ERROR]` prefix). Kullanıcı
+GitHub Actions log'unu Claude'a gösterirse Claude alternatif önerebilir
+(ek scraping yedek, kaynak değişikliği, vb.). v2'de `altinkaynak.com`,
+`bigpara`, `mynet` scraping yedekleri eklenebilir.
+
+---
+
+## 9. ACİL DURUM — LOCK BUG (referans)
 
 GitHub Actions geçişi öncesi Cowork'te `.git/index.lock` sürpriz sorunu
 için manuel çözüm:
@@ -365,7 +425,7 @@ silinir, bu bölüm dosyadan çıkarılır.
 
 ---
 
-## 9. GÜVENLİK NOTU
+## 10. GÜVENLİK NOTU
 
 - Repo public (GitHub Pages için).
 - Site şifresi sadece HTML içinde basit koruma; hassas veri JSON'larda.

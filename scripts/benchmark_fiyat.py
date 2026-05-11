@@ -22,11 +22,13 @@ import json
 import os
 import sys
 import time
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 import gspread
 import pandas as pd
+import requests
 import yfinance as yf
 from google.oauth2.service_account import Credentials
 
@@ -69,8 +71,50 @@ def bist100_seri(baslangic, bitis):
     return yfinance_seri("XU100.IS", baslangic, bitis)
 
 
+def tcmb_usd_anlik():
+    """
+    TCMB resmi XML'den anlik USD kurunu cek (sadece bugun, tek nokta).
+    Benchmark scripti normalde tarihsel seri ister; TCMB sadece bugunu verir.
+    Bu fonksiyon, yfinance USDTRY=X tamamen dustugunde, en azindan
+    bugunku benchmark cizgisinin kopmamasi icin kullanilir.
+    URL: https://www.tcmb.gov.tr/kurlar/today.xml
+    Donus: float kur veya None
+    """
+    try:
+        url = "https://www.tcmb.gov.tr/kurlar/today.xml"
+        r = requests.get(url, timeout=15)
+        r.raise_for_status()
+        root = ET.fromstring(r.content)
+        for currency in root.findall("Currency"):
+            if currency.get("CurrencyCode") == "USD":
+                forex_sell = currency.find("ForexSelling")
+                if forex_sell is not None and forex_sell.text:
+                    try:
+                        return float(forex_sell.text.strip())
+                    except ValueError:
+                        return None
+        return None
+    except Exception as e:
+        log(f"TCMB USD anlik yedek hata: {e}", "WARN")
+        return None
+
+
 def usd_try_seri(baslangic, bitis):
-    return yfinance_seri("USDTRY=X", baslangic, bitis)
+    """
+    USDTRY tarihsel seri - birincil yfinance, yedek TCMB (sinirli).
+    yfinance bos donerse, TCMB'den bugunun kurunu tek nokta olarak ekler.
+    Bu sayede sp500_tl ve gram_altin'in bugunku noktasi hesaplanabilir.
+    """
+    seri = yfinance_seri("USDTRY=X", baslangic, bitis)
+    if seri:
+        return seri
+    log("USDTRY seri bos, TCMB anlik yedegine donuluyor (sadece bugun).", "WARN")
+    tcmb_kur = tcmb_usd_anlik()
+    if tcmb_kur is None:
+        return {}
+    bugun_str = datetime.now(TR_TZ).strftime("%Y-%m-%d")
+    log(f"TCMB yedek: {bugun_str} -> {tcmb_kur:.4f}")
+    return {bugun_str: tcmb_kur}
 
 
 def sp500_tl_seri(baslangic, bitis):
