@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-05-12T13:04:30+03:00",
+  "olusturma_tarihi": "2026-05-12T14:30:28+03:00",
   "milat": "2026-05-21",
   "portfoyler": {
     "ozkan": [
@@ -62,11 +62,11 @@
         "kod_orjinal": "ZBJ",
         "adet": 84423.0,
         "maliyet": 2.22,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 391905.49579500005,
+        "onceki_tl": 391533.696903,
+        "gunluk_kazanc_tl": 371.7988920000498,
+        "gunluk_yuzde": 0.09495961521088711,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "AltinFonu",
@@ -75,11 +75,11 @@
         "kod_orjinal": "HBF",
         "adet": 4515.0,
         "maliyet": 29.8066,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 233229.25101,
+        "onceki_tl": 234348.65495999999,
+        "gunluk_kazanc_tl": -1119.403949999978,
+        "gunluk_yuzde": -0.4776660442924431,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "YurtdisiFonu",
@@ -88,11 +88,11 @@
         "kod_orjinal": "TFF",
         "adet": 4855.0,
         "maliyet": 26.76218258,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 191284.412285,
+        "onceki_tl": 187386.64350500001,
+        "gunluk_kazanc_tl": 3897.768779999984,
+        "gunluk_yuzde": 2.0800675582280657,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "AltinFonu",
@@ -101,11 +101,11 @@
         "kod_orjinal": "NAU",
         "adet": 12121.0,
         "maliyet": 1.954833,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 38711.055878,
+        "onceki_tl": 39147.266426,
+        "gunluk_kazanc_tl": -436.21054800000275,
+        "gunluk_yuzde": -1.1142809902820945,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "YurtdisiFonu",
@@ -114,11 +114,11 @@
         "kod_orjinal": "MPP",
         "adet": 26014.0,
         "maliyet": 18.1055,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 594338.08597,
+        "onceki_tl": 589802.779196,
+        "gunluk_kazanc_tl": 4535.306774000055,
+        "gunluk_yuzde": 0.7689531033038601,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "Emeklilik",
@@ -140,11 +140,11 @@
         "kod_orjinal": "AJR",
         "adet": 3311512.0,
         "maliyet": null,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 1306610.0437919998,
+        "onceki_tl": 1294874.0452639998,
+        "gunluk_kazanc_tl": 11735.998527999967,
+        "gunluk_yuzde": 0.9063428656188119,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "Kripto",
@@ -153,10 +153,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 241097.87083200002,
-        "onceki_tl": 241523.0255354348,
-        "gunluk_kazanc_tl": -425.15470343478955,
-        "gunluk_yuzde": -0.17603071280357632,
+        "guncel_tl": 240583.237755,
+        "onceki_tl": 241999.78145974243,
+        "gunluk_kazanc_tl": -1416.5437047424202,
+        "gunluk_yuzde": -0.5853491669280981,
         "fiyat_eksik": false
       },
       {
@@ -246,11 +246,11 @@
         "kod_orjinal": "FFC",
         "adet": 7299919.0,
         "maliyet": null,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 741759.369428,
+        "onceki_tl": 725991.544388,
+        "gunluk_kazanc_tl": 15767.825039999909,
+        "gunluk_yuzde": 2.1719020230865014,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "Altin",
