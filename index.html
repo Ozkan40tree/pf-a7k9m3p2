@@ -255,89 +255,79 @@ async function loadData() {
   }
 }
 
-function enrichHisse(holdings, prices) {
-  return holdings.map(h => {
-    const p = prices[h.kod] || {};
-    const guncel = p.guncel ?? h.maliyet;
-    const tm = h.adet * h.maliyet;
-    const tg = h.adet * guncel;
-    const gunlukP = p.gunluk_getiri ?? 0;
-    const oncekiFiyat = guncel / (1 + gunlukP/100);
-    const gunlukKZ = h.adet * (guncel - oncekiFiyat);
-    return {
-      ...h, guncel, tm, tg,
-      kz: tg - tm,
-      kzp: ((guncel - h.maliyet) / h.maliyet) * 100,
-      gunlukP, gunlukKZ,
-      ybb: p.yilbasi ? ((guncel - p.yilbasi) / p.yilbasi) * 100 : 0
-    };
-  });
-}
-
-function enrichFon(holdings, prices) {
-  return holdings.map(f => {
-    const p = prices[f.kod] || {};
-    const guncel = p.guncel ?? f.maliyet;
-    const onceki = p.onceki ?? guncel;
-    const tm = f.adet * f.maliyet;
-    const tg = f.adet * guncel;
-    const gunlukP = onceki ? ((guncel - onceki) / onceki) * 100 : 0;
-    const gunlukKZ = f.adet * (guncel - onceki);
-    return {
-      ...f, guncel, tm, tg,
-      kz: tg - tm,
-      kzp: ((guncel - f.maliyet) / f.maliyet) * 100,
-      gunlukP, gunlukKZ,
-      ybb: p.yilbasi ? ((guncel - p.yilbasi) / p.yilbasi) * 100 : 0
-    };
-  });
-}
-
-function enrichKripto(holdings, prices) {
-  return holdings.map(c => {
-    const p = prices[c.kod] || {};
-    const guncel_tl = p.guncel_tl ?? c.maliyet_tl;
-    const tm = c.adet * c.maliyet_tl;
-    const tg = c.adet * guncel_tl;
-    return {
-      ...c, guncel_tl, tm, tg,
-      kz: tg - tm,
-      kzp: ((guncel_tl - c.maliyet_tl) / c.maliyet_tl) * 100,
-      ybb: p.yilbasi_tl ? ((guncel_tl - p.yilbasi_tl) / p.yilbasi_tl) * 100 : 0,
-      gunlukKZ: 0
-    };
-  });
-}
-
-const sum = (arr, f) => arr.reduce((s, x) => s + x[f], 0);
+// ═══════════════════════════════════════════════
+// YARDIMCI FONKSIYONLAR
+// ═══════════════════════════════════════════════
+const sum = (arr, f) => arr.reduce((s, x) => s + (x[f] || 0), 0);
 
 function weightBar(pct) {
   return `<span class="weight-bar"><span class="weight-bar-fill" style="width:${Math.min(pct,100)}%"></span></span>${pct.toFixed(1)}%`;
 }
 
 // ═══════════════════════════════════════════════
-// RENDER
+// VERI DONUSUMU - portfoy.json yapisi:
+// data.portfoyler.ozkan = [ {tip, kod, adet, maliyet, guncel_tl, onceki_tl,
+//                            gunluk_kazanc_tl, gunluk_yuzde, fiyat_eksik}, ... ]
+// Tipler: hisse | fon | altinfonu | yurtdisifonu | emeklilik | kripto | alacak
+// Hesaplar backend'de yapilmis, frontend sadece okur ve gosterir.
 // ═══════════════════════════════════════════════
-function renderPortfoy(name, data, prices) {
-  const hisseler = enrichHisse(data.hisseler || [], prices.hisseler || {});
-  const fonlar = enrichFon(data.fonlar || [], prices.fonlar || {});
-  const kripto = enrichKripto(data.kripto || [], prices.kripto || {});
 
-  const hisseTop = sum(hisseler, 'tg');
-  const fonTop = sum(fonlar, 'tg');
+// Item'i dashboard'in bekledigi alanlarla zenginlestir
+function enrichItem(it, prices) {
+  const adet = it.adet || 0;
+  const maliyet = it.maliyet || 0;
+  const tm = adet * maliyet;
+  const tg = it.guncel_tl ?? tm;
+  const onceki_tl = it.onceki_tl ?? tg;
+  // Hisse/fon icin birim guncel fiyat (alacak/kripto haric)
+  const guncel = adet > 0 ? tg / adet : maliyet;
+  const gunlukP = it.gunluk_yuzde ?? 0;
+  const gunlukKZ = it.gunluk_kazanc_tl ?? 0;
+  // Yil basi bilgisi prices.json'dan
+  const pricesKey = it.tip === 'kripto'
+    ? (prices.kripto || {})[it.kod] || {}
+    : (prices.hisseler || {})[it.kod] || (prices.fonlar_ve_emeklilik || {})[it.kod] || {};
+  const yilbasi = pricesKey.yilbasi ?? null;
+  const ybb = (yilbasi && yilbasi > 0) ? ((guncel - yilbasi) / yilbasi) * 100 : 0;
+  return {
+    ...it,
+    adet, maliyet,
+    guncel, tm, tg,
+    onceki_tl,
+    kz: tg - tm,
+    kzp: tm > 0 ? ((tg - tm) / tm) * 100 : 0,
+    gunlukP, gunlukKZ,
+    ybb,
+    guncel_tl: tg
+  };
+}
+
+function renderPortfoy(name, items, prices) {
+  // Items: tek liste, tipe gore ayir
+  const hisseler  = items.filter(x => x.tip === 'hisse').map(x => enrichItem(x, prices));
+  const fonlarRaw = items.filter(x =>
+    x.tip === 'fon' || x.tip === 'altinfonu' || x.tip === 'yurtdisifonu' || x.tip === 'emeklilik'
+  ).map(x => enrichItem(x, prices));
+  const kripto   = items.filter(x => x.tip === 'kripto').map(x => enrichItem(x, prices));
+  const alacak   = items.filter(x => x.tip === 'alacak').map(x => enrichItem(x, prices));
+
+  const hisseTop  = sum(hisseler, 'tg');
+  const fonTop    = sum(fonlarRaw, 'tg');
   const kriptoTop = sum(kripto, 'tg');
-  const toplam = hisseTop + fonTop + kriptoTop;
-  const maliyet = sum(hisseler,'tm') + sum(fonlar,'tm') + sum(kripto,'tm');
+  const alacakTop = sum(alacak, 'tg');
+  const toplam = hisseTop + fonTop + kriptoTop + alacakTop;
+
+  const maliyet = sum(hisseler,'tm') + sum(fonlarRaw,'tm') + sum(kripto,'tm') + sum(alacak,'tm');
   const kz = toplam - maliyet;
-  const kzp = (toplam/maliyet - 1) * 100;
-  const gunlukKZ = sum(hisseler, 'gunlukKZ') + sum(fonlar, 'gunlukKZ');
+  const kzp = maliyet > 0 ? (toplam/maliyet - 1) * 100 : 0;
+  const gunlukKZ = sum(hisseler, 'gunlukKZ') + sum(fonlarRaw, 'gunlukKZ') + sum(kripto, 'gunlukKZ');
   const gunlukP = (toplam - gunlukKZ) > 0 ? gunlukKZ / (toplam - gunlukKZ) * 100 : 0;
 
   const allDaily = [
     ...hisseler.map(h => ({k:h.kod, v:h.gunlukP})),
-    ...fonlar.map(f => ({k:f.kod, v:f.gunlukP}))
+    ...fonlarRaw.map(f => ({k:f.kod, v:f.gunlukP}))
   ];
-  const best = allDaily.length ? [...allDaily].sort((a,b) => b.v - a.v)[0] : null;
+  const best  = allDaily.length ? [...allDaily].sort((a,b) => b.v - a.v)[0] : null;
   const worst = allDaily.length ? [...allDaily].sort((a,b) => a.v - b.v)[0] : null;
 
   let html = `
@@ -363,8 +353,9 @@ function renderPortfoy(name, data, prices) {
   // Dağılım
   const distItems = [
     ...hisseler.map(h => ({l:h.kod, v:h.tg})),
-    ...fonlar.map(f => ({l:f.kod, v:f.tg})),
-    ...(kriptoTop > 0 ? [{l:'BTC', v:kriptoTop}] : [])
+    ...fonlarRaw.map(f => ({l:f.kod, v:f.tg})),
+    ...(kriptoTop > 0 ? kripto.map(c => ({l:c.kod, v:c.tg})) : []),
+    ...(alacakTop > 0 ? alacak.map(a => ({l:a.kod, v:a.tg})) : [])
   ];
   if (distItems.length > 0) {
     const distTotal = distItems.reduce((s,x) => s+x.v, 0);
@@ -380,7 +371,7 @@ function renderPortfoy(name, data, prices) {
     </div>`;
   }
 
-  // Hisseler
+  // Hisseler tablosu
   if (hisseler.length > 0) {
     html += `<div class="section">
       <h3>📈 Hisseler <span class="subtotal">₺${fmt(hisseTop)}</span></h3>
@@ -390,7 +381,7 @@ function renderPortfoy(name, data, prices) {
         <th>K/Z ₺</th><th>K/Z %</th><th>YBB</th>
       </tr></thead><tbody>`;
     hisseler.forEach(h => {
-      const w = (h.tg / hisseTop) * 100;
+      const w = hisseTop > 0 ? (h.tg / hisseTop) * 100 : 0;
       html += `<tr>
         <td>${h.kod}</td>
         <td>${fmt(h.adet)}</td>
@@ -406,7 +397,7 @@ function renderPortfoy(name, data, prices) {
       </tr>`;
     });
     const t_kz=sum(hisseler,'kz'), t_gk=sum(hisseler,'gunlukKZ');
-    const t_kzp = (hisseTop/sum(hisseler,'tm') - 1) * 100;
+    const t_kzp = sum(hisseler,'tm') > 0 ? (hisseTop/sum(hisseler,'tm') - 1) * 100 : 0;
     html += `</tbody><tfoot><tr>
       <td>TOPLAM</td><td colspan="3"></td><td>₺${fmt(hisseTop)}</td><td>100.0%</td>
       <td class="${tlClass(t_gk)}">${tlSign(t_gk)}${fmt(Math.abs(t_gk))}</td><td></td>
@@ -415,19 +406,21 @@ function renderPortfoy(name, data, prices) {
     </tr></tfoot></table></div></div>`;
   }
 
-  // Fonlar
-  if (fonlar.length > 0) {
+  // Fonlar tablosu (fon + altinfonu + yurtdisifonu + emeklilik)
+  if (fonlarRaw.length > 0) {
     html += `<div class="section">
-      <h3>🏦 Fonlar <span class="subtotal">₺${fmt(fonTop)}</span></h3>
+      <h3>🏦 Fonlar & Emeklilik <span class="subtotal">₺${fmt(fonTop)}</span></h3>
       <div style="overflow-x:auto"><table><thead><tr>
-        <th>Kod</th><th>Pay</th><th>Maliyet</th><th>Güncel</th><th>Toplam ₺</th>
+        <th>Kod</th><th>Tip</th><th>Pay</th><th>Maliyet</th><th>Güncel</th><th>Toplam ₺</th>
         <th>Ağırlık</th><th>Günlük ₺</th><th>Günlük %</th>
         <th>K/Z ₺</th><th>K/Z %</th><th>YBB</th>
       </tr></thead><tbody>`;
-    fonlar.forEach(f => {
-      const w = (f.tg / fonTop) * 100;
+    fonlarRaw.forEach(f => {
+      const w = fonTop > 0 ? (f.tg / fonTop) * 100 : 0;
+      const tipEt = f.tip_orjinal || f.tip;
       html += `<tr>
         <td>${f.kod}</td>
+        <td style="font-size:11px;color:#64748b">${tipEt}</td>
         <td>${fmt(f.adet)}</td>
         <td>${fmt4(f.maliyet)}</td>
         <td style="font-weight:600">${fmt4(f.guncel)}</td>
@@ -440,10 +433,10 @@ function renderPortfoy(name, data, prices) {
         <td>${badge(f.ybb)}</td>
       </tr>`;
     });
-    const t_kz=sum(fonlar,'kz'), t_gk=sum(fonlar,'gunlukKZ');
-    const t_kzp = (fonTop/sum(fonlar,'tm') - 1) * 100;
+    const t_kz=sum(fonlarRaw,'kz'), t_gk=sum(fonlarRaw,'gunlukKZ');
+    const t_kzp = sum(fonlarRaw,'tm') > 0 ? (fonTop/sum(fonlarRaw,'tm') - 1) * 100 : 0;
     html += `</tbody><tfoot><tr>
-      <td>TOPLAM</td><td colspan="3"></td><td>₺${fmt(fonTop)}</td><td>100.0%</td>
+      <td>TOPLAM</td><td colspan="4"></td><td>₺${fmt(fonTop)}</td><td>100.0%</td>
       <td class="${tlClass(t_gk)}">${tlSign(t_gk)}${fmt(Math.abs(t_gk))}</td><td></td>
       <td class="${tlClass(t_kz)}">${tlSign(t_kz)}${fmt(Math.abs(t_kz))}</td>
       <td>${badge(t_kzp)}</td><td></td>
@@ -453,12 +446,13 @@ function renderPortfoy(name, data, prices) {
   // Kripto
   if (kripto.length > 0) {
     const c = kripto[0];
+    const birimFiyat = c.adet > 0 ? c.tg / c.adet : c.maliyet;
     html += `<div class="section">
       <h3>₿ Kripto <span class="subtotal">₺${fmt(kriptoTop)}</span></h3>
       <div class="kripto-row">
         <div class="kleft">₿ ${c.kod}<br><small>${c.adet} ${c.kod}</small></div>
         <div class="kitems">
-          <div class="kitem"><div class="kl">Birim Fiyat</div><div class="kv">₺${fmt(c.guncel_tl)}</div></div>
+          <div class="kitem"><div class="kl">Birim Fiyat</div><div class="kv">₺${fmt(birimFiyat)}</div></div>
           <div class="kitem"><div class="kl">Maliyet</div><div class="kv">₺${fmt(c.tm)}</div></div>
           <div class="kitem"><div class="kl">Değer</div><div class="kv">₺${fmt(c.tg)}</div></div>
           <div class="kitem"><div class="kl">K/Z</div><div class="kv ${tlClass(c.kz)}">${tlSign(c.kz)}₺${fmt(Math.abs(c.kz))}</div></div>
@@ -468,8 +462,22 @@ function renderPortfoy(name, data, prices) {
     </div>`;
   }
 
+  // Alacak (varsa)
+  if (alacak.length > 0) {
+    html += `<div class="section">
+      <h3>💰 Alacak <span class="subtotal">₺${fmt(alacakTop)}</span></h3>
+      <div style="overflow-x:auto"><table><thead><tr>
+        <th>Kim</th><th>Tutar ₺</th>
+      </tr></thead><tbody>`;
+    alacak.forEach(a => {
+      html += `<tr><td>${a.kod}</td><td>${fmt(a.tg)}</td></tr>`;
+    });
+    html += `</tbody></table></div></div>`;
+  }
+
   return { html, toplam, maliyet, kz, gunlukKZ };
 }
+
 
 function render(portfoy, prices) {
   const portfoyler = portfoy.portfoyler || {};

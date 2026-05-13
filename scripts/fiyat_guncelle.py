@@ -372,24 +372,13 @@ def borsapy_kur(sembol):
         return None
 
 
-def borsapy_gram_altin():
-    """Gram altin TL: bp.Ticker('ALTIN'). Direkt gram altin verir, donusum gerekmez."""
-    if not BORSAPY_OK:
-        return None
-    try:
-        t = bp.Ticker("ALTIN")
-        hist = t.history(period="5d")
-        if hist.empty or len(hist) < 1:
-            return None
-        kapanis = hist["Close"].dropna().tolist()
-        if not kapanis:
-            return None
-        guncel = float(kapanis[-1])
-        onceki = float(kapanis[-2]) if len(kapanis) >= 2 else guncel
-        return {"guncel": guncel, "onceki": onceki}
-    except Exception as e:
-        log(f"borsapy gram altin hata: {e}", "WARN")
-        return None
+def borsapy_gram_altin_KULLANMA():
+    """
+    ARTIK KULLANILMIYOR - bp.Ticker('ALTIN') aslinda 'Darphane Altin Sertifikasi'
+    diye bir BIST urunu donduruyor (~80 TL), gram altin TL/gr (~6800) degil.
+    Tarihsel referans icin tutuldu, gram_altin_cek artik buna basvurmaz.
+    """
+    return None
 
 
 def borsapy_btc_tl():
@@ -556,20 +545,20 @@ def kur_cek():
 
 def gram_altin_cek(usd_try_guncel, usd_try_onceki):
     """
-    Gram altin TL - birincil borsapy (direkt), yedek yfinance GC=F.
+    Gram altin TL fiyati.
+    Yontem: yfinance GC=F (ons altin USD) × USDTRY ÷ 31.1035
+    Not: borsapy 'ALTIN' sembolu Darphane Altin Sertifikasi (~80 TL) verir,
+    gerçek gram altin (~6800 TL/gr) degil. Bu yuzden kullanmiyoruz.
     """
-    # Birincil: borsapy ALTIN
-    veri = borsapy_gram_altin()
-    if veri:
-        return {**veri, "kaynak": "borsapy"}
-
-    # Yedek: yfinance GC=F (ons altin USD) x USDTRY / 31.1035
-    log("Gram altin borsapy basarisiz, yfinance GC=F yedegine donuluyor.", "WARN")
     if not usd_try_guncel:
+        log("Gram altin: USD kuru yok, hesaplanamiyor.", "ERROR")
         return None
+
     altin_oz = yfinance_fiyat("GC=F")
     if not altin_oz:
+        log("Gram altin: yfinance GC=F bos, ons altin alinamadi.", "ERROR")
         return None
+
     OZ_TO_GRAM = 31.1035
     guncel = (altin_oz["guncel"] * usd_try_guncel) / OZ_TO_GRAM
     onceki = (altin_oz["onceki"] * usd_try_onceki) / OZ_TO_GRAM
