@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-05-13T16:36:37+03:00",
+  "olusturma_tarihi": "2026-05-13T18:46:33+03:00",
   "milat": "2026-05-21",
   "portfoyler": {
     "ozkan": [
@@ -10,11 +10,11 @@
         "kod_orjinal": "INFO",
         "adet": 100179.0,
         "maliyet": 3.9,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 382683.77999999997,
+        "onceki_tl": 397710.63,
+        "gunluk_kazanc_tl": -15026.850000000035,
+        "gunluk_yuzde": -3.7783375314861547,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "Hisse",
@@ -23,11 +23,11 @@
         "kod_orjinal": "TRGYO",
         "adet": 3919.0,
         "maliyet": 81.44,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 391704.05,
+        "onceki_tl": 402873.2,
+        "gunluk_kazanc_tl": -11169.150000000023,
+        "gunluk_yuzde": -2.772373540856037,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "Hisse",
@@ -36,11 +36,11 @@
         "kod_orjinal": "SAHOL",
         "adet": 2044.0,
         "maliyet": 95.31,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 194691.0,
+        "onceki_tl": 194588.80000000002,
+        "gunluk_kazanc_tl": 102.19999999998254,
+        "gunluk_yuzde": 0.052521008403352366,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "Fon",
@@ -140,10 +140,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 239199.376458,
-        "onceki_tl": 240710.81937580009,
-        "gunluk_kazanc_tl": -1511.4429178000719,
-        "gunluk_yuzde": -0.6279081770065319,
+        "guncel_tl": 236600.962689,
+        "onceki_tl": 240358.763841,
+        "gunluk_kazanc_tl": -3757.801152,
+        "gunluk_yuzde": -1.5634134124960914,
         "fiyat_eksik": false
       },
       {
@@ -168,11 +168,11 @@
         "kod_orjinal": "INFO",
         "adet": 65.327,
         "maliyet": 3.9,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 249.54914,
+        "onceki_tl": 259.34819,
+        "gunluk_kazanc_tl": -9.799049999999994,
+        "gunluk_yuzde": -3.7783375314861436,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "Hisse",
@@ -181,11 +181,11 @@
         "kod_orjinal": "TRGYO",
         "adet": 2508.0,
         "maliyet": 83.733,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 250674.6,
+        "onceki_tl": 257822.4,
+        "gunluk_kazanc_tl": -7147.799999999988,
+        "gunluk_yuzde": -2.7723735408560266,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "Hisse",
@@ -194,11 +194,11 @@
         "kod_orjinal": "SAHOL",
         "adet": 1333.0,
         "maliyet": 95.25,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 126968.25,
+        "onceki_tl": 126901.6,
+        "gunluk_kazanc_tl": 66.64999999999418,
+        "gunluk_yuzde": 0.05252100840335676,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "Emeklilik",
@@ -233,11 +233,11 @@
         "kod_orjinal": "24ayar",
         "adet": 301.86,
         "maliyet": null,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 24166.911600000003,
+        "onceki_tl": 24160.874400000004,
+        "gunluk_kazanc_tl": 6.0371999999988475,
+        "gunluk_yuzde": 0.024987506246871787,
+        "fiyat_eksik": false
       }
     ]
   },
