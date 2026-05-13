@@ -24,3 +24,9 @@ venv/
 
 # Loglar
 *.log
+
+# GitHub Actions tarafindan uretilen veri dosyalari
+prices.json
+portfoy.json
+gecmis.json
+yilbasi_fiyatlari.json
