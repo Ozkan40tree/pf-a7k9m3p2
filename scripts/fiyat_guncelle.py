@@ -38,6 +38,13 @@ except ImportError:
     print("UYARI: tefas-crawler import edilemedi.")
     TefasCrawler = None
 
+try:
+    import borsapy as bp
+    BORSAPY_OK = True
+except ImportError:
+    print("UYARI: borsapy import edilemedi. Birincil kaynak olarak yfinance kullanilacak.")
+    BORSAPY_OK = False
+
 
 # =====================================================================
 # SABITLER
@@ -319,6 +326,119 @@ def yfinance_fiyat(sembol, retries=3):
     return None
 
 
+# =====================================================================
+# BORSAPY FONKSIYONLARI (BIRINCIL KAYNAK)
+# saidsurucu/borsapy kutuphanesi - TradingView altyapisi
+# Ucretsiz, apikey gerekmez, 15 dk gecikmeli
+# =====================================================================
+
+def borsapy_hisse(kod):
+    """BIST hissesi: bp.Ticker(kod). Cikti: {"guncel": x, "onceki": y} veya None"""
+    if not BORSAPY_OK:
+        return None
+    try:
+        t = bp.Ticker(kod)
+        hist = t.history(period="5d")
+        if hist.empty or len(hist) < 1:
+            return None
+        kapanis = hist["Close"].dropna().tolist()
+        if not kapanis:
+            return None
+        guncel = float(kapanis[-1])
+        onceki = float(kapanis[-2]) if len(kapanis) >= 2 else guncel
+        return {"guncel": guncel, "onceki": onceki}
+    except Exception as e:
+        log(f"borsapy hisse hata ({kod}): {e}", "WARN")
+        return None
+
+
+def borsapy_kur(sembol):
+    """Doviz: bp.FX('USD' veya 'EUR'). Cikti: {"guncel": x, "onceki": y} veya None"""
+    if not BORSAPY_OK:
+        return None
+    try:
+        fx = bp.FX(sembol)
+        hist = fx.history(period="5d")
+        if hist.empty or len(hist) < 1:
+            return None
+        kapanis = hist["Close"].dropna().tolist()
+        if not kapanis:
+            return None
+        guncel = float(kapanis[-1])
+        onceki = float(kapanis[-2]) if len(kapanis) >= 2 else guncel
+        return {"guncel": guncel, "onceki": onceki}
+    except Exception as e:
+        log(f"borsapy kur hata ({sembol}): {e}", "WARN")
+        return None
+
+
+def borsapy_gram_altin():
+    """Gram altin TL: bp.Ticker('ALTIN'). Direkt gram altin verir, donusum gerekmez."""
+    if not BORSAPY_OK:
+        return None
+    try:
+        t = bp.Ticker("ALTIN")
+        hist = t.history(period="5d")
+        if hist.empty or len(hist) < 1:
+            return None
+        kapanis = hist["Close"].dropna().tolist()
+        if not kapanis:
+            return None
+        guncel = float(kapanis[-1])
+        onceki = float(kapanis[-2]) if len(kapanis) >= 2 else guncel
+        return {"guncel": guncel, "onceki": onceki}
+    except Exception as e:
+        log(f"borsapy gram altin hata: {e}", "WARN")
+        return None
+
+
+def borsapy_btc_tl():
+    """Bitcoin TL: bp.Crypto('BTCTRY'). Direkt TL verir."""
+    if not BORSAPY_OK:
+        return None
+    try:
+        c = bp.Crypto("BTCTRY")
+        hist = c.history(period="5d")
+        if hist.empty or len(hist) < 1:
+            return None
+        kapanis = hist["Close"].dropna().tolist()
+        if not kapanis:
+            return None
+        guncel = float(kapanis[-1])
+        onceki = float(kapanis[-2]) if len(kapanis) >= 2 else guncel
+        return {"guncel": guncel, "onceki": onceki}
+    except Exception as e:
+        log(f"borsapy BTC hata: {e}", "WARN")
+        return None
+
+
+def borsapy_fon(kod):
+    """TEFAS fonu: bp.Fund(kod). history kolon adi 'Price'."""
+    if not BORSAPY_OK:
+        return None
+    try:
+        f = bp.Fund(kod)
+        hist = f.history(period="5d")
+        if hist.empty or len(hist) < 1:
+            return None
+        # Fund'da kolon adi 'Price' (buyuk P)
+        if "Price" in hist.columns:
+            fiyat_kol = hist["Price"]
+        elif "Close" in hist.columns:
+            fiyat_kol = hist["Close"]
+        else:
+            return None
+        kapanis = fiyat_kol.dropna().tolist()
+        if not kapanis:
+            return None
+        guncel = float(kapanis[-1])
+        onceki = float(kapanis[-2]) if len(kapanis) >= 2 else guncel
+        return {"guncel": guncel, "onceki": onceki}
+    except Exception as e:
+        log(f"borsapy fon hata ({kod}): {e}", "WARN")
+        return None
+
+
 def tcmb_kur_yedek():
     """
     TCMB resmi XML'den USD ve EUR kurunu cek (anlik, gun ici tek nokta).
@@ -396,28 +516,34 @@ def coingecko_btc_yedek():
 
 def kur_cek():
     """
-    USDTRY ve EURTRY - birincil yfinance, yedek TCMB.
-    Donus: {"usd_try": {"guncel":x, "onceki":y, "kaynak":"yfinance|tcmb"}, ...}
+    USDTRY ve EURTRY - birincil borsapy, yedek1 yfinance, yedek2 TCMB.
+    Donus: {"usd_try": {"guncel":x, "onceki":y, "kaynak":"borsapy|yfinance|tcmb"}, ...}
     Tamamen basarisizsa o anahtar None olur.
     """
     sonuc = {}
 
-    # Birincil: yfinance
-    for sembol, anahtar in [("USDTRY=X", "usd_try"), ("EURTRY=X", "eur_try")]:
-        veri = yfinance_fiyat(sembol)
+    # Birincil: borsapy
+    for sembol, anahtar in [("USD", "usd_try"), ("EUR", "eur_try")]:
+        veri = borsapy_kur(sembol)
         if veri:
-            sonuc[anahtar] = {**veri, "kaynak": "yfinance"}
+            sonuc[anahtar] = {**veri, "kaynak": "borsapy"}
         else:
             sonuc[anahtar] = None
 
-    # Birincil basarisizsa yedek: TCMB
+    # Yedek 1: yfinance
+    for sembol, anahtar in [("USDTRY=X", "usd_try"), ("EURTRY=X", "eur_try")]:
+        if not sonuc.get(anahtar):
+            veri = yfinance_fiyat(sembol)
+            if veri:
+                sonuc[anahtar] = {**veri, "kaynak": "yfinance"}
+
+    # Yedek 2: TCMB
     if not sonuc.get("usd_try") or not sonuc.get("eur_try"):
-        log("Kur birincil kaynak basarisiz (en az biri), TCMB yedegine donuluyor.", "WARN")
+        log("Kur birincil ve yedek1 basarisiz (en az biri), TCMB yedegine donuluyor.", "WARN")
         tcmb = tcmb_kur_yedek()
         if tcmb:
             for k, v in tcmb.items():
                 if not sonuc.get(k):
-                    # TCMB anlik kur veriyor, onceki=guncel olarak kullanilir
                     sonuc[k] = {"guncel": v, "onceki": v, "kaynak": "tcmb"}
 
     if not sonuc.get("usd_try"):
@@ -430,9 +556,15 @@ def kur_cek():
 
 def gram_altin_cek(usd_try_guncel, usd_try_onceki):
     """
-    Gram altin TL fiyati cek.
-    Yontem: GC=F (altin futures, USD/oz) * USDTRY / 31.1035 (oz->gram)
+    Gram altin TL - birincil borsapy (direkt), yedek yfinance GC=F.
     """
+    # Birincil: borsapy ALTIN
+    veri = borsapy_gram_altin()
+    if veri:
+        return {**veri, "kaynak": "borsapy"}
+
+    # Yedek: yfinance GC=F (ons altin USD) x USDTRY / 31.1035
+    log("Gram altin borsapy basarisiz, yfinance GC=F yedegine donuluyor.", "WARN")
     if not usd_try_guncel:
         return None
     altin_oz = yfinance_fiyat("GC=F")
@@ -441,20 +573,38 @@ def gram_altin_cek(usd_try_guncel, usd_try_onceki):
     OZ_TO_GRAM = 31.1035
     guncel = (altin_oz["guncel"] * usd_try_guncel) / OZ_TO_GRAM
     onceki = (altin_oz["onceki"] * usd_try_onceki) / OZ_TO_GRAM
-    return {"guncel": guncel, "onceki": onceki}
+    return {"guncel": guncel, "onceki": onceki, "kaynak": "yfinance"}
 
 
 def bist_hisse_cek(kod):
-    """BIST hisse fiyati: yfinance KOD.IS"""
-    return yfinance_fiyat(f"{kod}.IS")
+    """
+    BIST hisse fiyati - birincil borsapy, yedek yfinance KOD.IS.
+    Donus: {"guncel":x, "onceki":y, "kaynak":"borsapy|yfinance"} veya None.
+    """
+    # Birincil: borsapy
+    veri = borsapy_hisse(kod)
+    if veri:
+        return {**veri, "kaynak": "borsapy"}
+
+    # Yedek: yfinance
+    veri = yfinance_fiyat(f"{kod}.IS")
+    if veri:
+        return {**veri, "kaynak": "yfinance"}
+
+    return None
 
 
 def btc_tl_cek(usd_try_guncel, usd_try_onceki):
     """
-    Bitcoin TL fiyati - birincil yfinance (BTC-USD * USDTRY), yedek CoinGecko.
-    Donus: {"guncel":x, "onceki":y, "kaynak":"yfinance|coingecko"} veya None.
+    Bitcoin TL fiyati - birincil borsapy (BTCTRY direkt),
+    yedek1 yfinance BTC-USD * USDTRY, yedek2 CoinGecko.
     """
-    # Birincil: yfinance BTC-USD * USDTRY
+    # Birincil: borsapy BTCTRY
+    veri = borsapy_btc_tl()
+    if veri:
+        return {**veri, "kaynak": "borsapy"}
+
+    # Yedek 1: yfinance BTC-USD * USDTRY
     if usd_try_guncel:
         btc_usd = yfinance_fiyat("BTC-USD")
         if btc_usd:
@@ -464,8 +614,8 @@ def btc_tl_cek(usd_try_guncel, usd_try_onceki):
                 "kaynak": "yfinance",
             }
 
-    # Yedek: CoinGecko
-    log("BTC birincil kaynak basarisiz, CoinGecko yedegine donuluyor.", "WARN")
+    # Yedek 2: CoinGecko
+    log("BTC birincil ve yfinance basarisiz, CoinGecko yedegine donuluyor.", "WARN")
     cg = coingecko_btc_yedek()
     if cg:
         return {**cg, "kaynak": "coingecko"}
@@ -477,41 +627,52 @@ def btc_tl_cek(usd_try_guncel, usd_try_onceki):
 def tefas_fiyat_toplu(kodlar):
     """
     Tum TEFAS kodlarini toplu cek.
-    tefas-crawler'dan son 7 gunluk veri al, son 2 gunu kaydet.
-    Cikti: {"KOD": {"guncel": x, "onceki": y}}
+    Birincil: tefas-crawler. Yedek: borsapy Fund.
+    Cikti: {"KOD": {"guncel": x, "onceki": y, "kaynak": "..."}}
     """
     if not kodlar:
         return {}
-    if TefasCrawler is None:
-        log("TefasCrawler import edilmedi, fonlar atlanir.", "ERROR")
-        return {}
 
     sonuc = {}
-    try:
-        crawler = TefasCrawler()
-        bugun = datetime.now(TR_TZ).date()
-        baslangic = bugun - timedelta(days=10)
 
-        # tefas-crawler tek tek sorgulamaya izin verir
-        for kod in kodlar:
-            try:
-                df = crawler.fetch(start=str(baslangic), end=str(bugun), name=kod)
-                if df is None or df.empty:
-                    log(f"TEFAS bos: {kod}", "WARN")
+    # Birincil: tefas-crawler
+    if TefasCrawler is not None:
+        try:
+            crawler = TefasCrawler()
+            bugun = datetime.now(TR_TZ).date()
+            baslangic = bugun - timedelta(days=10)
+
+            for kod in kodlar:
+                try:
+                    df = crawler.fetch(start=str(baslangic), end=str(bugun), name=kod)
+                    if df is None or df.empty:
+                        log(f"TEFAS bos: {kod}", "WARN")
+                        continue
+                    df = df.sort_values("date")
+                    fiyatlar = df["price"].dropna().tolist()
+                    if not fiyatlar:
+                        continue
+                    guncel = float(fiyatlar[-1])
+                    onceki = float(fiyatlar[-2]) if len(fiyatlar) >= 2 else guncel
+                    sonuc[kod] = {"guncel": guncel, "onceki": onceki, "kaynak": "tefas-crawler"}
+                    time.sleep(0.5)  # nezaket
+                except Exception as e:
+                    log(f"TEFAS hata ({kod}): {e}", "WARN")
                     continue
-                df = df.sort_values("date")
-                fiyatlar = df["price"].dropna().tolist()
-                if not fiyatlar:
-                    continue
-                guncel = float(fiyatlar[-1])
-                onceki = float(fiyatlar[-2]) if len(fiyatlar) >= 2 else guncel
-                sonuc[kod] = {"guncel": guncel, "onceki": onceki}
-                time.sleep(0.5)  # nezaket
-            except Exception as e:
-                log(f"TEFAS hata ({kod}): {e}", "WARN")
-                continue
-    except Exception as e:
-        log(f"TEFAS toplu hata: {e}", "ERROR")
+        except Exception as e:
+            log(f"TEFAS toplu hata: {e}", "ERROR")
+    else:
+        log("TefasCrawler import edilmedi, borsapy yedegine donuluyor.", "WARN")
+
+    # Yedek: borsapy Fund - tefas-crawler cekemediklerini kapat
+    eksikler = [k for k in kodlar if k not in sonuc]
+    if eksikler:
+        log(f"TEFAS'tan cekilemeyenler icin borsapy yedegi: {eksikler}", "WARN")
+        for kod in eksikler:
+            veri = borsapy_fon(kod)
+            if veri:
+                sonuc[kod] = {**veri, "kaynak": "borsapy"}
+
     return sonuc
 
 
@@ -579,26 +740,48 @@ def prices_json_olustur(hisseler, tefas_fiyatlari, kripto, gram_altin, kurlar, y
     # Kaynak durumu - yedek mantigi izi
     usd = kurlar.get("usd_try") or {}
     btc = kripto.get("BTC") or {}
+    altin = gram_altin or {}
+
+    # Hisse kaynaklarini topla (cogunluk hangi kaynak)
+    hisse_kaynaklar = [h.get("kaynak", "yok") for h in hisseler.values() if h]
+    if hisse_kaynaklar:
+        # En cok kullanilan kaynagi al
+        from collections import Counter
+        hisse_kaynak_dominant = Counter(hisse_kaynaklar).most_common(1)[0][0]
+    else:
+        hisse_kaynak_dominant = "yok"
+
+    # Fon kaynaklarini topla
+    fon_kaynaklar = [f.get("kaynak", "yok") for f in tefas_fiyatlari.values() if f]
+    if fon_kaynaklar:
+        from collections import Counter
+        fon_kaynak_dominant = Counter(fon_kaynaklar).most_common(1)[0][0]
+    else:
+        fon_kaynak_dominant = "yok"
+
     kaynak_durumu = {
         "kur_kaynak": usd.get("kaynak", "yok"),
         "btc_kaynak": btc.get("kaynak", "yok") if btc else "yok",
+        "hisse_kaynak": hisse_kaynak_dominant,
+        "altin_kaynak": altin.get("kaynak", "yok") if altin else "yok",
+        "fon_kaynak": fon_kaynak_dominant,
     }
 
-    # Kurlardan "kaynak" alanini cikar (frontend icin temiz JSON)
-    def _temiz_kur(k):
+    # Kurlardan/altindan "kaynak" alanini cikar (frontend icin temiz JSON)
+    def _temiz(k):
         if not k:
             return None
         return {"guncel": k.get("guncel"), "onceki": k.get("onceki")}
 
     return {
         "son_guncelleme": datetime.now(TR_TZ).isoformat(timespec="seconds"),
-        "kaynak": "yfinance + tefas-crawler (yedek: TCMB, CoinGecko)",
+        "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
         "kaynak_durumu": kaynak_durumu,
         "kurlar": {
-            "usd_try": _temiz_kur(kurlar.get("usd_try")),
-            "eur_try": _temiz_kur(kurlar.get("eur_try")),
+            "usd_try": _temiz(kurlar.get("usd_try")),
+            "eur_try": _temiz(kurlar.get("eur_try")),
         },
-        "gram_altin_tl": gram_altin,
+        "gram_altin_tl": _temiz(gram_altin),
         "hisseler": {k: _fiyat_with_yilbasi(k, v) for k, v in hisseler.items()},
         "fonlar_ve_emeklilik": {k: _fiyat_with_yilbasi(k, v) for k, v in tefas_fiyatlari.items()},
         "kripto": {k: _fiyat_with_yilbasi(k, v) for k, v in kripto.items()},

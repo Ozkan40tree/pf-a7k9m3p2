@@ -2,5 +2,6 @@ gspread==6.1.4
 google-auth==2.35.0
 yfinance==0.2.50
 tefas-crawler==0.6.0
+borsapy==0.10.0
 requests==2.32.3
 pandas==2.2.3
