@@ -286,6 +286,8 @@ function enrichItem(it, prices) {
   // Yil basi bilgisi prices.json'dan
   const pricesKey = it.tip === 'kripto'
     ? (prices.kripto || {})[it.kod] || {}
+    : it.tip === 'altin'
+    ? {}  // altin icin yilbasi takibi yok
     : (prices.hisseler || {})[it.kod] || (prices.fonlar_ve_emeklilik || {})[it.kod] || {};
   const yilbasi = pricesKey.yilbasi ?? null;
   const ybb = (yilbasi && yilbasi > 0) ? ((guncel - yilbasi) / yilbasi) * 100 : 0;
@@ -309,18 +311,20 @@ function renderPortfoy(name, items, prices) {
     x.tip === 'fon' || x.tip === 'altinfonu' || x.tip === 'yurtdisifonu' || x.tip === 'emeklilik'
   ).map(x => enrichItem(x, prices));
   const kripto   = items.filter(x => x.tip === 'kripto').map(x => enrichItem(x, prices));
+  const altin    = items.filter(x => x.tip === 'altin').map(x => enrichItem(x, prices));
   const alacak   = items.filter(x => x.tip === 'alacak').map(x => enrichItem(x, prices));
 
   const hisseTop  = sum(hisseler, 'tg');
   const fonTop    = sum(fonlarRaw, 'tg');
   const kriptoTop = sum(kripto, 'tg');
+  const altinTop  = sum(altin, 'tg');
   const alacakTop = sum(alacak, 'tg');
-  const toplam = hisseTop + fonTop + kriptoTop + alacakTop;
+  const toplam = hisseTop + fonTop + kriptoTop + altinTop + alacakTop;
 
-  const maliyet = sum(hisseler,'tm') + sum(fonlarRaw,'tm') + sum(kripto,'tm') + sum(alacak,'tm');
+  const maliyet = sum(hisseler,'tm') + sum(fonlarRaw,'tm') + sum(kripto,'tm') + sum(altin,'tm') + sum(alacak,'tm');
   const kz = toplam - maliyet;
   const kzp = maliyet > 0 ? (toplam/maliyet - 1) * 100 : 0;
-  const gunlukKZ = sum(hisseler, 'gunlukKZ') + sum(fonlarRaw, 'gunlukKZ') + sum(kripto, 'gunlukKZ');
+  const gunlukKZ = sum(hisseler, 'gunlukKZ') + sum(fonlarRaw, 'gunlukKZ') + sum(kripto, 'gunlukKZ') + sum(altin, 'gunlukKZ');
   const gunlukP = (toplam - gunlukKZ) > 0 ? gunlukKZ / (toplam - gunlukKZ) * 100 : 0;
 
   const allDaily = [
@@ -355,6 +359,7 @@ function renderPortfoy(name, items, prices) {
     ...hisseler.map(h => ({l:h.kod, v:h.tg})),
     ...fonlarRaw.map(f => ({l:f.kod, v:f.tg})),
     ...(kriptoTop > 0 ? kripto.map(c => ({l:c.kod, v:c.tg})) : []),
+    ...(altinTop > 0 ? altin.map(a => ({l:a.kod, v:a.tg})) : []),
     ...(alacakTop > 0 ? alacak.map(a => ({l:a.kod, v:a.tg})) : [])
   ];
   if (distItems.length > 0) {
@@ -460,6 +465,33 @@ function renderPortfoy(name, items, prices) {
         </div>
       </div>
     </div>`;
+  }
+
+  // Altin (fiziksel)
+  if (altin.length > 0) {
+    const gramFiyat = (prices.gram_altin_tl || {}).guncel || 0;
+    html += `<div class="section">
+      <h3>🥇 Altın <span class="subtotal">₺${fmt(altinTop)}</span></h3>
+      <div style="overflow-x:auto"><table><thead><tr>
+        <th>KOD</th><th>GRAM</th><th>BİRİM ₺/gr</th><th>TOPLAM ₺</th><th>AĞIRLIK</th><th>GÜNLÜK ₺</th><th>GÜNLÜK %</th>
+      </tr></thead><tbody>`;
+    altin.forEach(a => {
+      const w = altinTop > 0 ? (a.tg / altinTop) * 100 : 0;
+      html += `<tr>
+        <td>${a.kod}</td>
+        <td>${fmt(a.adet)}</td>
+        <td>₺${fmt(gramFiyat)}</td>
+        <td>₺${fmt(a.tg)}</td>
+        <td>${weightBar(w)} ${w.toFixed(1)}%</td>
+        <td class="${tlClass(a.gunlukKZ)}">${tlSign(a.gunlukKZ)}₺${fmt(Math.abs(a.gunlukKZ))}</td>
+        <td>${badge(a.gunlukP)}</td>
+      </tr>`;
+    });
+    const t_gk = sum(altin, 'gunlukKZ');
+    html += `</tbody><tfoot><tr>
+      <td>TOPLAM</td><td colspan="2"></td><td>₺${fmt(altinTop)}</td><td>100.0%</td>
+      <td class="${tlClass(t_gk)}">${tlSign(t_gk)}₺${fmt(Math.abs(t_gk))}</td><td></td>
+    </tr></tfoot></table></div></div>`;
   }
 
   // Alacak (varsa)
