@@ -432,3 +432,40 @@ silinir, bu bölüm dosyadan çıkarılır.
 - Bu bilinçli bir tercih (kişisel kullanım, tehdit modeli düşük).
 - **Bu dosyaya ASLA yazılmaz:** şifreler, token'lar, Sheets ID,
   service account key, kişiyle özdeşleşen tutarlar.
+
+---
+
+## 11. SON GÜNCELLEMELER (15 Mayıs 2026)
+
+### 11.1 Altın veri kaynağı
+
+- **Birincil:** yfinance `GC=F` (ons altın USD × USDTRY ÷ 31.1035)
+- **Yedek:** Twelve Data `XAU/USD` `/quote` endpoint
+- **API key:** GitHub Secrets → `TWELVE_DATA_API_KEY`
+- **Kaynak kodu:** `scripts/fiyat_guncelle.py` → `twelve_data_xau_usd()` ve `gram_altin_cek()`
+
+Yedek tablosu güncellendi (bkz. Bölüm 8.1):
+
+| Veri | Birincil | Yedek |
+|---|---|---|
+| Gram altın | yfinance `GC=F × USDTRY ÷ 31.1035` | **Twelve Data** `XAU/USD` |
+
+### 11.2 Dashboard altın render
+
+- `index.html` güncellendi: `tip == "altin"` kalemleri artık **"🥇 Altın"** bölümünde gösteriliyor.
+- Derya portföyünde `24AYAR` 301.86 gram → ~2.06M TL.
+
+### 11.3 Otomasyon (cron-job.org)
+
+- **Servis:** `https://console.cron-job.org` (Özkan hesabı)
+- **Cron 1 — "Portfoy Otomatik":** 10:30, 12:30, 14:30, 16:30 (Pzt-Cum) → normal mod
+- **Cron 2 — "Portfoy Kapanis":** 18:35 (Pzt-Cum) → kapanış modu (`inputs.kapanis=true`)
+- **GitHub PAT:** `cron-job-org-portfoy-tetikleyici` (geçerlilik: 2027-05-14)
+- GitHub schedule cron'ları paralel sigorta olarak korunuyor.
+
+### 11.4 Yapılacaklar (öncelik sırasıyla)
+
+1. Dashboard toplamları düzeltme (Özkan hazırlayacak)
+2. Benchmark Guncelleme #3 hatası (13 Mayıs kırmızı)
+3. Geçmiş Veriler sekmesi (21 Mayıs sonrası, Excel benzeri tablo + grafik)
+4. Privacy/gizlilik mode (göz ikonuyla 1M TL normalizasyonu)
