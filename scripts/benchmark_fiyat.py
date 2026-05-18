@@ -3,10 +3,10 @@
 Benchmark verilerini cek ve benchmark_gecmis.json olarak kaydet.
 
 Benchmark seti (CLAUDE.md'ye gore):
-- BIST100 (XU100.IS)
-- S&P500 (TL) (^GSPC * USDTRY)
-- Gram Altin (GC=F * USDTRY / 31.1035)
-- YAE fonu (TEFAS)
+- BIST100 (borsapy Index "XU100" birincil, yfinance "XU100.IS" yedek)
+- Amerika Hisse (TL) (borsapy Fund "AFA" birincil, "ABE" yedek, son care yfinance ^GSPC*USDTRY)
+- Gram Altin (borsapy FX "gram-altin" birincil, yfinance GC=F*USDTRY/31.1035 yedek)
+- YAE fonu (borsapy Fund "YAE")
 - TUFE (Sheets'ten okunur, ayri akista)
 
 Mod 1 (--gecmis): 5 yillik gecmisi tek seferlik cek (ilk kurulum).
@@ -191,27 +191,28 @@ def usd_try_seri(baslangic, bitis):
     return {bugun_str: tcmb_kur}
 
 
-def sp500_tl_seri(baslangic, bitis):
+def amerika_hisse_seri(baslangic, bitis):
     """
-    S&P500 (TL) - Turk yatirimci perspektifi.
-    Birincil: TEFAS DSP fonu (Garanti Portfoy S&P500 ABD Hisse Senedi).
-    Yedek 1: TEFAS TI2 fonu (Is Portfoy S&P500).
-    Yedek 2 (son care): yfinance ^GSPC * USDTRY.
+    Amerika Hisse (TL) - Turk yatirimci perspektifi.
+    Birincil: TEFAS AFA fonu (Amerika Hisse Senedi).
+    Yedek: TEFAS ABE fonu (Amerika Hisse Senedi).
+    Son care: yfinance ^GSPC * USDTRY (saf S&P500 yaklasimi, GitHub Actions
+    IP'lerinden Yahoo Finance erisimi sorunlu oldugu icin genelde calismaz).
 
-    Not: TEFAS fonu yonetim ucreti icerir, saf S&P500'den ~%1.5-2/yil
-    negatif sapma olur. Turk yatirimci pratiginde S&P500'e bu yolla
-    erisildigi icin yaklasim dogru.
+    Not: AFA/ABE saf S&P500 degil, Amerika hisse senedi pazarini takip eder.
+    Endeks bilesimine bagli olarak S&P500'den hafif sapma gosterebilir;
+    Turk yatirimci pratiginde "Amerika hissesi" karsilastirmasi icin yeterli.
     """
-    seri = borsapy_fund_seri("DSP", baslangic, bitis)
+    seri = borsapy_fund_seri("AFA", baslangic, bitis)
     if seri:
-        log(f"S&P500 (TL, DSP): {len(seri)} kayit")
+        log(f"Amerika Hisse (TL, AFA): {len(seri)} kayit")
         return seri
-    log("DSP bos, TI2 yedegine donuluyor.", "WARN")
-    seri = borsapy_fund_seri("TI2", baslangic, bitis)
+    log("AFA bos, ABE yedegine donuluyor.", "WARN")
+    seri = borsapy_fund_seri("ABE", baslangic, bitis)
     if seri:
-        log(f"S&P500 (TL, TI2): {len(seri)} kayit")
+        log(f"Amerika Hisse (TL, ABE): {len(seri)} kayit")
         return seri
-    log("DSP ve TI2 ikisi de bos, yfinance ^GSPC*USDTRY son caresine donuluyor.", "WARN")
+    log("AFA ve ABE ikisi de bos, yfinance ^GSPC*USDTRY son caresine donuluyor.", "WARN")
     sp = yfinance_seri("^GSPC", baslangic, bitis)
     usd = usd_try_seri(baslangic, bitis)
     sonuc = {}
@@ -327,9 +328,9 @@ def gecmis_olustur():
     log(f"  {len(bist100)} kayit")
     time.sleep(1)
 
-    log("S&P500 (TL) cekiliyor...")
-    sp500_tl = sp500_tl_seri(baslangic, bitis)
-    log(f"  {len(sp500_tl)} kayit")
+    log("Amerika Hisse (TL) cekiliyor...")
+    amerika_hisse = amerika_hisse_seri(baslangic, bitis)
+    log(f"  {len(amerika_hisse)} kayit")
     time.sleep(1)
 
     log("Gram altin cekiliyor...")
@@ -350,7 +351,7 @@ def gecmis_olustur():
         "son_guncelleme": datetime.now(TR_TZ).isoformat(timespec="seconds"),
         "seriler": {
             "bist100": bist100,
-            "sp500_tl": sp500_tl,
+            "amerika_hisse": amerika_hisse,
             "gram_altin": gram_altin,
             "yae": yae,
             "tufe_aylik_gerceklesen": tufe.get("gerceklesen", {}),
@@ -377,7 +378,7 @@ def gunluk_guncelle():
 
     yeni = {
         "bist100": bist100_seri(baslangic, bitis),
-        "sp500_tl": sp500_tl_seri(baslangic, bitis),
+        "amerika_hisse": amerika_hisse_seri(baslangic, bitis),
         "gram_altin": gram_altin_seri(baslangic, bitis),
         "yae": yae_seri(baslangic, bitis),
     }
