@@ -33,9 +33,10 @@ import yfinance as yf
 from google.oauth2.service_account import Credentials
 
 try:
-    from tefas import Crawler as TefasCrawler
+    import borsapy as bp
+    BORSAPY_OK = True
 except ImportError:
-    TefasCrawler = None
+    BORSAPY_OK = False
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -143,18 +144,25 @@ def gram_altin_seri(baslangic, bitis):
 
 
 def yae_seri(baslangic, bitis):
-    """YAE TEFAS fonu serisi."""
-    if TefasCrawler is None:
+    """YAE TEFAS fonu serisi - borsapy ile (saidsurucu/borsapy).
+
+    borsapy.Fund.history() TEFAS v2 API'sini kullanir; max 5 yil destekler.
+    DataFrame: Date index, 'Price' sutunu.
+    """
+    if not BORSAPY_OK:
+        log("borsapy import edilemedi, YAE atlanir.", "WARN")
         return {}
     try:
-        crawler = TefasCrawler()
-        df = crawler.fetch(start=baslangic, end=bitis, name="YAE")
+        f = bp.Fund("YAE")
+        df = f.history(start=baslangic, end=bitis)
         if df is None or df.empty:
             return {}
         seri = {}
-        for _, row in df.iterrows():
-            tarih = pd.to_datetime(row["date"]).strftime("%Y-%m-%d")
-            seri[tarih] = float(row["price"])
+        for tarih, row in df.iterrows():
+            fiyat = row.get("Price")
+            if fiyat is None or pd.isna(fiyat):
+                continue
+            seri[pd.to_datetime(tarih).strftime("%Y-%m-%d")] = float(fiyat)
         return seri
     except Exception as e:
         log(f"YAE hata: {e}", "WARN")
