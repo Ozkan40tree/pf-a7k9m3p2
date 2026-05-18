@@ -74,6 +74,8 @@
   }
   .summary-card .label { color: #cbd5e1; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
   .summary-card .val { font-size: 17px; font-weight: 700; margin-top: 4px; color: white; }
+  .summary-card .val.green { color: #34d399; }
+  .summary-card .val.red   { color: #f87171; }
   .green { color: #34d399; } .red { color: #f87171; }
 
   .container { max-width: 980px; margin: -20px auto 0; padding: 0 16px; position: relative; z-index: 10; }
@@ -490,6 +492,8 @@ function renderPortfoy(name, items, prices) {
           <div class="kitem"><div class="kl">Birim Fiyat</div><div class="kv">₺${fmt(birimFiyat)}</div></div>
           <div class="kitem"><div class="kl">Maliyet</div><div class="kv">₺${fmt(c.tm)}</div></div>
           <div class="kitem"><div class="kl">Değer</div><div class="kv">₺${fmt(c.tg)}</div></div>
+          <div class="kitem"><div class="kl">Günlük ₺</div><div class="kv ${tlClass(c.gunlukKZ)}">${tlSign(c.gunlukKZ)}₺${fmt(Math.abs(c.gunlukKZ))}</div></div>
+          <div class="kitem"><div class="kl">Günlük %</div><div class="kv">${badge(c.gunlukP)}</div></div>
           <div class="kitem"><div class="kl">K/Z</div><div class="kv ${tlClass(c.kz)}">${tlSign(c.kz)}₺${fmt(Math.abs(c.kz))}</div></div>
           <div class="kitem"><div class="kl">Getiri</div><div class="kv">${badge(c.kzp)}</div></div>
         </div>
@@ -567,8 +571,18 @@ function render(portfoy, prices) {
 
   document.getElementById('genel-toplam').textContent = '₺' + fmt(genTop);
 
+  // Günlük Kazanç: işaret + renk + yüzde
+  const gkSign = genGK > 0 ? '+' : (genGK < 0 ? '-' : '');
+  const gkCls  = genGK > 0 ? 'green' : (genGK < 0 ? 'red' : '');
+  const gpSign = genGP > 0 ? '+' : (genGP < 0 ? '-' : '');
+  const gpStr  = Math.abs(genGP).toFixed(2) + '%';
+
   const summaryHtml = `
-    <div class="summary-card"><div class="label">Günlük Kazanç</div><div class="val ${genGK>=0?'green':'red'}">${genGK>=0?'+':''}₺${fmt(Math.abs(genGK))}</div></div>
+    <div class="summary-card">
+      <div class="label">Günlük Kazanç</div>
+      <div class="val ${gkCls}">${gkSign}₺${fmt(Math.abs(genGK))}</div>
+      <div class="val ${gkCls}" style="font-size:12px;margin-top:2px">${gpSign}${gpStr}</div>
+    </div>
     ${names.map(n => `<div class="summary-card"><div class="label">${displayNames[n] || n} Varlık</div><div class="val">₺${fmt(rendered[n].toplam)}</div></div>`).join('')}
   `;
   document.getElementById('summary-row').innerHTML = summaryHtml;
