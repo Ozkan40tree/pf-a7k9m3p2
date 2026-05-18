@@ -186,7 +186,6 @@
         <div class="header-total">
           <div class="label">Toplam Aile Varlığı</div>
           <div class="value" id="genel-toplam">—</div>
-          <div id="genel-badge"></div>
         </div>
       </div>
       <div class="summary-row" id="summary-row"></div>
@@ -275,7 +274,8 @@ function weightBar(pct) {
 // Item'i dashboard'in bekledigi alanlarla zenginlestir
 function enrichItem(it, prices) {
   const adet = it.adet || 0;
-  const maliyet = it.maliyet || 0;
+  const maliyetVar = it.maliyet !== null && it.maliyet !== undefined;
+  const maliyet = maliyetVar ? it.maliyet : 0;
   const tm = adet * maliyet;
   const tg = it.guncel_tl ?? tm;
   const onceki_tl = it.onceki_tl ?? tg;
@@ -293,7 +293,7 @@ function enrichItem(it, prices) {
   const ybb = (yilbasi && yilbasi > 0) ? ((guncel - yilbasi) / yilbasi) * 100 : 0;
   return {
     ...it,
-    adet, maliyet,
+    adet, maliyet, maliyetVar,
     guncel, tm, tg,
     onceki_tl,
     kz: tg - tm,
@@ -306,16 +306,22 @@ function enrichItem(it, prices) {
 
 function renderPortfoy(name, items, prices) {
   // Items: tek liste, tipe gore ayir
-  const hisseler  = items.filter(x => x.tip === 'hisse').map(x => enrichItem(x, prices));
-  const fonlarRaw = items.filter(x =>
-    x.tip === 'fon' || x.tip === 'altinfonu' || x.tip === 'yurtdisifonu' || x.tip === 'emeklilik'
-  ).map(x => enrichItem(x, prices));
-  const kripto   = items.filter(x => x.tip === 'kripto').map(x => enrichItem(x, prices));
-  const altin    = items.filter(x => x.tip === 'altin').map(x => enrichItem(x, prices));
-  const alacak   = items.filter(x => x.tip === 'alacak').map(x => enrichItem(x, prices));
+  const hisseler      = items.filter(x => x.tip === 'hisse').map(x => enrichItem(x, prices));
+  const yurtdisiList  = items.filter(x => x.tip === 'yurtdisifonu').map(x => enrichItem(x, prices));
+  const fonList       = items.filter(x => x.tip === 'fon').map(x => enrichItem(x, prices));
+  const altinFonuList = items.filter(x => x.tip === 'altinfonu').map(x => enrichItem(x, prices));
+  const emeklilikList = items.filter(x => x.tip === 'emeklilik').map(x => enrichItem(x, prices));
+  const fonlarRaw     = [...yurtdisiList, ...fonList, ...altinFonuList, ...emeklilikList];
+  const kripto        = items.filter(x => x.tip === 'kripto').map(x => enrichItem(x, prices));
+  const altin         = items.filter(x => x.tip === 'altin').map(x => enrichItem(x, prices));
+  const alacak        = items.filter(x => x.tip === 'alacak').map(x => enrichItem(x, prices));
 
-  const hisseTop  = sum(hisseler, 'tg');
-  const fonTop    = sum(fonlarRaw, 'tg');
+  const hisseTop     = sum(hisseler, 'tg');
+  const yurtdisiTop  = sum(yurtdisiList, 'tg');
+  const fonOnlyTop   = sum(fonList, 'tg');
+  const altinFonuTop = sum(altinFonuList, 'tg');
+  const emeklilikTop = sum(emeklilikList, 'tg');
+  const fonTop       = yurtdisiTop + fonOnlyTop + altinFonuTop + emeklilikTop;
   const kriptoTop = sum(kripto, 'tg');
   const altinTop  = sum(altin, 'tg');
   const alacakTop = sum(alacak, 'tg');
@@ -334,16 +340,24 @@ function renderPortfoy(name, items, prices) {
   const best  = allDaily.length ? [...allDaily].sort((a,b) => b.v - a.v)[0] : null;
   const worst = allDaily.length ? [...allDaily].sort((a,b) => a.v - b.v)[0] : null;
 
+  // Tab içi büyük kart: kişiye göre dinamik (emeklilik / alacak hariç varlık)
+  let ozetBaslik, ozetDeger;
+  if (name === 'ozkan') {
+    ozetBaslik = 'Emeklilik ve Alacak Hariç Özkan Varlık';
+    ozetDeger = toplam - emeklilikTop - alacakTop;
+  } else if (name === 'derya') {
+    ozetBaslik = 'Emeklilik Hariç Derya Varlık';
+    ozetDeger = toplam - emeklilikTop;
+  } else {
+    ozetBaslik = 'Portföy Değeri';
+    ozetDeger = toplam;
+  }
+
   let html = `
     <div class="cards-row">
       <div class="card dark">
-        <div class="clabel">Portföy Değeri</div>
-        <div class="cval">₺${fmt(toplam)}</div>
-      </div>
-      <div class="card">
-        <div class="clabel">Toplam K/Z</div>
-        <div class="cval ${tlClass(kz)}">${tlSign(kz)}₺${fmt(Math.abs(kz))}</div>
-        <div style="margin-top:4px">${badge(kzp)}</div>
+        <div class="clabel">${ozetBaslik}</div>
+        <div class="cval">₺${fmt(ozetDeger)}</div>
       </div>
       <div class="card">
         <div class="clabel">Günlük K/Z</div>
@@ -411,42 +425,58 @@ function renderPortfoy(name, items, prices) {
     </tr></tfoot></table></div></div>`;
   }
 
-  // Fonlar tablosu (fon + altinfonu + yurtdisifonu + emeklilik)
-  if (fonlarRaw.length > 0) {
-    html += `<div class="section">
-      <h3>🏦 Fonlar & Emeklilik <span class="subtotal">₺${fmt(fonTop)}</span></h3>
+  // Fonlar & Emeklilik: 4 ayrı blok (YurtdışıFon, Fon, AltınFonu, Emeklilik)
+  // Helper: tek bir tip için tam tablo bloğu üretir.
+  // Maliyet null olan satırlarda (emeklilik) Maliyet, K/Z ₺, K/Z %, YBB hücreleri "—" gösterilir.
+  function renderFonBlok(baslik, list) {
+    if (list.length === 0) return '';
+    const blokTop = sum(list, 'tg');
+    // Maliyet bilgisi olanların toplamı (TOPLAM satırı K/Z hesabı için)
+    const hasMaliyet = list.some(x => x.maliyetVar);
+    let h = `<div class="section">
+      <h3>${baslik} <span class="subtotal">₺${fmt(blokTop)}</span></h3>
       <div style="overflow-x:auto"><table><thead><tr>
         <th>Kod</th><th>Tip</th><th>Pay</th><th>Maliyet</th><th>Güncel</th><th>Toplam ₺</th>
         <th>Ağırlık</th><th>Günlük ₺</th><th>Günlük %</th>
         <th>K/Z ₺</th><th>K/Z %</th><th>YBB</th>
       </tr></thead><tbody>`;
-    fonlarRaw.forEach(f => {
-      const w = fonTop > 0 ? (f.tg / fonTop) * 100 : 0;
+    list.forEach(f => {
+      const w = blokTop > 0 ? (f.tg / blokTop) * 100 : 0;
       const tipEt = f.tip_orjinal || f.tip;
-      html += `<tr>
+      const mv = f.maliyetVar;
+      h += `<tr>
         <td>${f.kod}</td>
         <td style="font-size:11px;color:#64748b">${tipEt}</td>
         <td>${fmt(f.adet)}</td>
-        <td>${fmt4(f.maliyet)}</td>
+        <td>${mv ? fmt4(f.maliyet) : '—'}</td>
         <td style="font-weight:600">${fmt4(f.guncel)}</td>
         <td>${fmt(f.tg)}</td>
         <td style="color:#64748b;font-size:11px">${weightBar(w)}</td>
         <td class="${tlClass(f.gunlukKZ)}">${tlSign(f.gunlukKZ)}${fmt(Math.abs(f.gunlukKZ))}</td>
         <td>${badge(f.gunlukP)}</td>
-        <td class="${tlClass(f.kz)}">${tlSign(f.kz)}${fmt(Math.abs(f.kz))}</td>
-        <td>${badge(f.kzp)}</td>
-        <td>${badge(f.ybb)}</td>
+        <td class="${mv ? tlClass(f.kz) : 'val-zero'}">${mv ? (tlSign(f.kz)+fmt(Math.abs(f.kz))) : '—'}</td>
+        <td>${mv ? badge(f.kzp) : '—'}</td>
+        <td>${mv ? badge(f.ybb) : '—'}</td>
       </tr>`;
     });
-    const t_kz=sum(fonlarRaw,'kz'), t_gk=sum(fonlarRaw,'gunlukKZ');
-    const t_kzp = sum(fonlarRaw,'tm') > 0 ? (fonTop/sum(fonlarRaw,'tm') - 1) * 100 : 0;
-    html += `</tbody><tfoot><tr>
-      <td>TOPLAM</td><td colspan="4"></td><td>₺${fmt(fonTop)}</td><td>100.0%</td>
+    const t_gk = sum(list, 'gunlukKZ');
+    // K/Z toplamı sadece maliyet bilgisi olan kalemler için anlamlı
+    const t_tm = sum(list.filter(x => x.maliyetVar), 'tm');
+    const t_kz = hasMaliyet ? (sum(list.filter(x => x.maliyetVar), 'tg') - t_tm) : 0;
+    const t_kzp = t_tm > 0 ? (t_kz / t_tm) * 100 : 0;
+    h += `</tbody><tfoot><tr>
+      <td>TOPLAM</td><td colspan="4"></td><td>₺${fmt(blokTop)}</td><td>100.0%</td>
       <td class="${tlClass(t_gk)}">${tlSign(t_gk)}${fmt(Math.abs(t_gk))}</td><td></td>
-      <td class="${tlClass(t_kz)}">${tlSign(t_kz)}${fmt(Math.abs(t_kz))}</td>
-      <td>${badge(t_kzp)}</td><td></td>
+      <td class="${hasMaliyet ? tlClass(t_kz) : 'val-zero'}">${hasMaliyet ? (tlSign(t_kz)+fmt(Math.abs(t_kz))) : '—'}</td>
+      <td>${hasMaliyet ? badge(t_kzp) : '—'}</td><td></td>
     </tr></tfoot></table></div></div>`;
+    return h;
   }
+
+  html += renderFonBlok('🏦 YurtdışıFon',  yurtdisiList);
+  html += renderFonBlok('🏦 Fon',          fonList);
+  html += renderFonBlok('🏦 AltınFonu',    altinFonuList);
+  html += renderFonBlok('🏦 Emeklilik',    emeklilikList);
 
   // Kripto
   if (kripto.length > 0) {
@@ -536,11 +566,8 @@ function render(portfoy, prices) {
   document.getElementById('last-update').textContent = lastUpdate + ' • Fintables 15 dk gecikmeli';
 
   document.getElementById('genel-toplam').textContent = '₺' + fmt(genTop);
-  document.getElementById('genel-badge').innerHTML = badge(genKZP);
 
   const summaryHtml = `
-    <div class="summary-card"><div class="label">Toplam Maliyet</div><div class="val">₺${fmt(genMal)}</div></div>
-    <div class="summary-card"><div class="label">Net K/Z</div><div class="val ${genKZ>=0?'green':'red'}">${genKZ>=0?'+':''}₺${fmt(genKZ)}</div></div>
     <div class="summary-card"><div class="label">Günlük Kazanç</div><div class="val ${genGK>=0?'green':'red'}">${genGK>=0?'+':''}₺${fmt(Math.abs(genGK))}</div></div>
     ${names.map(n => `<div class="summary-card"><div class="label">${displayNames[n] || n} Varlık</div><div class="val">₺${fmt(rendered[n].toplam)}</div></div>`).join('')}
   `;
