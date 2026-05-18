@@ -68,7 +68,76 @@ def yfinance_seri(sembol, baslangic, bitis):
         return {}
 
 
+def borsapy_index_seri(sembol, baslangic, bitis):
+    """Borsapy Index serisi: bp.Index(sembol).history(start, end). Cikti: {tarih: Close}."""
+    if not BORSAPY_OK:
+        return {}
+    try:
+        idx = bp.Index(sembol)
+        df = idx.history(start=baslangic, end=bitis)
+        if df is None or df.empty:
+            return {}
+        seri = {}
+        for tarih, row in df.iterrows():
+            fiyat = row.get("Close")
+            if fiyat is None or pd.isna(fiyat):
+                continue
+            seri[pd.to_datetime(tarih).strftime("%Y-%m-%d")] = float(fiyat)
+        return seri
+    except Exception as e:
+        log(f"borsapy Index hata ({sembol}): {e}", "WARN")
+        return {}
+
+
+def borsapy_fx_seri(asset, baslangic, bitis):
+    """Borsapy FX serisi: bp.FX(asset).history(start, end). Cikti: {tarih: Close}."""
+    if not BORSAPY_OK:
+        return {}
+    try:
+        fx = bp.FX(asset)
+        df = fx.history(start=baslangic, end=bitis)
+        if df is None or df.empty:
+            return {}
+        seri = {}
+        for tarih, row in df.iterrows():
+            fiyat = row.get("Close")
+            if fiyat is None or pd.isna(fiyat):
+                continue
+            seri[pd.to_datetime(tarih).strftime("%Y-%m-%d")] = float(fiyat)
+        return seri
+    except Exception as e:
+        log(f"borsapy FX hata ({asset}): {e}", "WARN")
+        return {}
+
+
+def borsapy_fund_seri(kod, baslangic, bitis):
+    """Borsapy Fund serisi: bp.Fund(kod).history(start, end). Cikti: {tarih: Price}."""
+    if not BORSAPY_OK:
+        return {}
+    try:
+        f = bp.Fund(kod)
+        df = f.history(start=baslangic, end=bitis)
+        if df is None or df.empty:
+            return {}
+        seri = {}
+        for tarih, row in df.iterrows():
+            fiyat = row.get("Price")
+            if fiyat is None or pd.isna(fiyat):
+                continue
+            seri[pd.to_datetime(tarih).strftime("%Y-%m-%d")] = float(fiyat)
+        return seri
+    except Exception as e:
+        log(f"borsapy Fund hata ({kod}): {e}", "WARN")
+        return {}
+
+
 def bist100_seri(baslangic, bitis):
+    """BIST100 - birincil borsapy Index('XU100'), yedek yfinance 'XU100.IS'."""
+    seri = borsapy_index_seri("XU100", baslangic, bitis)
+    if seri:
+        log(f"BIST100: borsapy ile {len(seri)} kayit")
+        return seri
+    log("BIST100 borsapy bos, yfinance yedegine donuluyor.", "WARN")
     return yfinance_seri("XU100.IS", baslangic, bitis)
 
 
@@ -102,14 +171,18 @@ def tcmb_usd_anlik():
 
 def usd_try_seri(baslangic, bitis):
     """
-    USDTRY tarihsel seri - birincil yfinance, yedek TCMB (sinirli).
-    yfinance bos donerse, TCMB'den bugunun kurunu tek nokta olarak ekler.
-    Bu sayede sp500_tl ve gram_altin'in bugunku noktasi hesaplanabilir.
+    USDTRY tarihsel seri - birincil borsapy FX('USD'), yedek yfinance 'USDTRY=X',
+    son care TCMB anlik (sadece bugun, tek nokta).
     """
+    seri = borsapy_fx_seri("USD", baslangic, bitis)
+    if seri:
+        log(f"USDTRY: borsapy ile {len(seri)} kayit")
+        return seri
+    log("USDTRY borsapy bos, yfinance yedegine donuluyor.", "WARN")
     seri = yfinance_seri("USDTRY=X", baslangic, bitis)
     if seri:
         return seri
-    log("USDTRY seri bos, TCMB anlik yedegine donuluyor (sadece bugun).", "WARN")
+    log("USDTRY yfinance de bos, TCMB anlik yedegine donuluyor (sadece bugun).", "WARN")
     tcmb_kur = tcmb_usd_anlik()
     if tcmb_kur is None:
         return {}
@@ -119,7 +192,26 @@ def usd_try_seri(baslangic, bitis):
 
 
 def sp500_tl_seri(baslangic, bitis):
-    """S&P500 USD * USDTRY = S&P500 TL"""
+    """
+    S&P500 (TL) - Turk yatirimci perspektifi.
+    Birincil: TEFAS DSP fonu (Garanti Portfoy S&P500 ABD Hisse Senedi).
+    Yedek 1: TEFAS TI2 fonu (Is Portfoy S&P500).
+    Yedek 2 (son care): yfinance ^GSPC * USDTRY.
+
+    Not: TEFAS fonu yonetim ucreti icerir, saf S&P500'den ~%1.5-2/yil
+    negatif sapma olur. Turk yatirimci pratiginde S&P500'e bu yolla
+    erisildigi icin yaklasim dogru.
+    """
+    seri = borsapy_fund_seri("DSP", baslangic, bitis)
+    if seri:
+        log(f"S&P500 (TL, DSP): {len(seri)} kayit")
+        return seri
+    log("DSP bos, TI2 yedegine donuluyor.", "WARN")
+    seri = borsapy_fund_seri("TI2", baslangic, bitis)
+    if seri:
+        log(f"S&P500 (TL, TI2): {len(seri)} kayit")
+        return seri
+    log("DSP ve TI2 ikisi de bos, yfinance ^GSPC*USDTRY son caresine donuluyor.", "WARN")
     sp = yfinance_seri("^GSPC", baslangic, bitis)
     usd = usd_try_seri(baslangic, bitis)
     sonuc = {}
@@ -131,7 +223,15 @@ def sp500_tl_seri(baslangic, bitis):
 
 
 def gram_altin_seri(baslangic, bitis):
-    """GC=F (USD/oz) * USDTRY / 31.1035 = TL/gram"""
+    """
+    Gram altin TL - birincil borsapy FX('gram-altin') direkt TL,
+    yedek yfinance GC=F (USD/oz) * USDTRY / 31.1035.
+    """
+    seri = borsapy_fx_seri("gram-altin", baslangic, bitis)
+    if seri:
+        log(f"Gram altin: borsapy ile {len(seri)} kayit")
+        return seri
+    log("Gram altin borsapy bos, yfinance GC=F*USDTRY/31.1035 yedegine donuluyor.", "WARN")
     OZ_TO_GRAM = 31.1035
     altin = yfinance_seri("GC=F", baslangic, bitis)
     usd = usd_try_seri(baslangic, bitis)
