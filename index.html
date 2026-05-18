@@ -129,12 +129,12 @@
   .weight-bar-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
 
   /* ── KRIPTO ── */
-  .kripto-row { background: linear-gradient(to right, #fffbeb, #fef3c7); border: 1px solid #fde68a; border-radius: 16px; padding: 18px; display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; }
-  .kleft { font-size: 18px; font-weight: 800; color: #d97706; }
-  .kleft small { font-weight: 500; font-size: 13px; color: #b45309; background: #fef3c7; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
+  .kripto-row { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 18px; display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; }
+  .kleft { font-size: 18px; font-weight: 800; color: #0f172a; }
+  .kleft small { font-weight: 500; font-size: 13px; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; }
   .kitems { display: flex; flex-wrap: wrap; gap: 18px; justify-content: flex-end; }
-  .kitem .kl { font-size: 10px; color: #b45309; text-transform: uppercase; }
-  .kitem .kv { font-weight: 700; font-size: 14px; color: #78350f; font-variant-numeric: tabular-nums; }
+  .kitem .kl { font-size: 10px; color: #64748b; text-transform: uppercase; }
+  .kitem .kv { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
 
   /* ── DIST ── */
   .dist-bar { display: flex; height: 12px; border-radius: 10px; overflow: hidden; border: 1px solid #e2e8f0; margin-top: 10px; }
@@ -238,6 +238,8 @@ const badge = v => {
 };
 const tlClass = v => v>0 ? 'val-pos' : (v<0 ? 'val-neg' : 'val-zero');
 const tlSign = v => v>0 ? '+' : '';
+// fullSign: pozitif için '+', negatif için '-', sıfır için ''. Mutlak değerle birlikte kullanılır.
+const fullSign = v => v>0 ? '+' : (v<0 ? '-' : '');
 const colors = ['#0f172a','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#14b8a6','#e11d48','#6366f1'];
 
 // ═══════════════════════════════════════════════
@@ -492,9 +494,9 @@ function renderPortfoy(name, items, prices) {
           <div class="kitem"><div class="kl">Birim Fiyat</div><div class="kv">₺${fmt(birimFiyat)}</div></div>
           <div class="kitem"><div class="kl">Maliyet</div><div class="kv">₺${fmt(c.tm)}</div></div>
           <div class="kitem"><div class="kl">Değer</div><div class="kv">₺${fmt(c.tg)}</div></div>
-          <div class="kitem"><div class="kl">Günlük ₺</div><div class="kv ${tlClass(c.gunlukKZ)}">${tlSign(c.gunlukKZ)}₺${fmt(Math.abs(c.gunlukKZ))}</div></div>
+          <div class="kitem"><div class="kl">Günlük ₺</div><div class="kv ${tlClass(c.gunlukKZ)}">${fullSign(c.gunlukKZ)}₺${fmt(Math.abs(c.gunlukKZ))}</div></div>
           <div class="kitem"><div class="kl">Günlük %</div><div class="kv">${badge(c.gunlukP)}</div></div>
-          <div class="kitem"><div class="kl">K/Z</div><div class="kv ${tlClass(c.kz)}">${tlSign(c.kz)}₺${fmt(Math.abs(c.kz))}</div></div>
+          <div class="kitem"><div class="kl">K/Z</div><div class="kv ${tlClass(c.kz)}">${fullSign(c.kz)}₺${fmt(Math.abs(c.kz))}</div></div>
           <div class="kitem"><div class="kl">Getiri</div><div class="kv">${badge(c.kzp)}</div></div>
         </div>
       </div>
