@@ -7,6 +7,8 @@
 <meta name="googlebot" content="noindex, nofollow">
 <title>Özel Sayfa</title>
 <link rel="icon" href="data:,">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; background: #f1f5f9; color: #0f172a; -webkit-font-smoothing: antialiased; padding-bottom: 40px; }
@@ -146,6 +148,30 @@
   .loading { text-align: center; padding: 60px 20px; color: #64748b; }
   .err-msg { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; border-radius: 12px; padding: 16px; margin: 16px; }
 
+  /* ── BENCHMARK ── */
+  .bench-controls { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+  .bench-select-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .bench-select-wrap label { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .bench-select { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid #e2e8f0; background: white; font-size: 14px; font-weight: 600; color: #0f172a; cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%223%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center; background-size: 12px; padding-right: 36px; }
+  .bench-select:focus { outline: none; border-color: #3b82f6; }
+  .bench-periods { display: flex; flex-wrap: wrap; gap: 6px; }
+  .bench-period-btn { padding: 8px 14px; border-radius: 10px; border: 1px solid #e2e8f0; background: white; font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.2s; }
+  .bench-period-btn:hover { background: #f8fafc; }
+  .bench-period-btn.active { background: #0f172a; color: white; border-color: #0f172a; }
+  .bench-chart-wrap { position: relative; height: 360px; margin: 8px 0 18px; }
+  .bench-info { font-size: 12px; color: #64748b; line-height: 1.55; background: #f8fafc; border-left: 3px solid #3b82f6; padding: 10px 14px; border-radius: 8px; margin-top: 14px; }
+  .bench-warn { font-size: 12px; color: #92400e; background: #fef3c7; border-left: 3px solid #f59e0b; padding: 10px 14px; border-radius: 8px; margin-top: 14px; }
+  .bench-table-wrap { overflow-x: auto; }
+  .bench-table th:first-child, .bench-table td:first-child { text-align: left; min-width: 130px; }
+  .bench-table .bench-row-self td:first-child { color: #0d9488; }
+  .bench-table .bench-row-fark { background: #f8fafc; font-weight: 700; }
+  @media (max-width: 720px) {
+    .bench-chart-wrap { height: 280px; }
+    .bench-period-btn { padding: 7px 10px; font-size: 12px; }
+  }
+
   @media (max-width: 720px) {
     .header { padding: 24px 14px; }
     .header-total .value { font-size: 26px; }
@@ -248,11 +274,14 @@ const colors = ['#0f172a','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec
 async function loadData() {
   try {
     const cb = '?t=' + Date.now();
-    const [portfoy, prices] = await Promise.all([
+    const safeFetch = (url) => fetch(url + cb).then(r => r.ok ? r.json() : null).catch(() => null);
+    const [portfoy, prices, benchmark, gecmis] = await Promise.all([
       fetch('portfoy.json' + cb).then(r => r.json()),
-      fetch('prices.json' + cb).then(r => r.json())
+      fetch('prices.json' + cb).then(r => r.json()),
+      safeFetch('benchmark_gecmis.json'),  // yoksa null
+      safeFetch('gecmis.json')              // 21 Mayis oncesi yok, null
     ]);
-    render(portfoy, prices);
+    render(portfoy, prices, benchmark, gecmis);
   } catch (e) {
     document.getElementById('panels').innerHTML = `<div class="err-msg">Veri yüklenemedi: ${e.message}</div>`;
   }
@@ -547,7 +576,10 @@ function renderPortfoy(name, items, prices) {
 }
 
 
-function render(portfoy, prices) {
+function render(portfoy, prices, benchmark, gecmis) {
+  // Benchmark verisini global tut (dropdown/donem degisikliginde tekrar kullanmak icin)
+  _benchmarkData = benchmark;
+  _gecmisData = gecmis;
   const portfoyler = portfoy.portfoyler || {};
   const rendered = {};
   let genTop = 0, genMal = 0, genGK = 0;
@@ -591,12 +623,14 @@ function render(portfoy, prices) {
 
   const tabsHtml = names.map((n,i) =>
     `<button class="tab ${i===0?'active':''}" data-panel="${n}" onclick="switchTab('${n}')">👤 ${displayNames[n] || n} • ₺${fmt(rendered[n].toplam)}</button>`
-  ).join('');
+  ).join('') +
+  `<button class="tab" data-panel="benchmark" onclick="switchTab('benchmark')">📊 Benchmark</button>`;
   document.getElementById('tabs').innerHTML = tabsHtml;
 
   const panelsHtml = names.map((n,i) =>
     `<div id="panel-${n}" class="${i===0?'':'hidden'}">${rendered[n].html}</div>`
-  ).join('');
+  ).join('') +
+  `<div id="panel-benchmark" class="hidden">${benchmarkPanelHtml()}</div>`;
   document.getElementById('panels').innerHTML = panelsHtml;
 }
 
@@ -607,6 +641,348 @@ function switchTab(name) {
   document.querySelectorAll('.tab').forEach(el => {
     el.className = 'tab' + (el.dataset.panel === name ? ' active' : '');
   });
+  // Benchmark tab acildigi an grafigi cizdir (canvas DOM'da gizli iken Chart.js boyut alamaz)
+  if (name === 'benchmark') {
+    setTimeout(refreshBenchmark, 0);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// BENCHMARK TABI
+// ═══════════════════════════════════════════════
+let _benchmarkData = null;
+let _gecmisData = null;
+let _benchChart = null;
+
+// Dropdown opsiyonlari (CLAUDE.md §6.1 — 15 oge, 3 grupta)
+const BENCH_SECIMLER = [
+  { grup: 'ÖZKAN', items: [
+    { v: 'ozkan_genel',       t: 'Özkan – Genel Toplam' },
+    { v: 'ozkan_aktif',       t: 'Özkan – Aktif Yatırım (Hisse+Fon+Yurtdışı+AltınFonu+Kripto)' },
+    { v: 'ozkan_hfy',         t: 'Özkan – Hisse+Fon+Yurtdışı' },
+    { v: 'ozkan_hisse',       t: 'Özkan – Hisse' },
+    { v: 'ozkan_fon',         t: 'Özkan – Fon' },
+    { v: 'ozkan_yurtdisi',    t: 'Özkan – YurtdışıFon' },
+    { v: 'ozkan_altinfonu',   t: 'Özkan – AltınFonu' },
+    { v: 'ozkan_kripto',      t: 'Özkan – Kripto' },
+    { v: 'ozkan_emeklilik',   t: 'Özkan – Emeklilik' },
+  ]},
+  { grup: 'DERYA', items: [
+    { v: 'derya_genel',       t: 'Derya – Genel' },
+    { v: 'derya_hisse',       t: 'Derya – Hisse' },
+    { v: 'derya_altin',       t: 'Derya – Altın' },
+    { v: 'derya_emeklilik',   t: 'Derya – Emeklilik' },
+  ]},
+  { grup: 'AİLE', items: [
+    { v: 'aile_toplam',       t: 'Aile – Toplam' },
+    { v: 'aile_aktif',        t: 'Aile – Aktif Yatırım' },
+  ]},
+];
+
+// Donem secimleri (CLAUDE.md §6.1)
+const BENCH_DONEMLER = ['1H', '1A', 'YTD', '6A', '1Y', '3Y', '5Y'];
+
+// Benchmark seri etiketleri ve renkleri
+const BENCH_SERILER = [
+  { key: 'bist100',        ad: 'BIST100',          renk: '#3b82f6' },
+  { key: 'amerika_hisse',  ad: 'Amerika Hisse (AFA)', renk: '#ef4444' },
+  { key: 'gram_altin',     ad: 'Gram Altın',       renk: '#f59e0b' },
+  { key: 'yae',            ad: 'YAE Fonu',         renk: '#8b5cf6' },
+  // TUFE ozel: aylik gerceklesen, yillasik enflasyon olarak gosterilir; ilerde
+  { key: 'tufe',           ad: 'TÜFE',             renk: '#64748b' },
+];
+const PORTFOY_RENK = '#0d9488';  // turkuaz
+
+// Tab acildiginda render edilecek iskelet HTML
+function benchmarkPanelHtml() {
+  const opts = BENCH_SECIMLER.map(g =>
+    `<optgroup label="${g.grup}">` +
+    g.items.map(it => `<option value="${it.v}">${it.t}</option>`).join('') +
+    `</optgroup>`
+  ).join('');
+  const periods = BENCH_DONEMLER.map((p,i) =>
+    `<button class="bench-period-btn ${p==='1A'?'active':''}" data-period="${p}" onclick="setBenchPeriod('${p}')">${p}</button>`
+  ).join('');
+  return `
+    <div class="section">
+      <div class="bench-controls">
+        <div class="bench-select-wrap">
+          <label>Karşılaştırılacak varlık</label>
+          <select class="bench-select" id="bench-select" onchange="refreshBenchmark()">${opts}</select>
+        </div>
+        <div class="bench-select-wrap">
+          <label>Dönem</label>
+          <div class="bench-periods">${periods}</div>
+        </div>
+      </div>
+      <div class="bench-chart-wrap"><canvas id="bench-canvas"></canvas></div>
+      <div id="bench-table-container"></div>
+      <div class="bench-info">
+        Portföy verisi <b>21 Mayıs 2026</b> itibarıyla kayıtlıdır.
+        Daha uzun dönemli karşılaştırmalarda benchmark çizgileri tamdır,
+        portföy çizgisi milat tarihinden itibaren başlar.
+      </div>
+      <div id="bench-warn-container"></div>
+    </div>
+  `;
+}
+
+function setBenchPeriod(p) {
+  document.querySelectorAll('.bench-period-btn').forEach(b => {
+    b.className = 'bench-period-btn' + (b.dataset.period === p ? ' active' : '');
+  });
+  refreshBenchmark();
+}
+
+// Bir tarihten "donem" kadar geriye git, baslangic tarihi don.
+function donemBaslangic(donem, sonTarihStr) {
+  const son = new Date(sonTarihStr + 'T00:00:00');
+  const d = new Date(son);
+  switch (donem) {
+    case '1H': d.setDate(d.getDate() - 7); break;
+    case '1A': d.setMonth(d.getMonth() - 1); break;
+    case 'YTD': d.setMonth(0); d.setDate(1); break;
+    case '6A': d.setMonth(d.getMonth() - 6); break;
+    case '1Y': d.setFullYear(d.getFullYear() - 1); break;
+    case '3Y': d.setFullYear(d.getFullYear() - 3); break;
+    case '5Y': d.setFullYear(d.getFullYear() - 5); break;
+  }
+  return d.toISOString().slice(0, 10);
+}
+
+// gecmis.json verisinden secime gore portfoy zaman serisi cikar: {tarih: tl}
+function portfoySerisi(secim, gecmis) {
+  if (!gecmis || !gecmis.gunler) return {};
+  const seri = {};
+  for (const [tarih, gun] of Object.entries(gecmis.gunler)) {
+    const o = gun.ozkan || {};
+    const d = gun.derya || {};
+    const ok = o.kategoriler || {};
+    const dk = d.kategoriler || {};
+    const get = (obj, k) => Number(obj[k] || 0);
+    let val = null;
+    switch (secim) {
+      case 'ozkan_genel':     val = Number(o.toplam || 0); break;
+      case 'ozkan_aktif':     val = get(ok,'hisse')+get(ok,'fon')+get(ok,'altinfonu')+get(ok,'yurtdisifonu')+get(ok,'kripto'); break;
+      case 'ozkan_hfy':       val = get(ok,'hisse')+get(ok,'fon')+get(ok,'yurtdisifonu'); break;
+      case 'ozkan_hisse':     val = get(ok,'hisse'); break;
+      case 'ozkan_fon':       val = get(ok,'fon'); break;
+      case 'ozkan_yurtdisi':  val = get(ok,'yurtdisifonu'); break;
+      case 'ozkan_altinfonu': val = get(ok,'altinfonu'); break;
+      case 'ozkan_kripto':    val = get(ok,'kripto'); break;
+      case 'ozkan_emeklilik': val = get(ok,'emeklilik'); break;
+      case 'derya_genel':     val = Number(d.toplam || 0); break;
+      case 'derya_hisse':     val = get(dk,'hisse'); break;
+      case 'derya_altin':     val = get(dk,'altin'); break;
+      case 'derya_emeklilik': val = get(dk,'emeklilik'); break;
+      case 'aile_toplam':     val = Number(gun.genel_toplam || 0); break;
+      case 'aile_aktif':
+        val = get(ok,'hisse')+get(ok,'fon')+get(ok,'altinfonu')+get(ok,'yurtdisifonu')+get(ok,'kripto')+get(dk,'hisse')+get(dk,'altin');
+        break;
+    }
+    if (val != null && val > 0) seri[tarih] = val;
+  }
+  return seri;
+}
+
+// Bir donem icin kumulatif % getiri noktalari: [{x:'YYYY-MM-DD', y:pct}]
+// baselineSeri: kumulatif hesabin sifir noktasi olan seri (genelde benchmark veya portfoy serisi),
+// bizimkinde her seri kendi baseline'ina gore.
+function cumulativeSeri(seri, baslangic, bitis) {
+  const tarihler = Object.keys(seri).filter(t => t >= baslangic && t <= bitis).sort();
+  if (tarihler.length < 1) return [];
+  const baseline = seri[tarihler[0]];
+  if (!baseline || baseline <= 0) return [];
+  return tarihler.map(t => ({ x: t, y: ((seri[t] / baseline) - 1) * 100 }));
+}
+
+// Bir donem icin tek skaler % getiri (baslangic -> bitis)
+function donemGetirisi(seri, baslangic, bitis) {
+  const tarihler = Object.keys(seri).filter(t => t >= baslangic && t <= bitis).sort();
+  if (tarihler.length < 2) return null;
+  const ilk = seri[tarihler[0]];
+  const son = seri[tarihler[tarihler.length - 1]];
+  if (!ilk || ilk <= 0) return null;
+  return ((son / ilk) - 1) * 100;
+}
+
+// TUFE serisi aylik bazda yyyy-MM seklinde. Ileride genisletmek icin simdilik
+// donem tablosu kismi kullanir, grafikte gosterilmez (tarih formati uyumsuz).
+function tufeDonemGetirisi(tufe, baslangic, bitis) {
+  if (!tufe) return null;
+  // tufe = {gerceklesen: {'YYYY-MM': float}, ...}. Kumulatif: (1+r1)(1+r2)...-1
+  const aylar = Object.keys(tufe).filter(ay => {
+    return ay >= baslangic.slice(0,7) && ay <= bitis.slice(0,7);
+  }).sort();
+  if (aylar.length === 0) return null;
+  let bir = 1;
+  for (const ay of aylar) {
+    bir *= (1 + (Number(tufe[ay]) || 0) / 100);
+  }
+  return (bir - 1) * 100;
+}
+
+function refreshBenchmark() {
+  const sel = document.getElementById('bench-select');
+  const secim = sel ? sel.value : 'aile_toplam';
+  const aktifBtn = document.querySelector('.bench-period-btn.active');
+  const donem = aktifBtn ? aktifBtn.dataset.period : '1A';
+
+  const warnEl = document.getElementById('bench-warn-container');
+  if (!_benchmarkData || !_benchmarkData.seriler) {
+    if (warnEl) warnEl.innerHTML = `<div class="bench-warn">⚠️ Benchmark verisi yüklenemedi (benchmark_gecmis.json bulunamadı).</div>`;
+    return;
+  }
+  warnEl.innerHTML = '';
+
+  const benchSeriler = _benchmarkData.seriler;
+  const portfoySer = portfoySerisi(secim, _gecmisData);
+
+  // Bitis: bugun veya benchmark son tarihinin minumumu (gelecek tarih olmasin)
+  const bugun = new Date().toISOString().slice(0, 10);
+  let benchSonTarih = bugun;
+  for (const b of BENCH_SERILER.filter(b => b.key !== 'tufe')) {
+    const seri = benchSeriler[b.key] || {};
+    const tarihler = Object.keys(seri).sort();
+    if (tarihler.length) {
+      const son = tarihler[tarihler.length - 1];
+      if (son > benchSonTarih) benchSonTarih = son;
+    }
+  }
+  const bitis = bugun > benchSonTarih ? bugun : benchSonTarih;
+  const baslangic = donemBaslangic(donem, bitis);
+
+  // Portfoy verisi var mi?
+  const portfoyTarihler = Object.keys(portfoySer).filter(t => t >= baslangic && t <= bitis);
+  if (Object.keys(portfoySer).length === 0) {
+    warnEl.innerHTML = `<div class="bench-warn">ℹ️ Portföy zaman serisi henüz yok — milat tarihi 21 Mayıs 2026. Bu tarihten itibaren her gece 18:35 kapanış sonrası snapshot eklenir.</div>`;
+  } else if (portfoyTarihler.length < 2) {
+    warnEl.innerHTML = `<div class="bench-warn">ℹ️ Bu dönem için yeterli portföy snapshot yok (en az 2 gün gerek). Daha kısa veya YTD/3Y/5Y deneyin.</div>`;
+  }
+
+  // ── ÇİZGİ GRAFİK ──
+  const secilenLabel = BENCH_SECIMLER.flatMap(g => g.items).find(it => it.v === secim)?.t || secim;
+
+  const datasets = [];
+  const portfoyPoints = cumulativeSeri(portfoySer, baslangic, bitis);
+  if (portfoyPoints.length > 0) {
+    datasets.push({
+      label: secilenLabel,
+      data: portfoyPoints,
+      borderColor: PORTFOY_RENK,
+      backgroundColor: PORTFOY_RENK + '20',
+      borderWidth: 3,
+      pointRadius: 0,
+      pointHoverRadius: 4,
+      tension: 0.15,
+    });
+  }
+  for (const b of BENCH_SERILER.filter(b => b.key !== 'tufe')) {
+    const seri = benchSeriler[b.key] || {};
+    const points = cumulativeSeri(seri, baslangic, bitis);
+    if (points.length === 0) continue;
+    datasets.push({
+      label: b.ad,
+      data: points,
+      borderColor: b.renk,
+      backgroundColor: b.renk + '20',
+      borderWidth: 1.8,
+      pointRadius: 0,
+      pointHoverRadius: 4,
+      borderDash: [4, 3],
+      tension: 0.15,
+    });
+  }
+
+  // Chart.js cizimi
+  const canvas = document.getElementById('bench-canvas');
+  if (_benchChart) { _benchChart.destroy(); _benchChart = null; }
+  if (canvas && datasets.length > 0) {
+    _benchChart = new Chart(canvas, {
+      type: 'line',
+      data: { datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        scales: {
+          x: { type: 'time', time: { parser: 'yyyy-MM-dd', unit: 'month', displayFormats: { month: 'MMM yy' } },
+               ticks: { color: '#64748b', maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
+               grid: { color: '#f1f5f9' } },
+          y: { ticks: { color: '#64748b', callback: v => v.toFixed(0) + '%' },
+               grid: { color: '#f1f5f9' } },
+        },
+        plugins: {
+          legend: { position: 'bottom', labels: { color: '#64748b', boxWidth: 12, font: { size: 11 } } },
+          tooltip: {
+            callbacks: {
+              title: items => items[0]?.parsed?.x ? new Date(items[0].parsed.x).toLocaleDateString('tr-TR') : '',
+              label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y >= 0 ? '+' : ''}${ctx.parsed.y.toFixed(2)}%`,
+            },
+          },
+        },
+      },
+    });
+  } else if (canvas) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Bu dönem için yeterli veri yok', canvas.width/2, canvas.height/2);
+  }
+
+  // ── 7×7 KARŞILAŞTIRMA TABLOSU ──
+  // Her donem icin: secilen varlik + 4 benchmark + TUFE + Fark satiri
+  const satirlar = [];
+  const portfoyGetirileri = {};
+  const benchGetirileri = {};  // {donem: {benchKey: pct}}
+
+  for (const dn of BENCH_DONEMLER) {
+    const dBaslangic = donemBaslangic(dn, bitis);
+    const portG = donemGetirisi(portfoySer, dBaslangic, bitis);
+    portfoyGetirileri[dn] = portG;
+    benchGetirileri[dn] = {};
+    for (const b of BENCH_SERILER) {
+      if (b.key === 'tufe') {
+        benchGetirileri[dn].tufe = tufeDonemGetirisi(benchSeriler.tufe_aylik_gerceklesen, dBaslangic, bitis);
+      } else {
+        benchGetirileri[dn][b.key] = donemGetirisi(benchSeriler[b.key] || {}, dBaslangic, bitis);
+      }
+    }
+  }
+
+  const fmtPct = v => v == null ? '—' : `<span class="${v>=0?'val-pos':'val-neg'}">${v>=0?'+':''}${v.toFixed(2)}%</span>`;
+
+  let tHtml = `<div class="bench-table-wrap"><table class="bench-table"><thead><tr>
+    <th></th>${BENCH_DONEMLER.map(d => `<th style="text-align:right">${d}</th>`).join('')}
+  </tr></thead><tbody>`;
+  // Secilen varlik satiri
+  tHtml += `<tr class="bench-row-self"><td>${secilenLabel.length > 40 ? secilenLabel.slice(0, 38) + '…' : secilenLabel}</td>`;
+  for (const dn of BENCH_DONEMLER) tHtml += `<td>${fmtPct(portfoyGetirileri[dn])}</td>`;
+  tHtml += `</tr>`;
+  // Her benchmark
+  for (const b of BENCH_SERILER) {
+    tHtml += `<tr><td>${b.ad}</td>`;
+    for (const dn of BENCH_DONEMLER) tHtml += `<td>${fmtPct(benchGetirileri[dn][b.key])}</td>`;
+    tHtml += `</tr>`;
+  }
+  // Fark: en iyi benchmark - secilen varlik (her donem)
+  tHtml += `<tr class="bench-row-fark"><td>Fark (en iyi − varlık)</td>`;
+  for (const dn of BENCH_DONEMLER) {
+    const portG = portfoyGetirileri[dn];
+    const allBench = Object.values(benchGetirileri[dn]).filter(v => v != null);
+    if (portG == null || allBench.length === 0) {
+      tHtml += `<td>—</td>`;
+    } else {
+      const enIyi = Math.max(...allBench);
+      const fark = enIyi - portG;
+      tHtml += `<td>${fmtPct(fark)}</td>`;
+    }
+  }
+  tHtml += `</tr></tbody></table></div>`;
+
+  document.getElementById('bench-table-container').innerHTML = tHtml;
 }
 </script>
 </body>
