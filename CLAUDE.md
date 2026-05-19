@@ -153,15 +153,17 @@ atla.
 
 ## 4. BENCHMARK SETİ
 
-| Benchmark | Amaç | Kaynak |
+| Benchmark | Amaç | Kaynak (19 Mayıs 2026 itibarıyla) |
 |---|---|---|
-| BIST100 | Hisse karşılaştırması | yfinance (`XU100.IS`) |
-| S&P500 (TL) | Yurtdışı hisse karşılaştırması | yfinance × USDTRY |
-| Gram Altın | Altın varlıkların karşılaştırması | yfinance (`GC=F` × USDTRY) |
-| YAE fonu | Faiz / para piyasası karşılaştırması (ZBJ için) | tefas-crawler |
-| TÜFE | Reel getiri (1 ay+ kıyaslamalar) | TÜİK; yoksa MB PKA |
+| BIST100 | Hisse karşılaştırması | `borsapy.Index("XU100")` birincil, yfinance `XU100.IS` yedek |
+| **Amerika Hisse (TL)** | Yurtdışı hisse karşılaştırması | `borsapy.Fund("AFA")` birincil, `Fund("ABE")` yedek, yfinance `^GSPC × USDTRY` son çare |
+| Gram Altın | Altın varlıkların karşılaştırması | `borsapy.FX("gram-altin")` birincil (TL direkt), yfinance `GC=F × USDTRY ÷ 31.1035` yedek |
+| YAE fonu | Faiz / para piyasası karşılaştırması (ZBJ için) | `borsapy.Fund("YAE")` (TEFAS v2 API) |
+| TÜFE | Reel getiri (1 ay+ kıyaslamalar) | Google Sheets `TUFE` sekmesi |
 
 **Karşılaştırma türü:** sadece **% getiri** (mutlak değer değil).
+
+**Not (19 Mayıs 2026):** "S&P500 (TL)" → "Amerika Hisse (AFA)" olarak değişti. borsapy doğrudan S&P500 endeksini desteklemediği için Türk yatırımcının S&P500 erişim aracı olan TEFAS S&P500 takipli fonlardan AFA kullanılıyor. Detay: §12.2.
 
 ---
 
@@ -463,9 +465,365 @@ Yedek tablosu güncellendi (bkz. Bölüm 8.1):
 - **GitHub PAT:** `cron-job-org-portfoy-tetikleyici` (geçerlilik: 2027-05-14)
 - GitHub schedule cron'ları paralel sigorta olarak korunuyor.
 
-### 11.4 Yapılacaklar (öncelik sırasıyla)
+### 11.4 Yapılacaklar (15 Mayıs'ta belirlendi)
 
-1. Dashboard toplamları düzeltme (Özkan hazırlayacak)
-2. Benchmark Guncelleme #3 hatası (13 Mayıs kırmızı)
-3. Geçmiş Veriler sekmesi (21 Mayıs sonrası, Excel benzeri tablo + grafik)
-4. Privacy/gizlilik mode (göz ikonuyla 1M TL normalizasyonu)
+> **Durum (19 Mayıs 2026):** Hepsi tamamlandı. Detaylar için §12.
+
+1. ~~Dashboard toplamları düzeltme~~ ✅ (§12.1)
+2. ~~Benchmark Guncelleme hatası~~ ✅ (§12.2)
+3. ~~Geçmiş Veriler sekmesi~~ ✅ (§12.4, 21 Mayıs'ı bekliyor)
+4. ~~Privacy/gizlilik mode~~ ✅ (§12.3)
+
+---
+
+## 12. 19 MAYIS 2026 — FAZ 2 GÜNCELLEMELERİ (kapsamlı)
+
+**Amaç:** Yarın bir gün repo silinse bile bu bölümle her şeyi
+yeniden kurmak mümkün. Bu oturumda yaptıklarımız, çıkardığımız
+dersler, mimari kararlar ve sırada ne var.
+
+### 12.1 Dashboard yeniden düzenlemesi
+
+**Üst aile bar (`<div class="header">` içinde):**
+- "Toplam Maliyet" ve "Net K/Z" kartları **kaldırıldı**.
+- "Toplam Aile Varlığı" başlığının altındaki K/Z % rozeti (`genel-badge`) **kaldırıldı**.
+- "Günlük Kazanç" kartı yeniden yazıldı:
+  - Negatif → `-₺xxx` ön eki + kırmızı renk
+  - Pozitif → `+₺xxx` ön eki + yeşil renk
+  - Sıfır → işaretsiz + nötr
+  - TL'nin **altına yüzde satırı** eklendi (aynı renkte, daha küçük font)
+
+**CSS özgüllük (specificity) bug fix:**
+- `.summary-card .val` kuralı `color: white` belirliyordu.
+- `.green` ve `.red` modifier class'ları özgüllükte alttaydı (alt sayfaya bakın §12.6.4), o yüzden hiç çalışmıyordu.
+- Çözüm: `.summary-card .val.green` ve `.summary-card .val.red` kuralları eklendi (özgüllük 0,3,0 > 0,2,0).
+
+**Tab içi üst kartlar (Özkan ve Derya tablarında):**
+- "Toplam K/Z" kartı **kaldırıldı**.
+- "Portföy Değeri" kartı **dinamik** oldu:
+  - Özkan tabında: başlık `"Emeklilik ve Alacak Hariç Özkan Varlık"`, değer = `toplam − emeklilik − alacak`
+  - Derya tabında: başlık `"Emeklilik Hariç Derya Varlık"`, değer = `toplam − emeklilik`
+- Diğer kartlar (Günlük K/Z, Günün Yıldızı, Günün En Zayıfı) aynı kaldı.
+
+**Fonlar & Emeklilik bölümü — komple refactor:**
+- Eski tek tablo (`fonlarRaw` karışık) yerine **4 ayrı blok**:
+  1. 🏦 YurtdışıFon
+  2. 🏦 Fon
+  3. 🏦 AltınFonu
+  4. 🏦 Emeklilik
+- Her blok kendi başlığında alt-toplam, kendi 12-sütunlu tablosu, kendi TOPLAM satırı.
+- **Ağırlık sütunu** o blok içindeki yüzde (`item.tg / blokToplam × 100`), tüm portföye değil.
+- Boş tip render edilmez (`if (list.length === 0) return ''`).
+- **Emeklilik bloğunda** maliyet null olduğu için: Maliyet, K/Z ₺, K/Z %, YBB hücreleri "—" gösterilir. Bunu desteklemek için `enrichItem()` fonksiyonuna `maliyetVar` flag eklendi.
+
+**Kripto kartı:**
+- Sarı/krem gradient zemin (`linear-gradient(to right, #fffbeb, #fef3c7)`) → **beyaz/gri** (diğer bölümlerle uyumlu, `#e2e8f0` border).
+- `.kitem .kv`'den `color` özelliği **kaldırıldı**. Eskiden `color: #78350f` (kahverengi) idi, bu `.val-pos/.val-neg` (yeşil/kırmızı) class'larını override ediyordu.
+- "Günlük ₺" ve "Günlük %" item'ları eklendi (Değer ile K/Z arasında).
+- Günlük ₺ ve K/Z için yeni `fullSign(v)` helper kullanılıyor:
+  - Pozitif: `+₺xxx` (yeşil)
+  - Negatif: `-₺xxx` (kırmızı)
+  - Sıfır: işaretsiz
+
+### 12.2 Benchmark backend güncellemesi
+
+**Sorun (11–18 Mayıs):**
+- `scripts/benchmark_fiyat.py` PyPI'dan `tefas-crawler==0.6.0` paketi kullanıyordu. Bu paket güvenilmez (TEFAS API değişiklikleri).
+- Ek olarak, yfinance GitHub Actions IP havuzundan **Yahoo Finance'a erişemiyor** (rate limit/block: `"Expecting value: line 1 column 1 (char 0)"` hatası).
+- Sonuç: 6 gün boyunca her gece benchmark cron'u failure verdi, `benchmark_gecmis.json` hiç oluşturulamadı.
+
+**Bonus problem:** İlk kurulum `--gecmis` parametresiyle hiç yapılmamıştı. Workflow `workflow_dispatch` input dropdown'undan `true` seçimi atlanmıştı.
+
+**Çözüm:** Ana script `fiyat_guncelle.py` zaten `borsapy` (saidsurucu/borsapy) kullanıyordu. Benchmark script'i de aynı pattern'e alındı.
+
+**Yeni katmanlı yapı (`scripts/benchmark_fiyat.py`):**
+
+| Seri | Birincil | Yedek 1 | Yedek 2 (son çare) |
+|---|---|---|---|
+| BIST100 | `bp.Index("XU100")` | yfinance `XU100.IS` | — |
+| USD/TRY | `bp.FX("USD")` | yfinance `USDTRY=X` | TCMB anlık (tek nokta) |
+| Gram Altın | `bp.FX("gram-altin")` (TL direkt) | yfinance `GC=F × USDTRY ÷ 31.1035` | — |
+| Amerika Hisse (TL) | `bp.Fund("AFA")` | `bp.Fund("ABE")` | yfinance `^GSPC × USDTRY` |
+| YAE | `bp.Fund("YAE")` | — | — |
+| TÜFE | Sheets `TUFE` sekmesi | — | — |
+
+**Önemli karar — Amerika Hisse (AFA):**
+- borsapy doğrudan S&P500 endeksini desteklemiyor (TR piyasa odaklı paket).
+- Türk yatırımcının S&P500'e erişim aracı: TEFAS S&P500 takipli fonlar.
+- **AFA** = Amerika hisse senedi fonu (kullanıcı tercihi). 5 yıllık veride S&P500'e çok yakın hareket etti (gözlenen +793% vs beklenen ~+750%).
+- Yedek **ABE** (Amerika Hisse Senedi Fonu).
+- JSON anahtarı `sp500_tl` → `amerika_hisse` olarak değişti.
+- Yardımcı fonksiyonlar: `borsapy_index_seri`, `borsapy_fx_seri`, `borsapy_fund_seri`.
+
+**`requirements.txt` değişikliği:**
+- `tefas-crawler==0.6.0` **silindi**. (Eski paket, artık kullanılmıyor.)
+- `borsapy==0.10.0` **kalır** (saidsurucu/borsapy).
+
+**İlk kurulum:** `benchmark_gecmis.json` hiç yoktu. Workflow `gecmis=true` ile manuel tetiklendi (Actions → "Benchmark Guncelleme" → "Run workflow" → dropdown'dan `true` seç → "Run workflow"). 5 yıllık seri çekildi:
+- BIST100: 1268 kayıt
+- Amerika Hisse (AFA): 1256 kayıt
+- Gram Altın: 1726 kayıt
+- YAE: 71 kayıt (TEFAS v2 API'da fonun yaşı sınırlı)
+- TÜFE: 1 kayıt (Sheets'te sadece 2025-04 var, kullanıcı zamanla ay ekleyecek)
+
+### 12.3 Privacy (gizlilik) modu
+
+Sağ üst header'da göz ikonu (👁 ↔ 🙈) ile aç/kapat.
+
+**Mekanik:**
+- Aile toplamı sabit ₺1.000.000 olarak görünür.
+- Katsayı `k = 1.000.000 / gerçek_aile_toplamı` hesaplanır.
+- Her portföy satırında çarpılanlar: `adet`, `guncel_tl`, `onceki_tl`, `gunluk_kazanc_tl`.
+- Çarpılmayanlar: `maliyet` (birim, gerçek piyasa bilgisi), `gunluk_yuzde` (oran zaten korunur).
+- **Maliyet hücreleri görüntüde "—" maskelenir** (kullanıcı tercihi: "matematiğe gerek yok"). Hisseler tablosu, fon blokları, kripto kartı hepsinde.
+- Yüzdeler (ağırlık, günlük %, K/Z %, YBB) aynen kalır.
+- Birim güncel fiyat aynen kalır (`adet × birim_fiyat = TL` ilişkisi korunur çünkü `tg/adet = guncel`, hem `tg` hem `adet` aynı `k` ile çarpılır, oran aynı).
+
+**Geçmiş veriler için normalize:**
+- Her gün için **kendi katsayısı** hesaplanır (`1.000.000 / o_günün_aile_toplamı`).
+- Sonuç: her satır 1.000.000 sabit toplam gösterir, ama günler arası oran zamanla değişir (yani %20'den %25'e büyüme görsel kalır).
+- `normalizeGecmis()` fonksiyonu `doRender()` içinde çağrılır.
+
+**`doRender()` sarmalayıcı:**
+- `loadData()` raw verileri 4 global'e atar (`_rawPortfoy`, `_rawPrices`, `_rawBenchmark`, `_rawGecmis`), sonra `doRender()`.
+- `doRender()` privacy durumuna göre veriyi normalize edip `render(p, prices, b, g)` çağırır.
+- Privacy toggle yapıldığında **aktif tab hatırlanır**, Chart.js instance'ları destroy edilir, render yapılır, aktif tab geri yüklenir (canvas'lar yeniden çizilir).
+
+**State persistence:** `sessionStorage.getItem('privacy') === '1'`. Sekme kapanınca sıfırlanır, sayfa yenilenince korunur.
+
+### 12.4 Dashboard yeni tablar
+
+Sidebar artık **5 tab**:
+
+```
+👤 Özkan • ₺...   |   👤 Derya • ₺...   |   📊 Benchmark   |   📋 Geçmiş Veriler   |   📈 Grafik
+```
+
+**📊 Benchmark tabı:**
+- Üstte 2 seçici:
+  - "Karşılaştırılacak varlık" dropdown (`<select>` + `<optgroup>`, 15 öğe, ÖZKAN/DERYA/AİLE grupları)
+  - Dönem buton grubu: 1H / 1A / YTD / 6A / 1Y / 3Y / 5Y (varsayılan 1A)
+  - Not: "Özel tarih aralığı" v2'ye bırakıldı.
+- **Chart.js çizgi grafik**: seçilen varlık (turkuaz, kalın, dolgu YOK, düz çizgi) + 4 benchmark (BIST100, Amerika Hisse AFA, Gram Altın, YAE; ince kesik çizgi, farklı renkler) — hepsi kümülatif % getiri, başlangıç %0.
+  - TÜFE grafikte yok (aylık veri, günlük çizgiyle uyumsuz).
+- **7×7 karşılaştırma tablosu**: 7 dönem × (1 varlık + 5 benchmark + 1 "Fark") = 7 sütun + 7 satır.
+- Alt bilgi notu: portföy milat tarihi (21 Mayıs).
+
+**📋 Geçmiş Veriler tabı (Excel benzeri tablo):**
+- 12 sütun (kullanıcı kesin listesi):
+  1. **Tarih** (sticky-left — yatay scroll'da görünür kalır)
+  2. Özkan (em+alacak hariç)
+  3. Özkan Toplam
+  4. Özkan Emeklilik
+  5. Kripto (sadece Özkan'da)
+  6. Derya (em hariç)
+  7. Derya Toplam
+  8. Derya Emeklilik
+  9. Derya Altın
+  10. Aile Toplam
+  11. Aile (em+alacak hariç)
+  12. Aile Emeklilik
+- Üstte tarih seçici (`<input type="date">`): seçilen tarihin satırı **sarı highlight + scrollIntoView**.
+- "Vurguyu temizle" butonu.
+- Sıralama: en yeni en üstte.
+- Grafik yok, indir butonu yok (kullanıcı tercihi).
+- gecmis.json yoksa: "📭 Geçmiş veri henüz yok — milat tarihi 21 Mayıs 2026" mesajı.
+
+**📈 Grafik tabı:**
+- 15-öğeli dropdown (Benchmark ile aynı liste).
+- 7 dönem butonu (1H/1A/YTD/6A/1Y/3Y/5Y).
+- **Chart.js çizgi grafik**: SADECE seçilen varlığın kümülatif % getirisi (turkuaz, alan dolgu var). Benchmark karşılaştırması yok.
+- Alt durum kutusunda dönem getirisi rakamı (örn. "1A dönemde toplam değişim: +5,23%").
+- gecmis.json yoksa boş canvas + uyarı mesajı.
+
+### 12.5 CDN bağımlılıkları (yeni)
+
+`index.html` `<head>` içinde:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+```
+
+**Chart.js v4'te `time` scale için date-fns adapter zorunlu.** Toplam ~70 KB, CDN, ek build adımı yok.
+
+### 12.6 Öğrenilen dersler — YAPILMAMASI GEREKENLER
+
+**12.6.1 — Workflow_dispatch dropdown'u atlamak:**
+GitHub Actions'ta `workflow_dispatch` ile manuel tetiklerken, varsayılan input değerleri (örn. `gecmis: 'false'`) **kullanıcı dropdown'a tıklayıp `true` seçmedikçe** geçmez. İlk benchmark çalıştırmasında bu atlandı, 6 gün boyunca cron her gün hata verdi.
+**Doktrin:** Manuel tetikleme talimatı verirken adım adım, dropdown'a tıklama seviyesinde net olunmalı. Log'da `Run if [ "false" = "true" ]; then` görüldüğünde dropdown atlanmış demektir.
+
+**12.6.2 — `tefas-crawler` PyPI paketi güvenilmez:**
+TEFAS API değişiklikleri yüzünden zaman zaman bozuluyor. **TEFAS verisi için tek doğru kaynak:** `borsapy.Fund(kod)` (saidsurucu/borsapy, TEFAS v2 API). `tefas-crawler==0.6.0` bağımlılığı `requirements.txt`'ten silindi.
+
+**12.6.3 — yfinance GitHub Actions IP'lerinden çalışmıyor:**
+Yahoo Finance, GitHub Actions IP havuzunu rate-limit'liyor. yfinance log'unda `"Expecting value: line 1 column 1 (char 0)"` ya da `"possibly delisted; no timezone found"` görürsen sebep budur.
+**Doktrin:** Tüm fiyat çekimlerinde **borsapy birincil, yfinance yedek, TCMB son çare** sıralaması.
+
+**12.6.4 — CSS specificity (özgüllük) bug'ı:**
+Bir parent class'ı (`.summary-card`) içindeki child class'a (`.val`) `color: X` verirsen, sonra `.green/.red/.blue` modifier class'ları **özgüllük olarak alttadır**:
+- `.summary-card .val` → (0, 2, 0) = 20
+- `.green` → (0, 1, 0) = 10  → **özgüllük yetmiyor**
+- `.summary-card .val.green` → (0, 3, 0) = 30 → ✓
+**Çözüm:** Modifier class'larını parent scope ile birlikte yaz: `.summary-card .val.green { color: ... }`.
+
+**12.6.5 — `Math.abs(negatif)` + sadece "+" döndüren `tlSign` çakışması:**
+`fmt(Math.abs(v))` mutlak değer alır (eksi gider). `tlSign(v)` sadece pozitif için "+" döndürür (negatif için boş string). Sonuç: negatif değerler pozitif gibi görünür ("−122.237 TL" yerine "₺122.237").
+**Çözüm:** Yeni `fullSign(v)` helper: `v > 0 ? '+' : (v < 0 ? '-' : '')`. Üst banner ve kripto kartında bu kullanılıyor.
+
+**12.6.6 — Chart.js v4 + `time` scale = adapter şart:**
+Chart.js v4'te `scales: { x: { type: 'time' } }` kullanmak için tarih adapter'ı **zorunlu**. `chartjs-adapter-date-fns` CDN ile yükleniyor. Olmadan: "Time scale: cannot find a date adapter" hatası.
+
+**12.6.7 — Tab değişimi sonrası Chart.js yeniden çizim:**
+Chart.js bir canvas'a bağlandığında, canvas DOM'dan kalkınca (`panel-X` `hidden` olunca) yeniden açıldığında **otomatik canlanmaz**.
+**Doktrin:** `switchTab(name)` içinde ilgili tab açıldığında `setTimeout(refreshX, 0)` çağrısı yap. `setTimeout 0` canvas görünür hale gelince çalışacağı için Chart.js boyut alabilir.
+
+**12.6.8 — `doRender()` sonrası aktif tab restorasyonu:**
+Privacy toggle → `doRender()` → `render()` panelsHtml'i yeniden yazar → varsayılan ilk tab aktif olur. Eğer kullanıcı benchmark/grafik tabındaysa, kaybolur.
+**Doktrin:** `doRender()` başında aktif tab'ı hatırla, render sonrası eski tab'a dön. Aynı zamanda eski Chart.js instance'larını destroy et (yeni canvas oluştuğunda dangle ref kalmasın).
+
+**12.6.9 — Claude Preview MCP ve `defaults write` sandbox engeli:**
+Claude Preview MCP `python -m http.server`'ı sandbox altında çalıştıramıyor (`os.getcwd()` `PermissionError`). `defaults write com.apple.Safari ...` da Safari container'a yazma izni yok.
+**Pratik yol:** Bash ile manuel `python3 -m http.server PORT`. Dikkat: hangi dizinden başlatıldığı önemli! Worktree'den başlatırsan ana repodaki `benchmark_gecmis.json` 404 döner (worktree'de yok). **Ana repodan başlat veya worktree'ye dosyaları kopyala.**
+
+**12.6.10 — Git lock dosyası ve cron çakışması:**
+Otomatik commit cron'u (cron-job.org veya GitHub Actions) tam o anda push yaparsa, lokal `.git/index.lock` kalabilir.
+**Acil kurtarma:**
+```bash
+cd ~/Documents/pf-a7k9m3p2
+rm -f .git/index.lock .git/HEAD.lock
+git rebase --abort 2>/dev/null
+git fetch origin
+git reset --hard origin/main
+git status
+```
+**Sonra worktree'den `index.html`'i tekrar kopyala** (reset --hard lokali sildi).
+
+**12.6.11 — Tarayıcı cache + lokal sunucu:**
+Python `http.server` cache header göndermiyor, ama tarayıcı yine de cache'leyebilir. JS değişiklikleri yansımayabilir.
+**Pratik:** `Cmd+Shift+R` (hard refresh) ya da JSON'lara cache-busting eklenmiş (`?t=Date.now()`).
+
+### 12.7 Mimari kararlar
+
+**Privacy modu nasıl çalışır:**
+1. `loadData()` 4 dosyayı fetch eder → raw veriler global'lere (`_rawPortfoy` vs.).
+2. `doRender()` privacy durumuna göre veriyi normalize eder (orijinal raw'dan yeni clone üretir).
+3. `render(p, prices, b, g)` her zaman normalize edilmiş veya raw veriyle çağrılır.
+4. `_benchmarkData = b; _gecmisData = g;` global'leri render içinde set edilir; refreshBenchmark/refreshGecmis/refreshGrafik bunlardan okur.
+5. Privacy toggle → sadece `doRender()` yeniden çağrılır; fetch yapılmaz (raw'lar zaten elde).
+
+**Veri yapısı (özet):**
+- **`prices.json`** — anlık fiyatlar (`hisseler`, `fonlar_ve_emeklilik`, `kripto`, `gram_altin_tl`, `usd_try`, `eur_try`, `kaynak_durumu`, vs.). Her güncellemede üzerine yazılır.
+- **`portfoy.json`** — `{portfoyler: {ozkan: [], derya: []}}`. Her satırda: `tip`, `tip_orjinal`, `kod`, `kod_orjinal`, `adet`, `maliyet` (birim), `guncel_tl`, `onceki_tl`, `gunluk_kazanc_tl`, `gunluk_yuzde`, `fiyat_eksik`.
+- **`gecmis.json`** — `{kayit_baslangic: "2026-05-21", gunler: {tarih: {ozkan: {kategoriler: {hisse, fon, ...}, toplam: X}, derya: {...}, genel_toplam: Y}}}`. **21 Mayıs'tan itibaren her iş günü 18:35 kapanışta bir satır**.
+- **`benchmark_gecmis.json`** — `{kayit_baslangic: "2021-04-20", son_guncelleme, seriler: {bist100: {YYYY-MM-DD: değer}, amerika_hisse, gram_altin, yae, tufe_aylik_gerceklesen, tufe_aylik_beklenti}}`. Her gün 19:00 cron'unda son gün eklenir (son 10 gün yedek).
+- **`yilbasi_fiyatlari.json`** — Her yıl ilk fiyat çekiminde yılbaşı snapshot, YTD getiri için.
+
+**Tip normalizasyonu** (§2.1'den): Türkçe karakterler Latin'e (`ı→i, ş→s, ç→c, ğ→g, ü→u, ö→o`), boşluk atılır, lowercase karşılaştırma. Portfoy.json'da `tip` zaten lowercase Latin (`yurtdisifonu, altinfonu, emeklilik` vs.). Ekran gösteriminde `tip_orjinal` (`YurtdisiFonu` vs.) kullanılır.
+
+### 12.8 Hangi dosyada ne var (REFERANS HARİTASI)
+
+| Dosya | İçerik | Boyut |
+|---|---|---|
+| `index.html` | Tüm frontend (HTML + CSS + JS). | ~1370 satır, 31 JS fonksiyonu |
+| `scripts/fiyat_guncelle.py` | Ana fiyat scripti. Sheets oku, fiyat çek, JSON yaz. | ~1100 satır |
+| `scripts/benchmark_fiyat.py` | Benchmark veri scripti (5 yıllık + günlük). | ~400 satır |
+| `.github/workflows/portfoy-guncelle.yml` | Cron 4 zamanlı (10:30, 12:30, 14:30, 18:35 TR). | 50 satır |
+| `.github/workflows/benchmark-guncelle.yml` | Cron 1 zamanlı (19:00 TR). | 60 satır |
+| `requirements.txt` | Python bağımlılıkları (`gspread, google-auth, yfinance, borsapy, requests, pandas`). **tefas-crawler artık yok.** | 6 satır |
+| `portfoy.json` | Anlık portföy verisi. | ~7 KB |
+| `prices.json` | Anlık fiyatlar. | ~2 KB |
+| `gecmis.json` | Günlük kapanış snapshot'ı. **Henüz yok**, 21 Mayıs'tan itibaren oluşur. | — |
+| `benchmark_gecmis.json` | 5 yıllık + günlük benchmark serileri. | ~130 KB |
+| `yilbasi_fiyatlari.json` | Yılbaşı fiyatları. | <1 KB |
+
+**Frontend ana JS fonksiyonları (`index.html` içinde):**
+
+| Fonksiyon | Görev |
+|---|---|
+| `loadData()` | Tüm JSON dosyalarını fetch et, global'lere ata, `doRender()` çağır. |
+| `doRender()` | Privacy durumuna göre veriyi normalize et, render çağır, aktif tab'a dön. |
+| `render(p, pr, b, g)` | Üst banner + tab butonları + paneller (5 tab). |
+| `renderPortfoy(name, items, prices)` | Bir kişinin tab içeriği (üst kartlar + dağılım + Hisseler + 4 fon bloğu + Kripto + Altın + Alacak). |
+| `renderFonBlok(baslik, list)` | Tek bir fon tipi için tablo (YurtdışıFon/Fon/AltınFonu/Emeklilik). |
+| `enrichItem(it, prices)` | Bir portföy satırını hesaplı alanlarla zenginleştirir (`tg, tm, kz, kzp, ybb, gunlukKZ, gunlukP, maliyetVar`). |
+| `benchmarkPanelHtml()` / `refreshBenchmark()` | Benchmark tabı. |
+| `gecmisPanelHtml()` / `refreshGecmis()` | Geçmiş Veriler tabı. |
+| `gecmisDegerleri(gun)` | Bir günden 12 sütunun TL değerlerini hesapla. |
+| `grafikPanelHtml()` / `refreshGrafik()` | Grafik tabı. |
+| `switchTab(name)` | Tab geçişi, Chart.js redraw tetikleyici. |
+| `togglePrivacy()` / `normalizePortfoy()` / `normalizeGecmis()` / `updatePrivacyButton()` | Privacy modu. |
+| `portfoySerisi(secim, gecmis)` | Dropdown seçimine göre gecmis.json'dan zaman serisi {tarih: TL}. |
+| `cumulativeSeri(seri, b, e)` | Kümülatif % getiri hesabı (Chart.js datasets formatında). |
+| `donemBaslangic(donem, sonTarih)` | "1H/1A/YTD/6A/1Y/3Y/5Y" → tarih string. |
+| `donemGetirisi(seri, b, e)` | Tek skaler % getiri (tablo için). |
+| `tufeDonemGetirisi(tufe, b, e)` | Aylık TÜFE'den kümülatif: (1+r1)(1+r2)...-1. |
+
+### 12.9 Şu anki durum (19 Mayıs 2026 gece)
+
+✅ **Tamamlandı (tüm 19 Mayıs işleri):**
+- Tüm dashboard düzenlemeleri (§12.1)
+- Benchmark backend borsapy geçişi (§12.2)
+- Privacy modu (§12.3)
+- Benchmark / Geçmiş Veriler / Grafik tabları (§12.4)
+
+⏳ **Otomatik bekleniyor:**
+- **21 Mayıs 2026 18:35** → `gecmis.json` ilk satır.
+- **25-26 Mayıs** → 3-5 günlük veri biriktiğinde Geçmiş Veriler ve Grafik tabları gerçek veriyle test edilebilir.
+
+### 12.10 Sonraki yapılacaklar (öncelik sırasıyla)
+
+1. **21 Mayıs sonrası ufak UX düzeltmeleri** — Gerçek `gecmis.json` verisiyle Geçmiş Veriler tablosu ve Grafik tabı test edilecek, küçük görsel/etkileşim düzeltmeleri çıkabilir.
+
+2. **Genel (Aile) tabı** (CLAUDE.md §5.3'te tanımlı, hâlâ yok) — Özkan + Derya birleşik özet, 3 kart: Aile Aktif Yatırım, Aile Emeklilik, Aile Toplam.
+
+3. **Her tab için küçük portföy çizgi grafiği** (CLAUDE.md §5.4) — Tab içeriğinin üstüne ufak bir trend grafiği. Grafik tabıyla kısmen örtüşüyor, kararı veri gelince ver.
+
+4. **Veri Güncelle butonu** (CLAUDE.md §5.4) — Sağ üstte manuel yenileme butonu. Şu an yok.
+
+5. **Twelve Data altın yedeği temizliği** — §11.1'de `fiyat_guncelle.py` içindeki `twelve_data_xau_usd()` fonksiyonu bahsedilen yer var. Ana script borsapy'ya geçirildiyse Twelve Data'ya gerek kalmayabilir. Doğrulanmadı; `TWELVE_DATA_API_KEY` secret hâlâ var.
+
+6. **Benchmark günlük güncelleme gözlemi** — Her gün 19:00 TR cron'unda 4 ana serinin son gününün eklenmesi takip edilecek. AFA fonu için TEFAS v2 API her gün başarılı çalışmalı; çalışmazsa ABE'ye düşer, o da olmazsa yfinance'a (genelde çalışmaz).
+
+7. **Benchmark tabı "Özel tarih aralığı"** (CLAUDE.md §6.1) — Şu an yok, v2.
+
+8. **TÜFE Sheets güncellemesi** — `TUFE` sekmesinde şu an sadece 2025-04 verisi var. Kullanıcı her ay yeni TÜİK rakamını eklemeli (ay sonu açıklanır). Otomasyon yok (manuel).
+
+### 12.11 Yeni bir Claude oturumu nasıl başlamalı?
+
+Yeni oturum bu CLAUDE.md'yi otomatik okur, ama hızlı kontrol için:
+
+```bash
+ls -la *.json scripts/ .github/workflows/
+git log --oneline -10
+cat CLAUDE.md | head -50  # bağlam için
+```
+
+**Önemli son commit'ler (kronolojik):**
+- `6e93ce2` — Geçmiş Veriler + Grafik tabları (19 May)
+- `9a9ff68` — Gizlilik (privacy) modu (göz ikonu) (19 May)
+- `9af06dc` — Benchmark dashboard tabı (Chart.js + 7×7 tablo) (19 May)
+- `88fb442` — S&P500 → Amerika Hisse (AFA) (19 May)
+- `97e2784` — Tüm benchmark serileri için borsapy birincil (19 May)
+- `f281069` — tefas-crawler → borsapy (YAE fix) (19 May)
+- `d9ada90` — Kripto kartı beyaz tema + işaret düzeltmesi (19 May)
+- `db4fe1b` — Günlük Kazanç işaret/renk/yüzde + kripto Günlük ₺/% (19 May)
+- `caa20d6` — Dashboard üst kartlar + Fonlar 4 ayrı blok (19 May)
+- `b265f8a` — CLAUDE.md Bölüm 11 eklendi (19 May)
+
+**Felaket kurtarma (her şey silinirse):**
+1. Repo clone: `git clone https://github.com/Ozkan40tree/pf-a7k9m3p2.git`
+2. GitHub Secrets ayarlı mı kontrol et: `GOOGLE_SHEETS_CREDENTIALS`, `SHEETS_ID`, `TWELVE_DATA_API_KEY` (opsiyonel).
+3. `requirements.txt`'i yükle: `pip install -r requirements.txt`
+4. Sheets'in `Ozkan_Portfoy`, `Derya_Portfoy`, `TUFE` sekmelerinin servisAccount ile paylaşıldığından emin ol.
+5. Cron'lar (cron-job.org + GitHub Actions schedule) zaten çalışır.
+6. İlk kurulum: benchmark'i `gecmis=true` ile manuel tetikle (5 yıllık seri çekmek için).
+7. `gecmis.json` 21 Mayıs sonrası kendiliğinden dolar.
+
+### 12.12 Bu dosyayı güncellerken kurallar
+
+- Her büyük faz sonunda yeni numaralı bölüm ekle (§13, §14, vs.).
+- Eski bölümleri **silme** — sadece "Durum: bkz §X" notu ekle.
+- Hatalardan dersleri **12.6'daki formatla** kaydet: ne oldu, sebep, çözüm.
+- "Yapılmaması gerekenler" bölümünü canlı tut.
+- Tarih ve commit hash'leri her dersle birlikte.
