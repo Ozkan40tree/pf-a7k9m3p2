@@ -180,6 +180,35 @@
     .bench-period-btn { padding: 7px 10px; font-size: 12px; }
   }
 
+  /* ── GECMIS VERILER ── */
+  .gecmis-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 16px; }
+  .gecmis-date-wrap { display: flex; flex-direction: column; gap: 6px; }
+  .gecmis-date-wrap label { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .gecmis-date { padding: 10px 12px; border-radius: 10px; border: 1px solid #e2e8f0; background: white; font-size: 14px; font-weight: 600; color: #0f172a; cursor: pointer; font-family: inherit; }
+  .gecmis-date:focus { outline: none; border-color: #3b82f6; }
+  .gecmis-clear-btn { padding: 10px 14px; border-radius: 10px; border: 1px solid #e2e8f0; background: white; font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.2s; }
+  .gecmis-clear-btn:hover { background: #f8fafc; }
+  .gecmis-table-wrap { overflow-x: auto; max-height: 70vh; border: 1px solid #e2e8f0; border-radius: 10px; }
+  .gecmis-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+  .gecmis-table th { position: sticky; top: 0; background: #f8fafc; z-index: 2; padding: 10px 8px; text-align: right; font-size: 11px; font-weight: 700; color: #475569; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
+  .gecmis-table th:first-child, .gecmis-table td:first-child { position: sticky; left: 0; background: white; z-index: 1; text-align: left; font-weight: 700; border-right: 2px solid #e2e8f0; }
+  .gecmis-table th:first-child { background: #f8fafc; z-index: 3; }
+  .gecmis-table td { padding: 9px 8px; text-align: right; border-bottom: 1px solid #f1f5f9; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .gecmis-table tbody tr:hover { background: #f8fafc; }
+  .gecmis-table tbody tr:hover td:first-child { background: #f8fafc; }
+  .gecmis-table tbody tr.highlight { background: #fef3c7 !important; }
+  .gecmis-table tbody tr.highlight td:first-child { background: #fef3c7 !important; }
+  .gecmis-empty { text-align: center; padding: 40px 20px; color: #64748b; font-size: 13px; }
+
+  /* ── GRAFIK TABI ── */
+  .grafik-controls { display: flex; flex-direction: column; gap: 14px; margin-bottom: 18px; }
+  .grafik-chart-wrap { position: relative; height: 400px; margin: 8px 0; }
+  @media (max-width: 720px) {
+    .grafik-chart-wrap { height: 300px; }
+    .gecmis-table { font-size: 11px; }
+    .gecmis-table th, .gecmis-table td { padding: 7px 6px; }
+  }
+
   @media (max-width: 720px) {
     .header { padding: 24px 14px; }
     .header-total .value { font-size: 26px; }
@@ -352,16 +381,38 @@ function updatePrivacyButton() {
   btn.className = 'privacy-btn' + (on ? ' active' : '');
 }
 
+function normalizeGecmis(gecmis) {
+  // Her gun icin kendi katsayisi (genel_toplam=1M olacak sekilde)
+  if (!gecmis || !gecmis.gunler) return gecmis;
+  const yeni = JSON.parse(JSON.stringify(gecmis));
+  for (const tarih of Object.keys(yeni.gunler)) {
+    const gun = yeni.gunler[tarih];
+    const aileToplam = Number(gun.genel_toplam) || 0;
+    if (aileToplam <= 0) continue;
+    const k = 1000000 / aileToplam;
+    for (const kisi of ['ozkan', 'derya']) {
+      if (!gun[kisi]) continue;
+      gun[kisi].toplam = (Number(gun[kisi].toplam) || 0) * k;
+      const cats = gun[kisi].kategoriler || {};
+      for (const c of Object.keys(cats)) cats[c] = (Number(cats[c]) || 0) * k;
+    }
+    gun.genel_toplam = 1000000;
+  }
+  return yeni;
+}
+
 function doRender() {
   if (!_rawPortfoy) return;
   // Aktif tabi hatirla (privacy toggle sonrasi geri donmek icin)
   const aktifBtn = document.querySelector('.tab.active');
   const aktifTab = aktifBtn ? aktifBtn.dataset.panel : null;
-  // Eski Chart.js instance'i kaldır (panel HTML yenilenmeden once destroy)
+  // Eski Chart.js instance'lari kaldır (panel HTML yenilenmeden once destroy)
   if (_benchChart) { _benchChart.destroy(); _benchChart = null; }
+  if (_grafikChart) { _grafikChart.destroy(); _grafikChart = null; }
   updatePrivacyButton();
   const p = isPrivacy() ? normalizePortfoy(_rawPortfoy) : _rawPortfoy;
-  render(p, _rawPrices, _rawBenchmark, _rawGecmis);
+  const g = isPrivacy() ? normalizeGecmis(_rawGecmis) : _rawGecmis;
+  render(p, _rawPrices, _rawBenchmark, g);
   // Render sonrasi varsayilan olarak ilk tab aktif. Eski tab farkliysa geri don.
   if (aktifTab && aktifTab !== Object.keys(_rawPortfoy.portfoyler || {})[0]) {
     switchTab(aktifTab);
@@ -706,13 +757,17 @@ function render(portfoy, prices, benchmark, gecmis) {
   const tabsHtml = names.map((n,i) =>
     `<button class="tab ${i===0?'active':''}" data-panel="${n}" onclick="switchTab('${n}')">👤 ${displayNames[n] || n} • ₺${fmt(rendered[n].toplam)}</button>`
   ).join('') +
-  `<button class="tab" data-panel="benchmark" onclick="switchTab('benchmark')">📊 Benchmark</button>`;
+  `<button class="tab" data-panel="benchmark" onclick="switchTab('benchmark')">📊 Benchmark</button>` +
+  `<button class="tab" data-panel="gecmis" onclick="switchTab('gecmis')">📋 Geçmiş Veriler</button>` +
+  `<button class="tab" data-panel="grafik" onclick="switchTab('grafik')">📈 Grafik</button>`;
   document.getElementById('tabs').innerHTML = tabsHtml;
 
   const panelsHtml = names.map((n,i) =>
     `<div id="panel-${n}" class="${i===0?'':'hidden'}">${rendered[n].html}</div>`
   ).join('') +
-  `<div id="panel-benchmark" class="hidden">${benchmarkPanelHtml()}</div>`;
+  `<div id="panel-benchmark" class="hidden">${benchmarkPanelHtml()}</div>` +
+  `<div id="panel-gecmis" class="hidden">${gecmisPanelHtml()}</div>` +
+  `<div id="panel-grafik" class="hidden">${grafikPanelHtml()}</div>`;
   document.getElementById('panels').innerHTML = panelsHtml;
 }
 
@@ -723,10 +778,10 @@ function switchTab(name) {
   document.querySelectorAll('.tab').forEach(el => {
     el.className = 'tab' + (el.dataset.panel === name ? ' active' : '');
   });
-  // Benchmark tab acildigi an grafigi cizdir (canvas DOM'da gizli iken Chart.js boyut alamaz)
-  if (name === 'benchmark') {
-    setTimeout(refreshBenchmark, 0);
-  }
+  // Chart canvasli sekmeler: canvas gizliyken Chart.js boyut alamaz, gosterdikten sonra cizdir
+  if (name === 'benchmark') setTimeout(refreshBenchmark, 0);
+  else if (name === 'gecmis') setTimeout(refreshGecmis, 0);
+  else if (name === 'grafik') setTimeout(refreshGrafik, 0);
 }
 
 // ═══════════════════════════════════════════════
@@ -1065,6 +1120,250 @@ function refreshBenchmark() {
   tHtml += `</tr></tbody></table></div>`;
 
   document.getElementById('bench-table-container').innerHTML = tHtml;
+}
+
+// ═══════════════════════════════════════════════
+// GECMIS VERILER TABI (Excel benzeri tablo)
+// ═══════════════════════════════════════════════
+// Kullanici tarafindan istenen 12 sutun. Tarih sticky-left, digerleri akar.
+const GECMIS_KOLONLAR = [
+  { key: 'tarih',        ad: 'Tarih' },
+  { key: 'ozkan_ea',     ad: 'Özkan (em+alacak hariç)' },
+  { key: 'ozkan_top',    ad: 'Özkan Toplam' },
+  { key: 'ozkan_em',     ad: 'Özkan Emeklilik' },
+  { key: 'kripto',       ad: 'Kripto' },
+  { key: 'derya_e',      ad: 'Derya (em hariç)' },
+  { key: 'derya_top',    ad: 'Derya Toplam' },
+  { key: 'derya_em',     ad: 'Derya Emeklilik' },
+  { key: 'derya_altin',  ad: 'Derya Altın' },
+  { key: 'aile_top',     ad: 'Aile Toplam' },
+  { key: 'aile_ea',      ad: 'Aile (em+alacak hariç)' },
+  { key: 'aile_em',      ad: 'Aile Emeklilik' },
+];
+
+function gecmisDegerleri(gun) {
+  // Bir gun snapshot'indan 12 sutunun TL degerlerini hesapla.
+  const o = gun.ozkan || {};
+  const d = gun.derya || {};
+  const ok = o.kategoriler || {};
+  const dk = d.kategoriler || {};
+  const g = (obj, k) => Number(obj[k] || 0);
+  const ozkanEm = g(ok,'emeklilik');
+  const deryaEm = g(dk,'emeklilik');
+  const ozkanAlacak = g(ok,'alacak');
+  const ozkanTop = Number(o.toplam || 0);
+  const deryaTop = Number(d.toplam || 0);
+  const aileTop = Number(gun.genel_toplam || (ozkanTop + deryaTop));
+  return {
+    ozkan_ea:    ozkanTop - ozkanEm - ozkanAlacak,
+    ozkan_top:   ozkanTop,
+    ozkan_em:    ozkanEm,
+    kripto:      g(ok,'kripto'),
+    derya_e:     deryaTop - deryaEm,
+    derya_top:   deryaTop,
+    derya_em:    deryaEm,
+    derya_altin: g(dk,'altin'),
+    aile_top:    aileTop,
+    aile_ea:     aileTop - ozkanEm - deryaEm - ozkanAlacak,
+    aile_em:     ozkanEm + deryaEm,
+  };
+}
+
+function gecmisPanelHtml() {
+  const cols = GECMIS_KOLONLAR.map(c => `<th>${c.ad}</th>`).join('');
+  return `
+    <div class="section">
+      <div class="gecmis-controls">
+        <div class="gecmis-date-wrap">
+          <label>Tarihe git</label>
+          <input type="date" id="gecmis-date" class="gecmis-date" onchange="gecmisTariheGit()">
+        </div>
+        <button class="gecmis-clear-btn" onclick="gecmisVurguTemizle()">Vurguyu temizle</button>
+      </div>
+      <div class="gecmis-table-wrap">
+        <table class="gecmis-table">
+          <thead><tr>${cols}</tr></thead>
+          <tbody id="gecmis-tbody"></tbody>
+        </table>
+      </div>
+      <div id="gecmis-status" class="bench-info" style="margin-top:14px"></div>
+    </div>
+  `;
+}
+
+function refreshGecmis() {
+  const tbody = document.getElementById('gecmis-tbody');
+  const status = document.getElementById('gecmis-status');
+  if (!tbody || !status) return;
+
+  if (!_rawGecmis || !_rawGecmis.gunler || Object.keys(_rawGecmis.gunler).length === 0) {
+    tbody.innerHTML = `<tr><td colspan="${GECMIS_KOLONLAR.length}" class="gecmis-empty">📭 Geçmiş veri henüz yok. <b>Milat tarihi 21 Mayıs 2026</b>. Bu tarihten itibaren her iş günü 18:35 kapanışından sonra otomatik kayıt eklenecek.</td></tr>`;
+    status.innerHTML = `<b>Şu an itibarıyla 0 günlük kayıt var.</b> İlk satır 21 Mayıs 2026 akşamı oluşacak.`;
+    return;
+  }
+
+  // Privacy modunda _gecmisData zaten normalize edilmis (doRender icinde)
+  const gunler = _gecmisData.gunler;
+  const tarihler = Object.keys(gunler).sort().reverse();  // en yeni ustte
+
+  // Tarih input min/max ayarla
+  const dateInput = document.getElementById('gecmis-date');
+  if (dateInput && tarihler.length) {
+    dateInput.min = tarihler[tarihler.length - 1];
+    dateInput.max = tarihler[0];
+  }
+
+  let html = '';
+  for (const t of tarihler) {
+    const vals = gecmisDegerleri(gunler[t]);
+    html += `<tr data-tarih="${t}">`;
+    html += `<td>${t}</td>`;
+    for (const c of GECMIS_KOLONLAR.slice(1)) {
+      const v = vals[c.key];
+      html += `<td>${v != null ? '₺' + fmt(v) : '—'}</td>`;
+    }
+    html += `</tr>`;
+  }
+  tbody.innerHTML = html;
+  status.innerHTML = `${tarihler.length} günlük kayıt — en yeni: <b>${tarihler[0]}</b>, en eski: <b>${tarihler[tarihler.length-1]}</b>.`;
+}
+
+function gecmisTariheGit() {
+  const d = document.getElementById('gecmis-date');
+  if (!d || !d.value) return;
+  const tarih = d.value;
+  // Once tum highlight'lari temizle
+  document.querySelectorAll('#gecmis-tbody tr.highlight').forEach(tr => tr.classList.remove('highlight'));
+  // Hedef satiri bul
+  const target = document.querySelector(`#gecmis-tbody tr[data-tarih="${tarih}"]`);
+  if (target) {
+    target.classList.add('highlight');
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+function gecmisVurguTemizle() {
+  document.querySelectorAll('#gecmis-tbody tr.highlight').forEach(tr => tr.classList.remove('highlight'));
+  const d = document.getElementById('gecmis-date');
+  if (d) d.value = '';
+}
+
+// ═══════════════════════════════════════════════
+// GRAFIK TABI (sadece secilen varlik, benchmark karsilastirmasi yok)
+// ═══════════════════════════════════════════════
+let _grafikChart = null;
+
+function grafikPanelHtml() {
+  const opts = BENCH_SECIMLER.map(g =>
+    `<optgroup label="${g.grup}">` +
+    g.items.map(it => `<option value="${it.v}">${it.t}</option>`).join('') +
+    `</optgroup>`
+  ).join('');
+  const periods = BENCH_DONEMLER.map(p =>
+    `<button class="bench-period-btn ${p==='1A'?'active':''}" data-period="${p}" onclick="setGrafikPeriod('${p}')">${p}</button>`
+  ).join('');
+  return `
+    <div class="section">
+      <div class="grafik-controls">
+        <div class="bench-select-wrap">
+          <label>Varlık</label>
+          <select class="bench-select" id="grafik-select" onchange="refreshGrafik()">${opts}</select>
+        </div>
+        <div class="bench-select-wrap">
+          <label>Dönem</label>
+          <div class="bench-periods" id="grafik-periods">${periods}</div>
+        </div>
+      </div>
+      <div class="grafik-chart-wrap"><canvas id="grafik-canvas"></canvas></div>
+      <div id="grafik-status" class="bench-info"></div>
+    </div>
+  `;
+}
+
+function setGrafikPeriod(p) {
+  document.querySelectorAll('#grafik-periods .bench-period-btn').forEach(b => {
+    b.className = 'bench-period-btn' + (b.dataset.period === p ? ' active' : '');
+  });
+  refreshGrafik();
+}
+
+function refreshGrafik() {
+  const sel = document.getElementById('grafik-select');
+  const status = document.getElementById('grafik-status');
+  if (!sel || !status) return;
+  const secim = sel.value;
+  const aktifBtn = document.querySelector('#grafik-periods .bench-period-btn.active');
+  const donem = aktifBtn ? aktifBtn.dataset.period : '1A';
+
+  const portfoySer = portfoySerisi(secim, _gecmisData);
+  if (Object.keys(portfoySer).length === 0) {
+    status.innerHTML = `📭 Portföy zaman serisi henüz yok — <b>milat tarihi 21 Mayıs 2026</b>. Bu tarihten itibaren her gün 18:35 kapanış sonrası snapshot eklenir.`;
+    if (_grafikChart) { _grafikChart.destroy(); _grafikChart = null; }
+    const canvas = document.getElementById('grafik-canvas');
+    if (canvas) { const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    return;
+  }
+
+  const bugun = new Date().toISOString().slice(0, 10);
+  const tarihler = Object.keys(portfoySer).sort();
+  const sonTarih = tarihler[tarihler.length - 1];
+  const bitis = bugun > sonTarih ? bugun : sonTarih;
+  const baslangic = donemBaslangic(donem, bitis);
+
+  const points = cumulativeSeri(portfoySer, baslangic, bitis);
+  const secilenLabel = BENCH_SECIMLER.flatMap(g => g.items).find(it => it.v === secim)?.t || secim;
+
+  if (points.length < 2) {
+    status.innerHTML = `ℹ️ <b>${secilenLabel}</b> için bu dönemde yeterli snapshot yok (en az 2 gün gerek). Daha uzun bir dönem deneyin.`;
+    if (_grafikChart) { _grafikChart.destroy(); _grafikChart = null; }
+    const canvas = document.getElementById('grafik-canvas');
+    if (canvas) { const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); }
+    return;
+  }
+
+  const donemGetiri = points[points.length-1].y;
+  status.innerHTML = `<b>${secilenLabel}</b> — ${donem} dönemde toplam değişim: <b style="color:${donemGetiri>=0?'#10b981':'#ef4444'}">${donemGetiri>=0?'+':''}${donemGetiri.toFixed(2)}%</b> (${points.length} gün)`;
+
+  const canvas = document.getElementById('grafik-canvas');
+  if (_grafikChart) { _grafikChart.destroy(); _grafikChart = null; }
+  if (!canvas) return;
+  _grafikChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      datasets: [{
+        label: secilenLabel,
+        data: points,
+        borderColor: PORTFOY_RENK,
+        backgroundColor: PORTFOY_RENK + '25',
+        borderWidth: 3,
+        fill: true,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        tension: 0.15,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        x: { type: 'time', time: { parser: 'yyyy-MM-dd', unit: 'month', displayFormats: { month: 'MMM yy' } },
+             ticks: { color: '#64748b', maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
+             grid: { color: '#f1f5f9' } },
+        y: { ticks: { color: '#64748b', callback: v => v.toFixed(0) + '%' },
+             grid: { color: '#f1f5f9' } },
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: items => items[0]?.parsed?.x ? new Date(items[0].parsed.x).toLocaleDateString('tr-TR') : '',
+            label: ctx => `${ctx.parsed.y >= 0 ? '+' : ''}${ctx.parsed.y.toFixed(2)}%`,
+          },
+        },
+      },
+    },
+  });
 }
 </script>
 </body>
