@@ -64,7 +64,15 @@
   .subtitle { color: #94a3b8; font-size: 13px; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
   .live-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5);} 70% { box-shadow: 0 0 0 8px rgba(16,185,129,0);} }
-  .header-total { text-align: right; }
+  .header-total { text-align: right; position: relative; }
+  .privacy-btn {
+    background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 10px;
+    padding: 6px 10px; font-size: 16px; cursor: pointer; color: white;
+    margin-bottom: 6px; transition: all 0.2s; line-height: 1;
+  }
+  .privacy-btn:hover { background: rgba(255, 255, 255, 0.18); transform: translateY(-1px); }
+  .privacy-btn.active { background: #f59e0b; border-color: #d97706; }
   .header-total .label { color: #94a3b8; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px; }
   .header-total .value { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin: 4px 0;
     background: linear-gradient(to right, #fff, #e2e8f0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -212,6 +220,7 @@
           <div class="subtitle"><span class="live-dot"></span> <span id="last-update"></span></div>
         </div>
         <div class="header-total">
+          <button id="privacy-btn" class="privacy-btn" type="button" onclick="togglePrivacy()" title="Gizlilik modu">👁</button>
           <div class="label">Toplam Aile Varlığı</div>
           <div class="value" id="genel-toplam">—</div>
         </div>
@@ -271,6 +280,12 @@ const colors = ['#0f172a','#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec
 // ═══════════════════════════════════════════════
 // DATA LOADING
 // ═══════════════════════════════════════════════
+// Raw veriler: privacy modu acilip kapandiginda hizli yeniden render icin
+let _rawPortfoy = null;
+let _rawPrices = null;
+let _rawBenchmark = null;
+let _rawGecmis = null;
+
 async function loadData() {
   try {
     const cb = '?t=' + Date.now();
@@ -281,9 +296,75 @@ async function loadData() {
       safeFetch('benchmark_gecmis.json'),  // yoksa null
       safeFetch('gecmis.json')              // 21 Mayis oncesi yok, null
     ]);
-    render(portfoy, prices, benchmark, gecmis);
+    _rawPortfoy = portfoy;
+    _rawPrices = prices;
+    _rawBenchmark = benchmark;
+    _rawGecmis = gecmis;
+    doRender();
   } catch (e) {
     document.getElementById('panels').innerHTML = `<div class="err-msg">Veri yüklenemedi: ${e.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// GIZLILIK (PRIVACY) MODU
+// Aktif iken: aile_toplam = 1.000.000 TL sabit; diger TL ve adetler
+// gercek yuzdelere gore orantili olarak yeniden hesaplanir. Birim fiyatlar
+// (guncel) gercek piyasa fiyati olarak kalir; maliyet hucreleri "—" gosterilir.
+// ═══════════════════════════════════════════════
+function isPrivacy() { return sessionStorage.getItem('privacy') === '1'; }
+
+function togglePrivacy() {
+  sessionStorage.setItem('privacy', isPrivacy() ? '0' : '1');
+  doRender();
+}
+
+function normalizePortfoy(portfoy, hedefToplam) {
+  hedefToplam = hedefToplam || 1000000;
+  const portfoyler = portfoy.portfoyler || {};
+  let aileToplam = 0;
+  for (const items of Object.values(portfoyler)) {
+    for (const it of items) aileToplam += Number(it.guncel_tl || 0);
+  }
+  if (aileToplam <= 0) return portfoy;
+  const k = hedefToplam / aileToplam;
+  const yeni = JSON.parse(JSON.stringify(portfoy));
+  for (const ad of Object.keys(yeni.portfoyler)) {
+    yeni.portfoyler[ad] = yeni.portfoyler[ad].map(it => ({
+      ...it,
+      adet: (Number(it.adet) || 0) * k,
+      guncel_tl: (Number(it.guncel_tl) || 0) * k,
+      onceki_tl: (Number(it.onceki_tl) || 0) * k,
+      gunluk_kazanc_tl: (Number(it.gunluk_kazanc_tl) || 0) * k,
+      // maliyet (birim) AYNEN: render zamani isPrivacy() ile maskelenir
+      // gunluk_yuzde AYNEN
+    }));
+  }
+  return yeni;
+}
+
+function updatePrivacyButton() {
+  const btn = document.getElementById('privacy-btn');
+  if (!btn) return;
+  const on = isPrivacy();
+  btn.textContent = on ? '🙈' : '👁';
+  btn.title = on ? 'Gizli mod açık (tıkla: kapat)' : 'Gizli mod (tıkla: aç)';
+  btn.className = 'privacy-btn' + (on ? ' active' : '');
+}
+
+function doRender() {
+  if (!_rawPortfoy) return;
+  // Aktif tabi hatirla (privacy toggle sonrasi geri donmek icin)
+  const aktifBtn = document.querySelector('.tab.active');
+  const aktifTab = aktifBtn ? aktifBtn.dataset.panel : null;
+  // Eski Chart.js instance'i kaldır (panel HTML yenilenmeden once destroy)
+  if (_benchChart) { _benchChart.destroy(); _benchChart = null; }
+  updatePrivacyButton();
+  const p = isPrivacy() ? normalizePortfoy(_rawPortfoy) : _rawPortfoy;
+  render(p, _rawPrices, _rawBenchmark, _rawGecmis);
+  // Render sonrasi varsayilan olarak ilk tab aktif. Eski tab farkliysa geri don.
+  if (aktifTab && aktifTab !== Object.keys(_rawPortfoy.portfoyler || {})[0]) {
+    switchTab(aktifTab);
   }
 }
 
@@ -437,7 +518,7 @@ function renderPortfoy(name, items, prices) {
       html += `<tr>
         <td>${h.kod}</td>
         <td>${fmt(h.adet)}</td>
-        <td>${fmt2(h.maliyet)}</td>
+        <td>${isPrivacy() ? '—' : fmt2(h.maliyet)}</td>
         <td style="font-weight:600">${fmt2(h.guncel)}</td>
         <td>${fmt(h.tg)}</td>
         <td style="color:#64748b;font-size:11px">${weightBar(w)}</td>
@@ -476,20 +557,21 @@ function renderPortfoy(name, items, prices) {
     list.forEach(f => {
       const w = blokTop > 0 ? (f.tg / blokTop) * 100 : 0;
       const tipEt = f.tip_orjinal || f.tip;
-      const mv = f.maliyetVar;
+      const showMaliyet = f.maliyetVar && !isPrivacy();  // privacy modda maliyet "—"
+      const mvKZ = f.maliyetVar;                          // K/Z gercek maliyet varsa hesaplanir (privacy normalize edilmis gosterir)
       h += `<tr>
         <td>${f.kod}</td>
         <td style="font-size:11px;color:#64748b">${tipEt}</td>
         <td>${fmt(f.adet)}</td>
-        <td>${mv ? fmt4(f.maliyet) : '—'}</td>
+        <td>${showMaliyet ? fmt4(f.maliyet) : '—'}</td>
         <td style="font-weight:600">${fmt4(f.guncel)}</td>
         <td>${fmt(f.tg)}</td>
         <td style="color:#64748b;font-size:11px">${weightBar(w)}</td>
         <td class="${tlClass(f.gunlukKZ)}">${tlSign(f.gunlukKZ)}${fmt(Math.abs(f.gunlukKZ))}</td>
         <td>${badge(f.gunlukP)}</td>
-        <td class="${mv ? tlClass(f.kz) : 'val-zero'}">${mv ? (tlSign(f.kz)+fmt(Math.abs(f.kz))) : '—'}</td>
-        <td>${mv ? badge(f.kzp) : '—'}</td>
-        <td>${mv ? badge(f.ybb) : '—'}</td>
+        <td class="${mvKZ ? tlClass(f.kz) : 'val-zero'}">${mvKZ ? (tlSign(f.kz)+fmt(Math.abs(f.kz))) : '—'}</td>
+        <td>${mvKZ ? badge(f.kzp) : '—'}</td>
+        <td>${mvKZ ? badge(f.ybb) : '—'}</td>
       </tr>`;
     });
     const t_gk = sum(list, 'gunlukKZ');
@@ -521,7 +603,7 @@ function renderPortfoy(name, items, prices) {
         <div class="kleft">₿ ${c.kod}<br><small>${c.adet} ${c.kod}</small></div>
         <div class="kitems">
           <div class="kitem"><div class="kl">Birim Fiyat</div><div class="kv">₺${fmt(birimFiyat)}</div></div>
-          <div class="kitem"><div class="kl">Maliyet</div><div class="kv">₺${fmt(c.tm)}</div></div>
+          <div class="kitem"><div class="kl">Maliyet</div><div class="kv">${isPrivacy() ? '—' : '₺' + fmt(c.tm)}</div></div>
           <div class="kitem"><div class="kl">Değer</div><div class="kv">₺${fmt(c.tg)}</div></div>
           <div class="kitem"><div class="kl">Günlük ₺</div><div class="kv ${tlClass(c.gunlukKZ)}">${fullSign(c.gunlukKZ)}₺${fmt(Math.abs(c.gunlukKZ))}</div></div>
           <div class="kitem"><div class="kl">Günlük %</div><div class="kv">${badge(c.gunlukP)}</div></div>
