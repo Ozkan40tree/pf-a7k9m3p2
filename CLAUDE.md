@@ -169,11 +169,15 @@ atla.
 
 ## 5. DASHBOARD YAPISI
 
-**Sidebar tabları (4 adet):**
-1. Özkan
-2. Derya
-3. Genel (Aile)
-4. Benchmark
+> **GÜNCEL DURUM (19 Mayıs 2026):** Sidebar artık **5 tab** içeriyor: Özkan, Derya, Benchmark, Geçmiş Veriler, Grafik. "Genel (Aile)" tabı planlanmış ama henüz yapılmamıştır (kalan iş). Detay: §12.4. Aşağıdaki §5.1–§5.6 plan/spesifikasyon olarak kalıyor.
+
+**Sidebar tabları (planlanan — 4 ana + 2 yeni):**
+1. Özkan ✅
+2. Derya ✅
+3. Genel (Aile) ⏳ — yapılmadı, kalan iş (§12.10 madde 2)
+4. Benchmark ✅
+5. Geçmiş Veriler ✅ (yeni, §12.4)
+6. Grafik ✅ (yeni, §12.4)
 
 ### 5.1 Özkan tabı — kart sırası
 
@@ -827,3 +831,297 @@ cat CLAUDE.md | head -50  # bağlam için
 - Hatalardan dersleri **12.6'daki formatla** kaydet: ne oldu, sebep, çözüm.
 - "Yapılmaması gerekenler" bölümünü canlı tut.
 - Tarih ve commit hash'leri her dersle birlikte.
+
+---
+
+## 13. SIFIRDAN KURULUM REHBERİ (bağımsız AI/yeni kullanıcı için)
+
+> Bu bölüm, bağımsız bir yapay zeka veya yeni bir geliştiricinin bu
+> CLAUDE.md'yi okuyup sistemi **sıfırdan kurabilmesi** için yazılmıştır.
+> §0-§12 davranışı ve kararları açıklar; §13 eylem adımlarını içerir.
+> Bu bölüm self-contained'dir: dış kaynağa bakmadan kurulum yapılabilir.
+
+### 13.1 Sistem genel bakışı
+
+**Ne yapar?** Bir Türk ailenin (Özkan + Derya) yatırım portföyünü
+takip eden, GitHub Pages üzerinde yayınlanan, basit şifre korumalı bir
+web dashboard.
+
+**Mimari:**
+
+```
+┌─────────────────┐  okur  ┌────────────────┐  yazar  ┌──────────────┐
+│  Google Sheets  │ ◄───── │ Python script  │ ──────► │ JSON dosyalar│
+│ (kullanıcı veri │  (gspread)  │(fiyat_guncelle)│       │ (repo'ya commit)│
+│  girdiği yer)   │        │(benchmark_fiyat)│       └──────────────┘
+└─────────────────┘        └────────────────┘                │
+                                ▲                            ▼
+                                │                  ┌──────────────────┐
+                          ┌─────┴─────┐            │ GitHub Pages     │
+                          │GitHub      │            │ frontend         │
+                          │Actions cron│            │ (index.html)     │
+                          └────────────┘            └──────────────────┘
+                                                            ▲
+                                                            │
+                                                       ┌────┴────┐
+                                                       │ Tarayıcı│
+                                                       └─────────┘
+```
+
+**Kullanıcı sadece Sheets'e veri girer.** Diğer her şey otomatik.
+
+**Bileşenler:**
+
+- **Backend:** 2 Python scripti + 2 GitHub Actions workflow + ~5 JSON dosyası
+- **Frontend:** Tek bir `index.html` dosyası (HTML + CSS + JS, ~1370 satır, CDN'den Chart.js)
+- **Veri kaynakları (öncelik sırasıyla):**
+  - `borsapy` (saidsurucu/borsapy) — BIST hisse, döviz, gram altın, TEFAS fon
+  - `yfinance` — yedek (Yahoo Finance, GitHub Actions'tan genelde çalışmaz)
+  - `TCMB` resmi XML — döviz son çare
+  - Google Sheets `TUFE` sekmesi — enflasyon (manuel ay ekleme)
+
+### 13.2 Google Cloud kurulumu (Service Account)
+
+Service account, Python script'in Sheets'e erişmesi için gereken
+"robot kullanıcı".
+
+1. **Google Cloud Console**'a git: `https://console.cloud.google.com`
+2. Yeni bir proje oluştur: "portfoy-dashboard-ozkan" (veya istediğin isim)
+3. **APIs & Services → Library**:
+   - "Google Sheets API"yi etkinleştir
+   - "Google Drive API"yi etkinleştir
+4. **APIs & Services → Credentials → Create Credentials → Service Account**:
+   - Service account name: `sheets-reader`
+   - Role: gerek yok (boş bırak)
+   - Sonraki adımda **Key → Create New Key → JSON** seç → indir
+5. İndirilen JSON dosyasının içeriğini sakla (GitHub Secrets'a koyacaksın).
+   - Service account e-postası: `sheets-reader@portfoy-dashboard-ozkan.iam.gserviceaccount.com` formatında.
+
+### 13.3 Google Sheets kurulumu
+
+1. Yeni bir Google Sheets oluştur.
+2. **Paylaşım:** Service account e-postasını "Görüntüleyici" yetkisiyle paylaş.
+3. **Sekme 1: `Ozkan_Portfoy`** — sütunlar (A→D):
+   ```
+   A: Tip      B: Kod       C: Adet       D: Maliyet
+   ```
+4. **Sekme 2: `Derya_Portfoy`** — aynı sütunlar.
+5. **Sekme 3: `TUFE`** — sütunlar:
+   ```
+   A: Ay (YYYY-MM)    B: Gerçekleşen (%)    C: Beklenti (%)
+   ```
+
+**Tip geçerli değerleri (§2):**
+```
+Hisse, Fon, AltinFonu, YurtdisiFonu, Emeklilik, Altin, Alacak, Nakit, Kripto
+```
+
+**Örnek satırlar (Ozkan_Portfoy):**
+| Tip | Kod | Adet | Maliyet |
+|---|---|---|---|
+| Hisse | INFO | 100179 | 3,9 |
+| Hisse | TRGYO | 3919 | 81,44 |
+| Fon | ZBJ | 54470 | 2,22 |
+| AltinFonu | HBF | 4515 | 29,8066 |
+| YurtdisiFonu | TFF | 4855 | 26,76 |
+| Emeklilik | HES | 1334608 | (boş) |
+| Kripto | BTC | 0,065751 | 3631243 |
+| Alacak | Anne | 135000 | (boş) |
+
+**Örnek satırlar (Derya_Portfoy):**
+| Tip | Kod | Adet | Maliyet |
+|---|---|---|---|
+| Hisse | INFO | 65327 | 3,9 |
+| Emeklilik | FFC | 7299919 | (boş) |
+| Altin | 24ayar | 301,86 | (boş) |
+
+**Sheets ID:** URL'den çıkar:
+`https://docs.google.com/spreadsheets/d/<SHEETS_ID>/edit`
+
+### 13.4 GitHub repo kurulumu
+
+1. GitHub'da yeni public repo oluştur: `pf-a7k9m3p2` (veya istediğin isim).
+   - **Public olmalı** — GitHub Pages için.
+   - Tehdit modeli düşük (şifre + obscure URL yeterli kabul edilmiş).
+
+2. Repo'ya şu dosya yapısını kur:
+   ```
+   pf-a7k9m3p2/
+   ├── CLAUDE.md                       (bu dosya)
+   ├── index.html                       (frontend, ~1370 satır)
+   ├── robots.txt                       (`User-agent: * \n Disallow: /`)
+   ├── requirements.txt                 (Python paketleri)
+   ├── prices.json                      (boş başlangıç: {})
+   ├── portfoy.json                     (boş başlangıç: {"portfoyler":{"ozkan":[],"derya":[]}})
+   ├── yilbasi_fiyatlari.json           (boş başlangıç: {})
+   ├── .gitignore
+   ├── scripts/
+   │   ├── fiyat_guncelle.py
+   │   └── benchmark_fiyat.py
+   └── .github/
+       └── workflows/
+           ├── portfoy-guncelle.yml
+           └── benchmark-guncelle.yml
+   ```
+
+3. **`requirements.txt`** içeriği:
+   ```
+   gspread==6.1.4
+   google-auth==2.35.0
+   yfinance==0.2.50
+   borsapy==0.10.0
+   requests==2.32.3
+   pandas==2.2.3
+   ```
+   > `tefas-crawler` **YOK** (§12.6.2).
+
+4. **`.gitignore`** içeriği (en azından):
+   ```
+   *.eski
+   *.eski2
+   *.eski3
+   notes.md
+   secrets.txt
+   .claude/
+   .preview_server.py
+   ```
+
+### 13.5 GitHub Secrets ayarları
+
+Repo → Settings → Secrets and variables → Actions → New repository secret:
+
+| Secret adı | Değer |
+|---|---|
+| `GOOGLE_SHEETS_CREDENTIALS` | Service account JSON dosyasının tüm içeriği |
+| `SHEETS_ID` | Google Sheets URL'sindeki ID |
+| `TWELVE_DATA_API_KEY` | (opsiyonel, altın yedeği için §11.1; ana script borsapy'a geçmişse gereksiz olabilir) |
+
+### 13.6 GitHub Pages aktivasyonu
+
+1. Repo → Settings → Pages
+2. **Source:** "Deploy from a branch"
+3. **Branch:** `main`, folder: `/ (root)`
+4. Save
+5. Birkaç dakikada `https://<github-username>.github.io/<repo-adı>/` URL'sinde yayında olur.
+
+**Basit parola koruması:** `index.html` içinde `PASSWORD_HASH = "ozdege15"` (örnek). Bu profesyonel güvenlik değil, sadece arama motorlarından ve gelişigüzel görülmesinden korur (§10).
+
+### 13.7 cron-job.org tetikleyicileri (opsiyonel ama önerilen)
+
+GitHub Actions schedule cron'larının güvenilirliği için ek tetikleyici.
+GitHub Actions schedule'ı bazen 30 dk gecikiyor; cron-job.org garanti tetik atıyor.
+
+1. `https://console.cron-job.org` hesap aç.
+2. **Personal Access Token (PAT) üret** — GitHub → Settings → Developer settings → Tokens → Fine-grained:
+   - Repo permissions: `Actions: Read and write`
+   - Geçerlilik: 1-2 yıl
+   - Name: `cron-job-org-portfoy-tetikleyici`
+3. cron-job.org'da yeni job:
+   - **URL:** `https://api.github.com/repos/<github-username>/<repo>/actions/workflows/portfoy-guncelle.yml/dispatches`
+   - **Method:** POST
+   - **Header:** `Authorization: Bearer <PAT>`, `Accept: application/vnd.github+json`, `Content-Type: application/json`
+   - **Body (intraday):** `{"ref":"main"}`
+   - **Body (kapanış):** `{"ref":"main","inputs":{"kapanis":"true"}}`
+   - **Schedule:** Pzt-Cum, TR saati:
+     - Intraday: 10:30, 12:30, 14:30, 16:30
+     - Kapanış: 18:35 (ayrı job)
+
+### 13.8 İlk kurulum adımları (kritik sıra)
+
+1. **Sheets paylaş** — service account'ı görüntüleyici olarak ekle.
+2. **GitHub repo, secrets, Pages** ayarlarını tamamla.
+3. **İlk benchmark çekimi** — Actions → "Benchmark Guncelleme" → "Run workflow":
+   - **DİKKAT:** Dropdown'dan `gecmis: true` seç (§12.6.1 dersi!).
+   - 5-10 dakikada `benchmark_gecmis.json` oluşur (5 yıllık seri).
+4. **İlk portföy fiyat çekimi** — Actions → "Portföy Guncelleme" → "Run workflow":
+   - Normal mod (intraday). `prices.json` ve `portfoy.json` dolar.
+5. **Frontend kontrolü** — GitHub Pages URL'sinde dashboard açılmalı.
+
+### 13.9 Doğrulama
+
+- **portfoy.json**: `{"portfoyler":{"ozkan":[...], "derya":[...]}}` dolu mu?
+- **prices.json**: USD, EUR, gram altın, hisseler dolu mu?
+- **benchmark_gecmis.json**: 5 seri (bist100, amerika_hisse, gram_altin, yae, tufe) hepsi kayıt var mı?
+- **GitHub Pages**: parola gir → dashboard 5 tab açılıyor mu?
+- **Cron çalışıyor mu?** Birkaç saat sonra "Otomatik guncelleme" commit'leri repo log'unda görünmeli.
+
+### 13.10 Bilinen sınırlamalar ve gözlemler
+
+- **yfinance GitHub Actions'tan çalışmaz** (§12.6.3). Yedek olarak kalır ama beklemeden borsapy birincil olarak ayarlı.
+- **tefas-crawler PyPI bozuk** (§12.6.2). borsapy.Fund() kullan.
+- **TEFAS v2 API'de YAE'nin geçmişi sınırlı** — fon yaşı ya da API window'una bağlı. Şu an ~71 kayıt (3 ay).
+- **TÜFE manuel** — kullanıcı her ay TÜİK rakamını Sheets'e ekler.
+- **GitHub Actions schedule güvenilmez** — cron-job.org paralel sigorta.
+- **Mac sandbox sınırlamaları** — Preview MCP ve `defaults write` çalışmaz; Bash kullan (§12.6.9).
+- **Lokal sunucuyu HER ZAMAN ana repo dizininden başlat**, worktree'den değil (§12.6.9).
+
+### 13.11 Hızlı referans — TEFAS fon kodları (Türk yatırımcı pratiği)
+
+| Fon kodu | Tipi | Amaç |
+|---|---|---|
+| **AFA** | Amerika Hisse | S&P500 takipli (yaklaşık), benchmark birincil |
+| **ABE** | Amerika Hisse | Benchmark yedek |
+| **YAE** | Para Piyasası | Faiz benchmark'ı (ZBJ portföy kalemi için) |
+| **HBF** | Altın Fonu | Portföy kalemi |
+| **NAU** | Altın Fonu | Portföy kalemi |
+| **TFF** | Yurt Dışı Hisse | Portföy kalemi |
+| **MPP** | Yurt Dışı Hisse | Portföy kalemi |
+| **ZBJ** | Para Piyasası | Portföy kalemi |
+| **HES** | Emeklilik (BES) | Portföy kalemi |
+| **AJR** | Emeklilik (BES) | Portföy kalemi (Özkan) |
+| **FFC** | Emeklilik (BES) | Portföy kalemi (Derya) |
+
+### 13.12 Hızlı referans — BIST hisse kodları (portföydeki)
+
+| Kod | Şirket |
+|---|---|
+| INFO | İnfo Yatırım |
+| TRGYO | Torunlar GYO |
+| SAHOL | Sabancı Holding |
+
+### 13.13 Tasarım kararları (NEDEN böyle?)
+
+- **Tek HTML dosyası (no build step)**: dağıtım kolaylığı, GitHub Pages'a statik yükle.
+- **Chart.js CDN**: ek build tooling yok, sayfa hızlı yüklenir.
+- **CSS dark theme + 5 tab sidebar**: modern fintech estetiği (CLAUDE.md §5.6).
+- **Tüm hesap frontend'de**: backend sadece raw veri sağlar, frontend hesap ve render yapar. Bu sayede ihtiyaca göre frontend güncellemesi yeterli, backend'e dokunulmaz.
+- **Privacy modu**: kullanıcı ekran paylaşırken portföy büyüklüğünü gizler. Yüzdeler ve oranlar gösterilir, mutlak rakamlar normalize edilir.
+- **gecmis.json milat tarihi**: 21 Mayıs 2026'dan önce kayıt yok (sistem o zaman tasarlandı). Geçmiş verilerle backfill yapılmaz — sadece ileriye doğru kayıt tutulur.
+- **borsapy birincil yfinance yedek**: ana script `fiyat_guncelle.py`'de kanıtlanmış pattern; benchmark da aynı pattern'e geçirildi.
+
+### 13.14 Felaket senaryoları
+
+**Senaryo 1: Repo silindi**
+- Lokal kopya: `~/Documents/pf-a7k9m3p2/`. Buradan tekrar push.
+- GitHub Secrets manuel yeniden gir.
+- GitHub Pages tekrar aktif et.
+
+**Senaryo 2: Google Sheets silindi**
+- Yeniden oluştur (§13.3).
+- Service account ile paylaş.
+- `SHEETS_ID` secret'ı güncelle.
+
+**Senaryo 3: Service account silindi/kapatıldı**
+- Yeni service account oluştur (§13.2).
+- JSON'u yeni Sheets'le paylaş.
+- `GOOGLE_SHEETS_CREDENTIALS` secret'ı güncelle.
+
+**Senaryo 4: borsapy çalışmıyor**
+- Script otomatik yfinance'a düşer (genelde GitHub Actions'tan çalışmaz, ama lokal'de çalışır).
+- O da olmazsa TCMB anlık kuru (tek nokta, geçmiş yok).
+- Hisse/fon için manual fallback yok — script o satırı `fiyat_eksik: true` ile işaretler, dashboard "—" gösterir.
+
+**Senaryo 5: Cron çakışması/lock dosyası**
+- Bkz §12.6.10 acil kurtarma.
+
+**Senaryo 6: AFA fonu kapatıldı/değişti**
+- `scripts/benchmark_fiyat.py` → `amerika_hisse_seri()` → birincil kod değişir.
+- `benchmark_gecmis.json` üzerine yazılır (manuel `gecmis=true` tetik gerekir).
+- Tüm kullanıcılar için aile vurgu rengi/etiket değişebilir (frontend).
+
+### 13.15 Bu dosyanın kendi felaketi
+
+Eğer **CLAUDE.md silinirse**:
+- GitHub commit history'den herhangi bir versiyonu geri al.
+- En kapsamlı versiyon: §13'lü versiyon (commit hash'i §12.11'de).
+- Bağımsız bir AI bu dosyayı okuyup tüm sistemi sıfırdan kurabilir.
