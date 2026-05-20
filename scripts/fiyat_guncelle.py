@@ -693,7 +693,7 @@ def tefas_fiyat_toplu(kodlar):
     else:
         log("TefasCrawler import edilmedi, borsapy yedegine donuluyor.", "WARN")
 
-    # Yedek: borsapy Fund - tefas-crawler cekemediklerini kapat
+    # Yedek 1: borsapy Fund - tefas-crawler cekemediklerini kapat
     eksikler = [k for k in kodlar if k not in sonuc]
     if eksikler:
         log(f"TEFAS'tan cekilemeyenler icin borsapy yedegi: {eksikler}", "WARN")
@@ -701,6 +701,32 @@ def tefas_fiyat_toplu(kodlar):
             veri = borsapy_fon(kod)
             if veri:
                 sonuc[kod] = {**veri, "kaynak": "borsapy"}
+
+    # Yedek 2 (son care): Onceki prices.json snapshot'indan eski fiyati koru.
+    # TEFAS API gun ici transient hata verebilir; eski fiyati silmeyelim,
+    # boylece dashboard "yanlis tutar" gostermesin (HBF, HES, AJR vb.
+    # 20 Mayis 12:31 cron'unda bu sorun yasanmisti).
+    # Eski fiyat geri yazilirken onceki=guncel yapilir -> gunluk degisim 0.
+    eksikler = [k for k in kodlar if k not in sonuc]
+    if eksikler:
+        log(f"borsapy de cekemedi, onceki snapshot'tan koruma: {eksikler}", "WARN")
+        try:
+            if PRICES_FILE.exists():
+                with open(PRICES_FILE, "r", encoding="utf-8") as f:
+                    eski = json.load(f)
+                eski_fonlar = eski.get("fonlar_ve_emeklilik", {}) or {}
+                for kod in eksikler:
+                    ev = eski_fonlar.get(kod)
+                    if ev and ev.get("guncel") is not None:
+                        # Eski guncel'i hem guncel hem onceki yap (gunluk 0)
+                        sonuc[kod] = {
+                            "guncel": ev["guncel"],
+                            "onceki": ev["guncel"],
+                            "kaynak": "onceki_snapshot",
+                        }
+                        log(f"  {kod}: onceki snapshot'tan korundu ({ev['guncel']:.4f})")
+        except Exception as e:
+            log(f"Onceki prices.json okunamadi: {e}", "WARN")
 
     return sonuc
 

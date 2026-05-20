@@ -582,9 +582,11 @@ function renderPortfoy(name, items, prices) {
     });
     const t_kz=sum(hisseler,'kz'), t_gk=sum(hisseler,'gunlukKZ');
     const t_kzp = sum(hisseler,'tm') > 0 ? (hisseTop/sum(hisseler,'tm') - 1) * 100 : 0;
+    const t_gp = (hisseTop - t_gk) > 0 ? (t_gk / (hisseTop - t_gk)) * 100 : 0;
     html += `</tbody><tfoot><tr>
       <td>TOPLAM</td><td colspan="3"></td><td>₺${fmt(hisseTop)}</td><td>100.0%</td>
-      <td class="${tlClass(t_gk)}">${tlSign(t_gk)}${fmt(Math.abs(t_gk))}</td><td></td>
+      <td class="${tlClass(t_gk)}">${tlSign(t_gk)}${fmt(Math.abs(t_gk))}</td>
+      <td>${badge(t_gp)}</td>
       <td class="${tlClass(t_kz)}">${tlSign(t_kz)}${fmt(Math.abs(t_kz))}</td>
       <td>${badge(t_kzp)}</td><td></td>
     </tr></tfoot></table></div></div>`;
@@ -630,9 +632,12 @@ function renderPortfoy(name, items, prices) {
     const t_tm = sum(list.filter(x => x.maliyetVar), 'tm');
     const t_kz = hasMaliyet ? (sum(list.filter(x => x.maliyetVar), 'tg') - t_tm) : 0;
     const t_kzp = t_tm > 0 ? (t_kz / t_tm) * 100 : 0;
+    // Toplam blok için günlük % (tüm kalemler, maliyet şartı yok)
+    const t_gp = (blokTop - t_gk) > 0 ? (t_gk / (blokTop - t_gk)) * 100 : 0;
     h += `</tbody><tfoot><tr>
       <td>TOPLAM</td><td colspan="4"></td><td>₺${fmt(blokTop)}</td><td>100.0%</td>
-      <td class="${tlClass(t_gk)}">${tlSign(t_gk)}${fmt(Math.abs(t_gk))}</td><td></td>
+      <td class="${tlClass(t_gk)}">${tlSign(t_gk)}${fmt(Math.abs(t_gk))}</td>
+      <td>${badge(t_gp)}</td>
       <td class="${hasMaliyet ? tlClass(t_kz) : 'val-zero'}">${hasMaliyet ? (tlSign(t_kz)+fmt(Math.abs(t_kz))) : '—'}</td>
       <td>${hasMaliyet ? badge(t_kzp) : '—'}</td><td></td>
     </tr></tfoot></table></div></div>`;
@@ -686,9 +691,11 @@ function renderPortfoy(name, items, prices) {
       </tr>`;
     });
     const t_gk = sum(altin, 'gunlukKZ');
+    const t_gp = (altinTop - t_gk) > 0 ? (t_gk / (altinTop - t_gk)) * 100 : 0;
     html += `</tbody><tfoot><tr>
       <td>TOPLAM</td><td colspan="2"></td><td>₺${fmt(altinTop)}</td><td>100.0%</td>
-      <td class="${tlClass(t_gk)}">${tlSign(t_gk)}₺${fmt(Math.abs(t_gk))}</td><td></td>
+      <td class="${tlClass(t_gk)}">${tlSign(t_gk)}₺${fmt(Math.abs(t_gk))}</td>
+      <td>${badge(t_gp)}</td>
     </tr></tfoot></table></div></div>`;
   }
 
