@@ -968,22 +968,42 @@ def gecmis_kaydet(portfoy_data):
         log(f"Gecmis: bugun ({bugun}) milattan ({gecmis['kayit_baslangic']}) once, atlaniyor.")
         return False
 
-    # Kategori toplamlari hesapla
+    # Kategori toplamlari hesapla. Eksik fiyatli kalemleri ayri topla
+    # (defansif: eksik varsa snapshot kaydetmeyiz, yanlis kayit kalmasin).
     def _kisi_toplam(satirlar):
         kategoriler = {}
         toplam = 0.0
+        eksikler = []
         for s in satirlar:
             tip = s.get("tip", "bilinmeyen")
+            kod = s.get("kod", "?")
             tl = s.get("guncel_tl")
             if tl is None:
+                eksikler.append(f"{kod}({tip})")
                 continue
             kategoriler[tip] = kategoriler.get(tip, 0.0) + tl
             toplam += tl
-        return {"kategoriler": kategoriler, "toplam": toplam}
+        return {"kategoriler": kategoriler, "toplam": toplam, "_eksikler": eksikler}
 
-    ozkan = _kisi_toplam(portfoy_data["portfoyler"]["ozkan"])
-    derya = _kisi_toplam(portfoy_data["portfoyler"]["derya"])
-    genel_toplam = ozkan["toplam"] + derya["toplam"]
+    ozkan_t = _kisi_toplam(portfoy_data["portfoyler"]["ozkan"])
+    derya_t = _kisi_toplam(portfoy_data["portfoyler"]["derya"])
+
+    # DEFANSIF KONTROL: Fiyati eksik kalem varsa snapshot KAYDETMEYIZ.
+    # Yanlis kategori toplami ile kalici yanlis kayit tutmaktansa, o gun
+    # icin atlamak daha guvenli. Kullanici manuel workflow_dispatch ile
+    # (kapanis=true) tekrar tetikleyebilir veya bir sonraki gun normal akar.
+    tum_eksikler = ozkan_t["_eksikler"] + derya_t["_eksikler"]
+    if tum_eksikler:
+        log(f"GECMIS ATLANDI: {bugun} icin {len(tum_eksikler)} kalem fiyat eksik.", "ERROR")
+        log(f"  Eksik kalemler: {', '.join(tum_eksikler)}", "ERROR")
+        log(f"  Snapshot kalici yanlis tutmamak icin atlandi.", "ERROR")
+        log(f"  Cozum: Actions sayfasindan 'Portfoy Fiyat Guncelleme' workflow'unu", "ERROR")
+        log(f"  manuel tetikle (kapanis=true). TEFAS yayinladiysa snapshot duser.", "ERROR")
+        return False
+
+    genel_toplam = ozkan_t["toplam"] + derya_t["toplam"]
+    ozkan = {"kategoriler": ozkan_t["kategoriler"], "toplam": ozkan_t["toplam"]}
+    derya = {"kategoriler": derya_t["kategoriler"], "toplam": derya_t["toplam"]}
 
     gecmis["gunler"][bugun] = {
         "ozkan": ozkan,
