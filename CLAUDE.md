@@ -1125,3 +1125,133 @@ Eğer **CLAUDE.md silinirse**:
 - GitHub commit history'den herhangi bir versiyonu geri al.
 - En kapsamlı versiyon: §13'lü versiyon (commit hash'i §12.11'de).
 - Bağımsız bir AI bu dosyayı okuyup tüm sistemi sıfırdan kurabilir.
+
+---
+
+## 14. 20 MAYIS 2026 — MİLAT ÖNCESİ DEFANS PAKETİ
+
+**Amaç:** 21 Mayıs milat günü `gecmis.json`'a ilk snapshot düşmeden önce
+oluşabilecek hataları kapatmak. İki commit, iki farklı koruma katmanı.
+
+### 14.1 TEFAS transient hata → snapshot koruma (3. yedek katman)
+
+**Olay:** 20 Mayıs 12:31 cron'unda TEFAS API geçici hata verdi. AJR, HBF,
+HES, ZBJ fonları çekilemedi. Mevcut script bu durumda ilgili alanları
+`null` yazıyordu. Frontend'de `enrichItem()` içindeki
+`tg = guncel_tl ?? tm` fallback'i maliyet × adet'ten hesap yapıyordu.
+Sonuç: HBF gerçek ~228k TL yerine maliyet × adet = 134k TL gösterdi.
+HES ve AJR maliyet null olduğu için 0 TL göründü.
+
+**Ne yapıldı (`scripts/fiyat_guncelle.py` — `tefas_fiyat_toplu`):**
+
+3. yedek katman eklendi. Yedek katman sırası artık:
+
+| Sıra | Kaynak | Tetik |
+|---|---|---|
+| 1 (birincil) | tefas-crawler (import varsa) | her zaman önce denenir |
+| 2 (yedek 1) | borsapy `Fund(kod)` | birincil çekemediklerini kapatır |
+| 3 (yedek 2, yeni) | `prices.json` snapshot (son bilinen fiyat) | ikisi de başarısız olursa |
+
+3. yedek çalışırken: eski `guncel` hem `guncel` hem `onceki` yapılır →
+günlük değişim 0 görünür ama tutar mantıklı kalır. `kaynak` alanına
+`"onceki_snapshot"` yazılır. Bir sonraki başarılı cron'da gerçek fiyat
+üzerine yazılır, her şey düzelir.
+
+**Frontend (`index.html` — tablo toplamları):**
+Hisseler, YurtdışıFon, Fon, AltınFonu, Emeklilik ve Altın tablolarının
+TOPLAM satırında "Günlük ₺" sütununun yanında boş bırakılan hücreye
+**günlük % rozeti** eklendi. Hesap:
+
+```
+t_gp = (t_gk / (blokTop - t_gk)) × 100
+```
+
+Pozitif → yeşil `+%x,xx`, negatif → kırmızı, sıfır → nötr.
+Hisseler tablosunda `hisseTop` ve `t_gk`, fon bloklarında `blokTop` ve
+`t_gk`, altın tablosunda `altinTop` ve `t_gk` kullanılır.
+
+**Commit:** `b07caff`
+
+### 14.2 gecmis_kaydet defansif fix — eksik kalem varsa snapshot atla
+
+**Sorun:** Kapanış cron'u (18:35) çalışırken TEFAS API hâlâ hata
+veriyorsa, 3 yedek katman da başarısız olabilir ve bazı kalemlerin
+`guncel_tl` alanı `None` kalabilir. Önceki `gecmis_kaydet()` bu durumu
+kontrol etmiyordu: eksik kalemler `None` → `0.0` gibi davranıp kategoriye
+yanlış toplam yazabilirdi. `gecmis.json`'da kalıcı bozuk satır kalırdı.
+
+**Milat için kritik:** 21 Mayıs 2026 ilk snapshot ya doğru düşmeli ya da
+hiç düşmemeli — yanlış kayıt kabul edilemez.
+
+**Ne yapıldı (`scripts/fiyat_guncelle.py` — `gecmis_kaydet`):**
+
+`_kisi_toplam()` yardımcı fonksiyonu `_eksikler` listesi döndürecek
+şekilde genişletildi. Her portföy satırı taranır; `guncel_tl is None`
+olan kalemler `_eksikler`'e eklenir, toplamdan çıkarılır.
+
+Ardından yeni **defansif kontrol** eklendi:
+
+```python
+tum_eksikler = ozkan_t["_eksikler"] + derya_t["_eksikler"]
+if tum_eksikler:
+    log(f"GECMIS ATLANDI: {bugun} icin {len(tum_eksikler)} kalem fiyat eksik.", "ERROR")
+    # ... detay logları
+    return False   # snapshot YAZILMAZ
+```
+
+Snapshot atlanınca log'a `[ERROR]` düşer. Kullanıcı veya bir sonraki
+cron farkeder. Manuel kurtarma: Actions → "Portföy Fiyat Guncelleme" →
+"Run workflow" → `kapanis: true`. TEFAS o anda veri yayınladıysa
+snapshot başarıyla düşer.
+
+**Commit:** `7c346c1`
+
+### 14.3 Öğrenilen dersler (20 Mayıs)
+
+**14.3.1 — TEFAS transient hataları beklenmeli, savunma zorunlu:**
+TEFAS API gün içinde birkaç dakikalık kesinti verebiliyor. Hisse ve
+benchmark için anlık veri yokluğu tolere edilebilir (dashboard "—"
+gösterir); ama gecmis.json için yanlış yazılmış kalıcı kayıt ileride
+grafikleri bozar. İki ayrı savunma katmanı birbirini tamamlıyor:
+- `tefas_fiyat_toplu`'da snapshot koruması → intraday cron'larda
+  dashboard tutarlı kalır.
+- `gecmis_kaydet`'te eksik kalem kontrolü → kapanış cron'unda bozuk
+  kayıt kalmasını engeller.
+
+**14.3.2 — `kaynak_durumu` alanını ileride izle:**
+`prices.json.kaynak_durumu` içinde her fon için hangi kaynaktan
+çekildiği yazılıyor (`"borsapy"`, `"onceki_snapshot"` vb.).
+Frontend bu alana bakıp "⚠️ Bazı veriler gecikebilir" uyarısı
+gösterebilir (v2 önerisi).
+
+**14.3.3 — Defansif kod `_eksikler` alanını dışarı sızdırmamalı:**
+`gecmis_kaydet`'e gönderilecek `ozkan` ve `derya` dict'lerinden
+`_eksikler` key'i çıkarılmalı (kodda yapıldı: `{"kategoriler":...,
+"toplam":...}` şeklinde yeniden paketleniyor). Yoksa gecmis.json'a
+`_eksikler: []` yazılır, şema bozulur.
+
+### 14.4 Şu anki durum (20 Mayıs 2026 gece)
+
+✅ **Tamamlandı:**
+- TEFAS transient hata → prices.json snapshot koruması (3. yedek katman)
+- Tablo TOPLAM satırları günlük % rozeti
+- gecmis_kaydet defansif fix (eksik kalem varsa atla)
+
+⏳ **Bekleniyor:**
+- **21 Mayıs 2026 18:35** → `gecmis.json` ilk snapshot. Artık ya doğru
+  düşer ya atlanır; yanlış kayıt riski sıfır.
+
+### 14.5 Sonraki yapılacaklar (20 Mayıs güncellemesiyle değişen öncelikler)
+
+§12.10'daki liste geçerliliğini koruyor. Ek notlar:
+
+1. **21 Mayıs kapanış sonrası doğrulama** — `gecmis.json` oluştuysa
+   Actions log'unda `[INFO] Gecmis kaydedildi: 2026-05-21` mesajı
+   görünmeli. Görünmüyorsa `[ERROR] GECMIS ATLANDI` loguna bak.
+2. **`kaynak_durumu` frontend uyarısı** (v2) — snapshot yedek devredeyse
+   kullanıcıya bilgi notu göster (§14.3.2).
+
+### 14.6 Önemli commit'ler (20 Mayıs)
+
+- `b07caff` — TEFAS snapshot yedeği + tablo TOPLAM günlük % rozeti (20 May)
+- `7c346c1` — gecmis_kaydet defansif fix (eksik kalem varsa atla) (20 May)
