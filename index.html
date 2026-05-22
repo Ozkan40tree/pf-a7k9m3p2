@@ -92,12 +92,12 @@
 
   /* ── TABS ── */
   .tabs {
-    display: flex; gap: 8px; margin-bottom: 24px;
+    display: flex; gap: 6px; margin-bottom: 24px;
     background: white; padding: 6px; border-radius: 18px;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); width: max-content;
-    margin-left: auto; margin-right: auto;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    flex-wrap: wrap; justify-content: center;
   }
-  .tab { padding: 10px 22px; border-radius: 12px; font-weight: 600; font-size: 14px;
+  .tab { padding: 10px 20px; border-radius: 12px; font-weight: 600; font-size: 14px;
     cursor: pointer; color: #64748b; transition: all 0.3s; border: none; background: transparent; }
   .tab.active { background: #0f172a; color: white; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
 
@@ -220,8 +220,7 @@
     .card .cval { font-size: 17px; }
     .kitems { gap: 12px; }
     .weight-bar { width: 24px; }
-    .tabs { width: 100%; }
-    .tab { padding: 10px 14px; font-size: 13px; flex: 1; text-align: center; }
+    .tab { padding: 8px 12px; font-size: 12px; }
   }
 </style>
 </head>
@@ -716,6 +715,114 @@ function renderPortfoy(name, items, prices) {
 }
 
 
+// ═══════════════════════════════════════════════
+// AİLE TABI
+// ═══════════════════════════════════════════════
+function renderAile(portfoyler, prices) {
+  const tip = (arr, t) => arr.filter(x => x.tip === t);
+  const oz = (portfoyler.ozkan || []).map(x => enrichItem(x, prices));
+  const dr = (portfoyler.derya || []).map(x => enrichItem(x, prices));
+
+  // Aile Aktif Yatırım: Özkan(hisse+fon+yurtdısı+altınfonu+kripto) + Derya(hisse+altın)
+  const aktifOz = [...tip(oz,'hisse'), ...tip(oz,'fon'), ...tip(oz,'yurtdisifonu'), ...tip(oz,'altinfonu'), ...tip(oz,'kripto')];
+  const aktifDr = [...tip(dr,'hisse'), ...tip(dr,'altin')];
+  const aktifOzTop = sum(aktifOz, 'tg');
+  const aktifDrTop = sum(aktifDr, 'tg');
+  const aileAktifTop = aktifOzTop + aktifDrTop;
+
+  // Aile Emeklilik
+  const emOz = tip(oz, 'emeklilik');
+  const emDr = tip(dr, 'emeklilik');
+  const emOzTop = sum(emOz, 'tg');
+  const emDrTop = sum(emDr, 'tg');
+  const aileEmTop = emOzTop + emDrTop;
+
+  // Alacak (sadece Özkan)
+  const alacakTop = sum(tip(oz,'alacak'), 'tg');
+
+  const aileToplam = aileAktifTop + aileEmTop + alacakTop;
+
+  // Günlük K/Z
+  const aileGK = sum(oz,'gunlukKZ') + sum(dr,'gunlukKZ');
+  const aileGP = (aileToplam - aileGK) > 0 ? aileGK / (aileToplam - aileGK) * 100 : 0;
+
+  let html = `
+    <div class="cards-row">
+      <div class="card dark">
+        <div class="clabel">Aile Aktif Yatırım</div>
+        <div class="cval">₺${fmt(aileAktifTop)}</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:5px">Özkan ₺${fmt(aktifOzTop)} · Derya ₺${fmt(aktifDrTop)}</div>
+      </div>
+      <div class="card">
+        <div class="clabel">Aile Emeklilik</div>
+        <div class="cval">₺${fmt(aileEmTop)}</div>
+        <div style="font-size:11px;color:#64748b;margin-top:5px">Özkan ₺${fmt(emOzTop)} · Derya ₺${fmt(emDrTop)}</div>
+      </div>
+      <div class="card">
+        <div class="clabel">Aile Toplam</div>
+        <div class="cval">₺${fmt(aileToplam)}</div>
+      </div>
+      <div class="card">
+        <div class="clabel">Günlük K/Z</div>
+        <div class="cval ${tlClass(aileGK)}">${tlSign(aileGK)}₺${fmt(Math.abs(aileGK))}</div>
+        <div style="margin-top:4px">${badge(aileGP)}</div>
+      </div>
+    </div>`;
+
+  // Kategori dağılım tablosu
+  const tipSirasi = ['hisse','fon','yurtdisifonu','altinfonu','kripto','altin','emeklilik','alacak'];
+  const tipLabel  = {
+    hisse:'📈 Hisse', fon:'🏦 Fon', yurtdisifonu:'🌍 Yurtdışı Fon',
+    altinfonu:'🏦 Altın Fonu', kripto:'₿ Kripto',
+    altin:'🥇 Altın', emeklilik:'🏛️ Emeklilik', alacak:'💰 Alacak'
+  };
+
+  html += `<div class="section">
+    <h3>📊 Kategori Dağılımı <span class="subtotal">Aile Toplam ₺${fmt(aileToplam)}</span></h3>
+    <div style="overflow-x:auto"><table>
+    <thead><tr>
+      <th style="text-align:left">Kategori</th>
+      <th>Özkan</th><th>Derya</th><th>Aile Toplam</th>
+      <th>Pay %</th><th>Günlük ₺</th><th>Günlük %</th>
+    </tr></thead><tbody>`;
+
+  for (const t of tipSirasi) {
+    const ozI = tip(oz, t);
+    const drI = tip(dr, t);
+    if (!ozI.length && !drI.length) continue;
+    const ozTop = sum(ozI,'tg');
+    const drTop = sum(drI,'tg');
+    const tipTop = ozTop + drTop;
+    const pay = aileToplam > 0 ? tipTop / aileToplam * 100 : 0;
+    const tipGK = sum(ozI,'gunlukKZ') + sum(drI,'gunlukKZ');
+    const tipGP = (tipTop - tipGK) > 0 ? tipGK / (tipTop - tipGK) * 100 : 0;
+    html += `<tr>
+      <td style="text-align:left;font-weight:600">${tipLabel[t] || t}</td>
+      <td>${ozTop > 0 ? '₺'+fmt(ozTop) : '—'}</td>
+      <td>${drTop > 0 ? '₺'+fmt(drTop) : '—'}</td>
+      <td style="font-weight:700">₺${fmt(tipTop)}</td>
+      <td>${weightBar(pay)}</td>
+      <td class="${tlClass(tipGK)}">${tipGK!==0 ? tlSign(tipGK)+'₺'+fmt(Math.abs(tipGK)) : '—'}</td>
+      <td>${tipGK!==0 ? badge(tipGP) : '—'}</td>
+    </tr>`;
+  }
+
+  // TOPLAM satırı
+  const tumGK = sum(oz,'gunlukKZ') + sum(dr,'gunlukKZ');
+  const tumGP = (aileToplam - tumGK) > 0 ? tumGK / (aileToplam - tumGK) * 100 : 0;
+  html += `</tbody><tfoot><tr>
+    <td style="text-align:left">TOPLAM</td>
+    <td>₺${fmt(sum(oz,'tg'))}</td>
+    <td>₺${fmt(sum(dr,'tg'))}</td>
+    <td style="font-weight:700">₺${fmt(aileToplam)}</td>
+    <td>100.0%</td>
+    <td class="${tlClass(tumGK)}">${tlSign(tumGK)}₺${fmt(Math.abs(tumGK))}</td>
+    <td>${badge(tumGP)}</td>
+  </tr></tfoot></table></div></div>`;
+
+  return { html, toplam: aileToplam, gunlukKZ: aileGK };
+}
+
 function render(portfoy, prices, benchmark, gecmis) {
   // Benchmark verisini global tut (dropdown/donem degisikliginde tekrar kullanmak icin)
   _benchmarkData = benchmark;
@@ -736,7 +843,8 @@ function render(portfoy, prices, benchmark, gecmis) {
   const genKZP = genMal > 0 ? (genTop/genMal - 1) * 100 : 0;
   const genGP = (genTop - genGK) > 0 ? genGK / (genTop - genGK) * 100 : 0;
   const names = Object.keys(portfoyler);
-  const displayNames = { ozkan: 'Özkan', derya: 'Derya' };
+  const displayNames = { ozkan: 'Özkan', derya: 'Derya', aile: 'Aile' };
+  const aile = renderAile(portfoyler, prices);
 
   const lastUpdate = prices.son_guncelleme
     ? new Date(prices.son_guncelleme).toLocaleString('tr-TR', {dateStyle:'long', timeStyle:'short'})
@@ -764,6 +872,7 @@ function render(portfoy, prices, benchmark, gecmis) {
   const tabsHtml = names.map((n,i) =>
     `<button class="tab ${i===0?'active':''}" data-panel="${n}" onclick="switchTab('${n}')">👤 ${displayNames[n] || n} • ₺${fmt(rendered[n].toplam)}</button>`
   ).join('') +
+  `<button class="tab" data-panel="aile" onclick="switchTab('aile')">👨‍👩‍👧 Aile • ₺${fmt(aile.toplam)}</button>` +
   `<button class="tab" data-panel="benchmark" onclick="switchTab('benchmark')">📊 Benchmark</button>` +
   `<button class="tab" data-panel="gecmis" onclick="switchTab('gecmis')">📋 Geçmiş Veriler</button>` +
   `<button class="tab" data-panel="grafik" onclick="switchTab('grafik')">📈 Grafik</button>`;
@@ -772,6 +881,7 @@ function render(portfoy, prices, benchmark, gecmis) {
   const panelsHtml = names.map((n,i) =>
     `<div id="panel-${n}" class="${i===0?'':'hidden'}">${rendered[n].html}</div>`
   ).join('') +
+  `<div id="panel-aile" class="hidden">${aile.html}</div>` +
   `<div id="panel-benchmark" class="hidden">${benchmarkPanelHtml()}</div>` +
   `<div id="panel-gecmis" class="hidden">${gecmisPanelHtml()}</div>` +
   `<div id="panel-grafik" class="hidden">${grafikPanelHtml()}</div>`;
