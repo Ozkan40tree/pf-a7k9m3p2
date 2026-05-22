@@ -1230,16 +1230,42 @@ gösterebilir (v2 önerisi).
 "toplam":...}` şeklinde yeniden paketleniyor). Yoksa gecmis.json'a
 `_eksikler: []` yazılır, şema bozulur.
 
-### 14.4 Şu anki durum (20 Mayıs 2026 gece)
+**14.3.4 — `.gitignore`'da `gecmis.json` ölümcül tuzak (22 Mayıs bug):**
+Milat tarihi (21 Mayıs) öncesinde dosya henüz yokken `.gitignore`'a
+`gecmis.json` satırı yazılmıştı. 21 ve 22 Mayıs kapanış cron'larında
+script dosyayı başarıyla yazdı (`[INFO] Gecmis: ... snapshot
+kaydedildi`), ama `git add -A` adımı `.gitignore` nedeniyle dosyayı
+atladı — `gecmis.json` hiç commit'lenmedi. GitHub Actions runner her
+çalıştırmadan sonra imha edildiği için, yazılan dosya kaybolmuş gibi
+oldu, bir sonraki cron'da fresh checkout yapıldı, kısır döngü tekrar.
+- **Sebep:** `.gitignore`, **tracked dosyaları görmezden gelmez** ama
+  henüz tracked olmayanları (örn. milat günü ilk kez yaratılan
+  `gecmis.json`) atlar. Aynı listede olan `prices.json`, `portfoy.json`,
+  `yilbasi_fiyatlari.json` ise zaten tracked olduğu için sorun çıkarmadı.
+- **Çözüm:** `.gitignore`'dan `gecmis.json` satırı silindi. Diğerleri
+  zararsız olduğu için bırakıldı, ama satırlara uyarı yorumu eklendi
+  ("ASLA gecmis.json'i buraya ekleme").
+- **Kurtarma:** 21 ve 22 Mayıs kapanış commit'lerinde portfoy.json
+  mevcut olduğu için (ce65dcd ve 636d499), bu commit'lerden veri çıkarılıp
+  `gecmis_kaydet` mantığı lokal simüle edilerek `gecmis.json`
+  retrospektif olarak oluşturuldu (iki gün için tam doğru kayıtlar).
+- **Doktrin:** Cron'da yazılması beklenen veri dosyalarını **ASLA**
+  `.gitignore`'a yazma — milat öncesi yokken zararsız görünse bile,
+  ilk yazıldığı an gizlice commit dışı kalır.
+
+### 14.4 Şu anki durum (22 Mayıs 2026 gece — güncel)
 
 ✅ **Tamamlandı:**
 - TEFAS transient hata → prices.json snapshot koruması (3. yedek katman)
 - Tablo TOPLAM satırları günlük % rozeti
 - gecmis_kaydet defansif fix (eksik kalem varsa atla)
+- **`.gitignore` `gecmis.json` bug fix + 21+22 Mayıs retrospektif
+  snapshot kurtarma (22 Mayıs akşamı, §14.3.4)**
 
-⏳ **Bekleniyor:**
-- **21 Mayıs 2026 18:35** → `gecmis.json` ilk snapshot. Artık ya doğru
-  düşer ya atlanır; yanlış kayıt riski sıfır.
+📊 **gecmis.json durumu:**
+- 2026-05-21: 8.591.562 TL (Özkan 4.78M, Derya 3.81M) — HES Özkan'da
+- 2026-05-22: 7.428.626 TL (Özkan 3.63M, Derya 3.80M) — Özkan'dan HES
+  çıkarılmış, FFC eklenmiş (Sheets'te yapısal değişiklik)
 
 ### 14.5 Sonraki yapılacaklar (20 Mayıs güncellemesiyle değişen öncelikler)
 
@@ -1251,7 +1277,10 @@ gösterebilir (v2 önerisi).
 2. **`kaynak_durumu` frontend uyarısı** (v2) — snapshot yedek devredeyse
    kullanıcıya bilgi notu göster (§14.3.2).
 
-### 14.6 Önemli commit'ler (20 Mayıs)
+### 14.6 Önemli commit'ler (20–22 Mayıs)
 
 - `b07caff` — TEFAS snapshot yedeği + tablo TOPLAM günlük % rozeti (20 May)
 - `7c346c1` — gecmis_kaydet defansif fix (eksik kalem varsa atla) (20 May)
+- `9d8ab7c` — CLAUDE.md §14 eklendi (20 May gece)
+- **(22 May)** — `.gitignore` `gecmis.json` satırı silindi + retrospektif
+  `gecmis.json` (21+22 Mayıs) + CLAUDE.md §14.3.4 dersi eklendi

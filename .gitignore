@@ -26,7 +26,10 @@ venv/
 *.log
 
 # GitHub Actions tarafindan uretilen veri dosyalari
+# NOT: Asagidaki dosyalar repo'da tracked; .gitignore satirlari sadece
+# lokal kopyalarda yanlislikla yeni eklenmesini engellemek icin (zararsiz).
+# DIKKAT: gecmis.json'i ASLA buraya ekleme - milat oncesi dosya yokken
+# eklendigi icin cron'da yazilan snapshot'lar commit'lenememisti (bkz §14.3.4).
 prices.json
 portfoy.json
-gecmis.json
 yilbasi_fiyatlari.json
