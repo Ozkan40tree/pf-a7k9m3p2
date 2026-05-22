@@ -169,15 +169,15 @@ atla.
 
 ## 5. DASHBOARD YAPISI
 
-> **GÜNCEL DURUM (19 Mayıs 2026):** Sidebar artık **5 tab** içeriyor: Özkan, Derya, Benchmark, Geçmiş Veriler, Grafik. "Genel (Aile)" tabı planlanmış ama henüz yapılmamıştır (kalan iş). Detay: §12.4. Aşağıdaki §5.1–§5.6 plan/spesifikasyon olarak kalıyor.
+> **GÜNCEL DURUM (22 Mayıs 2026):** Sidebar **6 tab** içeriyor: Özkan, Derya, Aile, Benchmark, Geçmiş Veriler, Grafik. Aile tabı 22 Mayıs akşamı tamamlandı (commit f57230f). Tab'lar artık `flex-wrap: wrap` ile mobilde iki satıra dönüşüyor.
 
-**Sidebar tabları (planlanan — 4 ana + 2 yeni):**
+**Sidebar tabları:**
 1. Özkan ✅
 2. Derya ✅
-3. Genel (Aile) ⏳ — yapılmadı, kalan iş (§12.10 madde 2)
+3. Aile ✅ (22 Mayıs, §12.10 madde 2 tamamlandı)
 4. Benchmark ✅
-5. Geçmiş Veriler ✅ (yeni, §12.4)
-6. Grafik ✅ (yeni, §12.4)
+5. Geçmiş Veriler ✅ (§12.4)
+6. Grafik ✅ (§12.4)
 
 ### 5.1 Özkan tabı — kart sırası
 
@@ -779,7 +779,7 @@ Python `http.server` cache header göndermiyor, ama tarayıcı yine de cache'ley
 
 1. **21 Mayıs sonrası ufak UX düzeltmeleri** — Gerçek `gecmis.json` verisiyle Geçmiş Veriler tablosu ve Grafik tabı test edilecek, küçük görsel/etkileşim düzeltmeleri çıkabilir.
 
-2. **Genel (Aile) tabı** (CLAUDE.md §5.3'te tanımlı, hâlâ yok) — Özkan + Derya birleşik özet, 3 kart: Aile Aktif Yatırım, Aile Emeklilik, Aile Toplam.
+2. ~~**Genel (Aile) tabı**~~ ✅ (22 Mayıs, commit f57230f) — renderAile() fonksiyonu, 4 kart + kategori dağılım tablosu. Tab CSS'i `flex-wrap: wrap` yapıldı.
 
 3. **Her tab için küçük portföy çizgi grafiği** (CLAUDE.md §5.4) — Tab içeriğinin üstüne ufak bir trend grafiği. Grafik tabıyla kısmen örtüşüyor, kararı veri gelince ver.
 
