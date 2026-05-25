@@ -785,11 +785,11 @@ Python `http.server` cache header göndermiyor, ama tarayıcı yine de cache'ley
 
 5. ~~**Twelve Data altın yedeği temizliği**~~ ✅ (25 May, commit 5f7df88) — `twelve_data_xau_usd()` fonksiyonu silindi, secret kullanımdan kaldırıldı, §11.1 güncellendi.
 
-6. **Benchmark günlük güncelleme gözlemi** — Her gün 19:00 TR cron'unda 4 ana serinin son gününün eklenmesi takip edilecek. AFA fonu için TEFAS v2 API her gün başarılı çalışmalı; çalışmazsa ABE'ye düşer, o da olmazsa yfinance'a (genelde çalışmaz).
+6. ~~**Benchmark günlük güncelleme gözlemi**~~ — §14.7'ye taşındı (süregelen rutin, tek seferlik iş değil).
 
 7. **Benchmark tabı "Özel tarih aralığı"** (CLAUDE.md §6.1) — Şu an yok, v2.
 
-8. **TÜFE Sheets güncellemesi** — `TUFE` sekmesinde şu an sadece 2025-04 verisi var. Kullanıcı her ay yeni TÜİK rakamını eklemeli (ay sonu açıklanır). Otomasyon yok (manuel).
+8. ~~**TÜFE Sheets güncellemesi**~~ — §14.7'ye taşındı (kullanıcının her ay yapacağı manuel iş).
 
 ### 12.11 Yeni bir Claude oturumu nasıl başlamalı?
 
@@ -1281,3 +1281,36 @@ oldu, bir sonraki cron'da fresh checkout yapıldı, kısır döngü tekrar.
 - `9d8ab7c` — CLAUDE.md §14 eklendi (20 May gece)
 - **(22 May)** — `.gitignore` `gecmis.json` satırı silindi + retrospektif
   `gecmis.json` (21+22 Mayıs) + CLAUDE.md §14.3.4 dersi eklendi
+- `5f7df88` — Twelve Data API temizliği (25 May)
+
+### 14.7 Süregelen rutinler (tek seferlik iş değil, tekrarlayan gözlem)
+
+Bu maddeler "yapılacaklar" listesinde değil — bitişi olmayan, periyodik
+takip görevleridir. §12.10'dan buraya taşındı (25 May).
+
+**1. Benchmark günlük güncelleme gözlemi (ayda 1-2 kez)**
+
+Her gün 19:00 TR'de `benchmark-guncelle.yml` cron'u `benchmark_gecmis.json`'a
+o günün noktasını ekler. Sessiz bir başarısızlık, grafik üzerinde "veri
+boşluğu" olarak görünür. Periyodik kontrol:
+
+```
+1. benchmark_gecmis.json'da seriler.bist100 / amerika_hisse / gram_altin
+   / yae son tarihleri bugüne yakın mı?
+2. Yoksa GitHub Actions → Benchmark Guncelleme → son run log'una bak.
+3. Log'da [WARN] veya [ERROR] varsa müdahale gerekir.
+```
+
+Kaynak hiyerarşisi (AFA için): borsapy AFA → borsapy ABE →
+yfinance `^GSPC × USDTRY` (GitHub Actions IP'lerinden genelde çalışmaz,
+§12.6.3). Üçü de çökerse o gün için `null` düşer.
+
+**2. TÜFE Sheets güncellemesi (her ay)**
+
+`TUFE` sekmesinde her ay TÜİK'in açıkladığı yeni rakam manuel eklenir.
+Otomasyon yok (TÜİK API'si kararsız, ay başı/sonu açıklanan rakamlar
+revize edilebilir). Kullanıcı sorumluluğunda.
+
+Sütunlar: `A: Ay (YYYY-MM)`, `B: Gerçekleşen (%)`, `C: Beklenti (%)`.
+Açıklanmamış aylar için B boş, C dolu olabilir. Frontend `tufe_aylik_gerceklesen`
+ve `tufe_aylik_beklenti` serilerini ayrı işler.
