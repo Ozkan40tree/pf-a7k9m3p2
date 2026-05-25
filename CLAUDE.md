@@ -446,15 +446,14 @@ silinir, bu bölüm dosyadan çıkarılır.
 ### 11.1 Altın veri kaynağı
 
 - **Birincil:** yfinance `GC=F` (ons altın USD × USDTRY ÷ 31.1035)
-- **Yedek:** Twelve Data `XAU/USD` `/quote` endpoint
-- **API key:** GitHub Secrets → `TWELVE_DATA_API_KEY`
-- **Kaynak kodu:** `scripts/fiyat_guncelle.py` → `twelve_data_xau_usd()` ve `gram_altin_cek()`
+- **Yedek:** prices.json snapshot koruması (§14.1 — 3. yedek katman)
+- **Kaynak kodu:** `scripts/fiyat_guncelle.py` → `gram_altin_cek()`
 
-Yedek tablosu güncellendi (bkz. Bölüm 8.1):
+Yedek tablosu (bkz. Bölüm 8.1):
 
 | Veri | Birincil | Yedek |
 |---|---|---|
-| Gram altın | yfinance `GC=F × USDTRY ÷ 31.1035` | **Twelve Data** `XAU/USD` |
+| Gram altın | yfinance `GC=F × USDTRY ÷ 31.1035` | **prices.json snapshot** (§14.1) |
 
 ### 11.2 Dashboard altın render
 
@@ -994,7 +993,6 @@ Repo → Settings → Secrets and variables → Actions → New repository secre
 |---|---|
 | `GOOGLE_SHEETS_CREDENTIALS` | Service account JSON dosyasının tüm içeriği |
 | `SHEETS_ID` | Google Sheets URL'sindeki ID |
-| `TWELVE_DATA_API_KEY` | (opsiyonel, altın yedeği için §11.1; ana script borsapy'a geçmişse gereksiz olabilir) |
 
 ### 13.6 GitHub Pages aktivasyonu
 

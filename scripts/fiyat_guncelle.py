@@ -542,41 +542,11 @@ def kur_cek():
 
     return sonuc
 
-def twelve_data_xau_usd():
-    """
-    Twelve Data API'den XAU/USD (ons altin USD) fiyati cek.
-    /quote endpoint'i hem mevcut hem onceki gun close fiyatlarini doner.
-    Donus: {"guncel": x, "onceki": y} veya None.
-    Apikey TWELVE_DATA_API_KEY env degiskeninden okunur.
-    """
-    api_key = os.environ.get("TWELVE_DATA_API_KEY")
-    if not api_key:
-        log("Twelve Data: API key env'de yok, atlaniyor.", "WARN")
-        return None
-    try:
-        url = "https://api.twelvedata.com/quote"
-        params = {"symbol": "XAU/USD", "apikey": api_key}
-        r = requests.get(url, params=params, timeout=10)
-        r.raise_for_status()
-        data = r.json()
-        if isinstance(data, dict) and data.get("status") == "error":
-            log(f"Twelve Data API hatasi: {data.get('message', 'unknown')}", "WARN")
-            return None
-        close = data.get("close")
-        previous_close = data.get("previous_close")
-        if close is None or previous_close is None:
-            log(f"Twelve Data eksik alan: close={close}, previous_close={previous_close}", "WARN")
-            return None
-        return {"guncel": float(close), "onceki": float(previous_close)}
-    except Exception as e:
-        log(f"Twelve Data hata: {type(e).__name__}: {e}", "WARN")
-        return None
-      
 def gram_altin_cek(usd_try_guncel, usd_try_onceki):
     """
     Gram altin TL fiyati.
     Birincil: yfinance GC=F (ons altin USD) × USDTRY ÷ 31.1035
-    Yedek:    Twelve Data XAU/USD × USDTRY ÷ 31.1035
+    Yedek: prices.json snapshot koruması (§14.1 — 3. yedek katman)
     Not: borsapy 'ALTIN' sembolu Darphane Altin Sertifikasi (~80 TL) verir,
     gercek gram altin (~6800 TL/gr) degil. Bu yuzden kullanmiyoruz.
     """
@@ -593,15 +563,8 @@ def gram_altin_cek(usd_try_guncel, usd_try_onceki):
         onceki = (altin_oz["onceki"] * usd_try_onceki) / OZ_TO_GRAM
         return {"guncel": guncel, "onceki": onceki, "kaynak": "yfinance"}
 
-    # Yedek: Twelve Data XAU/USD
-    log("Gram altin: yfinance GC=F basarisiz, Twelve Data yedegine donuluyor.", "WARN")
-    altin_oz = twelve_data_xau_usd()
-    if altin_oz:
-        guncel = (altin_oz["guncel"] * usd_try_guncel) / OZ_TO_GRAM
-        onceki = (altin_oz["onceki"] * usd_try_onceki) / OZ_TO_GRAM
-        return {"guncel": guncel, "onceki": onceki, "kaynak": "twelve_data"}
-
-    log("HATA: Gram altin hicbir kaynaktan alinamadi.", "ERROR")
+    # Yedek: snapshot koruması tefas_fiyat_toplu()'da yapılır (3. yedek katman)
+    log("Gram altin: yfinance GC=F basarisiz, fiyat eksik kalacak.", "ERROR")
     return None
 
 

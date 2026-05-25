@@ -56,7 +56,6 @@ jobs:
         env:
           GOOGLE_SHEETS_CREDENTIALS: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS }}
           SHEETS_ID: ${{ secrets.SHEETS_ID }}
-          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
         run: |
           if [ "${{ steps.mod.outputs.kapanis }}" = "true" ]; then
             python scripts/fiyat_guncelle.py --kapanis
