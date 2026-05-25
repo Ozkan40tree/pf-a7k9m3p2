@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-05-25T16:31:41+03:00",
+  "olusturma_tarihi": "2026-05-25T17:21:08+03:00",
   "milat": "2026-05-21",
   "portfoyler": {
     "ozkan": [
@@ -36,10 +36,10 @@
         "kod_orjinal": "SAHOL",
         "adet": 2044.0,
         "maliyet": 95.31,
-        "guncel_tl": 183551.19999999998,
+        "guncel_tl": 184573.19999999998,
         "onceki_tl": 182222.6,
-        "gunluk_kazanc_tl": 1328.5999999999767,
-        "gunluk_yuzde": 0.7291082445316754,
+        "gunluk_kazanc_tl": 2350.5999999999767,
+        "gunluk_yuzde": 1.2899607403252817,
         "fiyat_eksik": false
       },
       {
@@ -140,10 +140,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 232255.084593,
-        "onceki_tl": 230865.06518060356,
-        "gunluk_kazanc_tl": 1390.0194123964466,
-        "gunluk_yuzde": 0.602091707252913,
+        "guncel_tl": 232878.141069,
+        "onceki_tl": 231948.94793700002,
+        "gunluk_kazanc_tl": 929.1931319999858,
+        "gunluk_yuzde": 0.4006024343996444,
         "fiyat_eksik": false
       },
       {
@@ -194,10 +194,10 @@
         "kod_orjinal": "SAHOL",
         "adet": 1333.0,
         "maliyet": 95.25,
-        "guncel_tl": 119703.4,
+        "guncel_tl": 120369.9,
         "onceki_tl": 118836.95000000001,
-        "gunluk_kazanc_tl": 866.4499999999825,
-        "gunluk_yuzde": 0.7291082445316734,
+        "gunluk_kazanc_tl": 1532.9499999999825,
+        "gunluk_yuzde": 1.2899607403252795,
         "fiyat_eksik": false
       },
       {
@@ -233,10 +233,10 @@
         "kod_orjinal": "24ayar",
         "adet": 301.86,
         "maliyet": null,
-        "guncel_tl": 2025341.4259431397,
+        "guncel_tl": 2028019.7925560686,
         "onceki_tl": 1993952.0200081572,
-        "gunluk_kazanc_tl": 31389.405934982467,
-        "gunluk_yuzde": 1.5742307548029193,
+        "gunluk_kazanc_tl": 34067.77254791139,
+        "gunluk_yuzde": 1.708555281474226,
         "fiyat_eksik": false
       }
     ]
