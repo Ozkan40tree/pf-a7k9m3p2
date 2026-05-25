@@ -212,7 +212,6 @@ atla.
 
 - **Üst banner:** Toplam Aile, Özkan Toplam, Derya Toplam, Günlük Kazanç (TL)
 - **Sağ üst:** Göz ikonu (gizlilik modu — 1.000.000 TL'ye normalize)
-- **Sağ üst:** Veri Güncelle butonu (manuel yenileme)
 - **Donut grafik:** kategori dağılımı
 - **Çizgi grafik:** portföy değeri zamanla (milat sonrası)
 - **Kategori tablosu:** Tip, Tutar, Pay %, Günlük Değişim %
@@ -782,9 +781,9 @@ Python `http.server` cache header göndermiyor, ama tarayıcı yine de cache'ley
 
 3. **Her tab için küçük portföy çizgi grafiği** (CLAUDE.md §5.4) — Tab içeriğinin üstüne ufak bir trend grafiği. Grafik tabıyla kısmen örtüşüyor, kararı veri gelince ver.
 
-4. **Veri Güncelle butonu** (CLAUDE.md §5.4) — Sağ üstte manuel yenileme butonu. Şu an yok.
+4. ~~**Veri Güncelle butonu**~~ — İptal edildi (25 May). Cron zaten günde 4 kez çalışıyor; manuel yenileme ihtiyacı yok. Gerekirse tarayıcı F5 yeterli, acil fiyat çekimi için Actions → "Run workflow" var (§7.3).
 
-5. **Twelve Data altın yedeği temizliği** — §11.1'de `fiyat_guncelle.py` içindeki `twelve_data_xau_usd()` fonksiyonu bahsedilen yer var. Ana script borsapy'ya geçirildiyse Twelve Data'ya gerek kalmayabilir. Doğrulanmadı; `TWELVE_DATA_API_KEY` secret hâlâ var.
+5. ~~**Twelve Data altın yedeği temizliği**~~ ✅ (25 May, commit 5f7df88) — `twelve_data_xau_usd()` fonksiyonu silindi, secret kullanımdan kaldırıldı, §11.1 güncellendi.
 
 6. **Benchmark günlük güncelleme gözlemi** — Her gün 19:00 TR cron'unda 4 ana serinin son gününün eklenmesi takip edilecek. AFA fonu için TEFAS v2 API her gün başarılı çalışmalı; çalışmazsa ABE'ye düşer, o da olmazsa yfinance'a (genelde çalışmaz).
 
