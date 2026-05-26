@@ -968,6 +968,24 @@ def gecmis_kaydet(portfoy_data):
     ozkan = {"kategoriler": ozkan_t["kategoriler"], "toplam": ozkan_t["toplam"]}
     derya = {"kategoriler": derya_t["kategoriler"], "toplam": derya_t["toplam"]}
 
+    # SANITY UYARISI: Onceki gunun toplamiyla karsilastir.
+    # %30'dan buyuk degisim varsa WARN at, ama kayit yine de yapilir.
+    # Sebep: Sheets'te yapisal degisiklik (22 May HES->FFC tasimasi gibi)
+    # gercek olabilir, otomatik bloklamak yanlis olur. WARN sadece
+    # gozden kacmasin diye.
+    onceki_gunler = sorted(gecmis.get("gunler", {}).keys())
+    if onceki_gunler:
+        onceki_gun = onceki_gunler[-1]
+        onceki_genel = gecmis["gunler"][onceki_gun].get("genel_toplam", 0)
+        if onceki_genel > 0:
+            degisim_yuzde = ((genel_toplam - onceki_genel) / onceki_genel) * 100
+            if abs(degisim_yuzde) >= 30:
+                log(f"SANITY UYARISI: {bugun} aile toplami {onceki_gun} gununden %{degisim_yuzde:+.1f} farkli!", "WARN")
+                log(f"  Onceki ({onceki_gun}): {onceki_genel:,.0f} TL", "WARN")
+                log(f"  Bugun ({bugun}): {genel_toplam:,.0f} TL", "WARN")
+                log(f"  Muhtemel sebep: Sheets'te yapisal degisiklik veya veri kaynagi tutarsizligi.", "WARN")
+                log(f"  Snapshot YINE DE kaydedildi; manuel kontrol oner.", "WARN")
+
     gecmis["gunler"][bugun] = {
         "ozkan": ozkan,
         "derya": derya,
