@@ -1282,6 +1282,9 @@ oldu, bir sonraki cron'da fresh checkout yapıldı, kısır döngü tekrar.
 - **(22 May)** — `.gitignore` `gecmis.json` satırı silindi + retrospektif
   `gecmis.json` (21+22 Mayıs) + CLAUDE.md §14.3.4 dersi eklendi
 - `5f7df88` — Twelve Data API temizliği (25 May)
+- `2d44a52` — Veri Güncelle iptal + temizlik tamamlandı işaretleri (27 May)
+- `15b9aed` — Süregelen rutinler §14.7'ye taşındı (27 May)
+- `3b3ee9c` — gecmis_kaydet sanity %30 WARN uyarısı (27 May)
 
 ### 14.7 Süregelen rutinler (tek seferlik iş değil, tekrarlayan gözlem)
 
@@ -1314,3 +1317,121 @@ revize edilebilir). Kullanıcı sorumluluğunda.
 Sütunlar: `A: Ay (YYYY-MM)`, `B: Gerçekleşen (%)`, `C: Beklenti (%)`.
 Açıklanmamış aylar için B boş, C dolu olabilir. Frontend `tufe_aylik_gerceklesen`
 ve `tufe_aylik_beklenti` serilerini ayrı işler.
+
+### 14.8 Sanity uyarısı: %30 ani değişim WARN (27 May)
+
+**Olay (referans):** 22 Mayıs'ta Sheets'te yapısal değişiklik yapıldı —
+HES Özkan'dan çıkarıldı, FFC Derya'ya eklendi. Aile toplamı 8.59M → 7.43M
+düştü (~%13). Bu gerçek bir değişiklikti, ama eğer veri kaynağında
+sessiz bir hata olsaydı da aynı görüntü çıkardı. Ayırt etmek mümkün değil.
+
+**Çözüm:** `gecmis_kaydet()` içine sanity karşılaştırması eklendi:
+
+- Önceki gün ile bugün arasındaki `genel_toplam` farkı **%30** veya
+  daha fazlaysa `[WARN]` log düşer.
+- Kayıt **engellenmiyor** — Sheets değişikliği gerçek olabilir, otomatik
+  blok yanlış olur.
+- WARN mesajı: önceki gün, bugün, fark yüzdesi ve "manuel kontrol öner"
+  notu içerir.
+
+**Neden %30 eşik?**
+- BIST/TEFAS gün içinde nadiren %15+ hareket eder.
+- Sheets yapısal değişiklikleri (kalem ekleme/çıkarma) tipik olarak
+  %5-25 aralığında.
+- %30 üstü neredeyse her zaman ya gerçek büyük olay (kripto crash) ya da
+  veri hatası demek.
+
+**Eşiği değiştirmek:** `scripts/fiyat_guncelle.py` →
+`gecmis_kaydet()` → `if abs(degisim_yuzde) >= 30:` satırı.
+
+---
+
+## 15. HIZLI BAŞLANGIÇ — Mevcut Durum (27 Mayıs 2026)
+
+> **Bu bölüm, yeni bir Claude oturumu veya repo'ya yeni gelen birinin
+> sistemi 5 dakikada anlayabilmesi için en üst düzey özetidir. §1-§14
+> detaylar ve karar gerekçeleridir; gerekirse oraya in.**
+
+### 15.1 Sistem 1 cümlede
+
+Özkan + Derya'nın yatırım portföyünü Google Sheets'ten okuyup, GitHub
+Actions cron'larıyla günde 4 kez fiyat çekip, GitHub Pages üzerinde
+şifre korumalı bir dashboard'da gösteren statik web sitesi.
+
+### 15.2 "Nereye bakacağım?" — Hızlı TOC
+
+| Aradığın şey | Bölüm |
+|---|---|
+| Çalışma kuralları (halüsinasyon yasak, vs.) | §0 |
+| Sheets sütunları, Tip değerleri | §2 |
+| JSON dosyalarının amacı | §3 |
+| Dashboard tab yapısı (6 tab) | §5 |
+| Cron zamanları | §7.2 |
+| Yedek (fallback) hiyerarşisi | §8 + §11.1 + §14.1 |
+| TEFAS/yfinance/borsapy kaynak kararları | §12.2, §12.6.2, §12.6.3 |
+| Privacy/gizlilik modu nasıl çalışır | §12.3, §12.7 |
+| **Sıfırdan kurulum** (felaket sonrası) | §13 |
+| Önemli öğrenilen dersler ("yapma!" listesi) | §12.6, §14.3 |
+| Devam eden rutin görevler | §14.7 |
+| Aktif yapılacak iş listesi | §15.5 (aşağıda) |
+
+### 15.3 Aktif konfigürasyon (özet)
+
+**Cron tetikleyiciler (Pzt-Cum, TR saati):**
+- 10:30, 12:30, 14:30 — intraday fiyat (`portfoy-guncelle.yml`)
+- 18:35 — kapanış + `gecmis.json` snapshot (`--kapanis` flag)
+- 19:00 — benchmark günlük (`benchmark-guncelle.yml`)
+- Paralel sigorta: cron-job.org (§11.3)
+
+**Veri kaynak hiyerarşisi (özet):**
+
+| Veri | Birincil | Yedek 1 | Yedek 2 |
+|---|---|---|---|
+| BIST hisse | borsapy | yfinance `.IS` | yok → `fiyat_eksik:true` |
+| TEFAS fon | tefas-crawler | borsapy `Fund()` | prices.json snapshot (§14.1) |
+| USD/EUR | yfinance `=X` | TCMB XML | — |
+| BTC TL | yfinance × USDTRY | CoinGecko | — |
+| Gram altın | yfinance `GC=F` × USDTRY | snapshot koruması | — |
+| Benchmark seriler | borsapy | yfinance | TCMB (sadece USDTRY) |
+
+**Defansif katmanlar:**
+- §14.1 — TEFAS snapshot yedeği (intraday)
+- §14.2 — `gecmis_kaydet` eksik kalem varsa snapshot atla (kapanış)
+- §14.8 — `gecmis_kaydet` aile toplamı %30+ ani değişim WARN
+
+### 15.4 Şu an stabil olan şeyler
+
+✅ 6 tab dashboard (Özkan, Derya, Aile, Benchmark, Geçmiş Veriler, Grafik)
+✅ Privacy modu (1M TL normalize)
+✅ 4 zamanlı cron + 19:00 benchmark cron
+✅ gecmis.json (21 May'dan beri günlük snapshot)
+✅ benchmark_gecmis.json (5 yıllık geçmiş + günlük ekleme)
+✅ 3 katmanlı defansif yedek (snapshot/eksik-kontrol/sanity WARN)
+
+### 15.5 Aktif yapılacak iş listesi (27 May)
+
+§12.10'daki tüm tamamlanmış/iptal edilmiş maddeler arşivde. Geriye kalan:
+
+1. **UX düzeltmeleri** — Veri biriktikçe (haftalar geçince) gerçek kullanım
+   geri bildirimine göre. Şu an erteleme.
+2. **Tab içi mini trend grafikleri** — Düşük öncelik, Grafik tabıyla örtüşüyor.
+3. **Benchmark "Özel tarih aralığı"** — v2.
+
+### 15.6 Son commit'ler (27 May itibarıyla)
+
+- `3b3ee9c` — gecmis_kaydet sanity %30 WARN (27 May)
+- `15b9aed` — Süregelen rutinler §14.7'ye taşındı (27 May)
+- `2d44a52` — Veri Güncelle iptal + temizlik tamamlandı (27 May)
+- `5f7df88` — Twelve Data API temizliği (25 May)
+- `5082cd7` — CLAUDE.md §5 ve §12.10 güncellendi (22 May)
+- `f57230f` — Aile tabı + flex-wrap mobil (22 May)
+- `9d43bff` — gecmis.json .gitignore bug fix + retrospektif (22 May)
+
+### 15.7 Bu dosyayı (CLAUDE.md) güncellerken
+
+- **Yeni bilgi:** Mevcut bölüme ekle veya yeni numaralı bölüm aç.
+- **Eski bilgi (artık geçersiz):** **Silme** — üstüne çiz (`~~...~~`) ve
+  "bkz §X" ile yeni yere yönlendir. Tarih + commit hash ekle.
+- **§15'i güncel tut:** Her büyük değişiklikten sonra §15.3-15.6 yenile.
+- **§12.6 ve §14.3 dersleri büyür:** Yapılmaması gereken her hata
+  oraya ek (sebep + çözüm + tarih).
