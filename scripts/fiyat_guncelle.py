@@ -894,7 +894,7 @@ def portfoy_json_olustur(ozkan_satirlar, derya_satirlar, prices, tufe_data):
 
     return {
         "olusturma_tarihi": datetime.now(TR_TZ).isoformat(timespec="seconds"),
-        "milat": "2026-05-21",
+        "milat": "2026-06-01",
         "portfoyler": {
             "ozkan": _kisi_olustur(ozkan_satirlar),
             "derya": _kisi_olustur(derya_satirlar),
@@ -917,9 +917,9 @@ def gecmis_kaydet(portfoy_data):
             with open(GECMIS_FILE, "r", encoding="utf-8") as f:
                 gecmis = json.load(f)
         except Exception:
-            gecmis = {"kayit_baslangic": "2026-05-21", "gunler": {}}
+            gecmis = {"kayit_baslangic": "2026-06-01", "gunler": {}}
     else:
-        gecmis = {"kayit_baslangic": "2026-05-21", "gunler": {}}
+        gecmis = {"kayit_baslangic": "2026-06-01", "gunler": {}}
 
     # Bugun zaten varsa atla
     if bugun in gecmis.get("gunler", {}):

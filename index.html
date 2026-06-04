@@ -322,7 +322,7 @@ async function loadData() {
       fetch('portfoy.json' + cb).then(r => r.json()),
       fetch('prices.json' + cb).then(r => r.json()),
       safeFetch('benchmark_gecmis.json'),  // yoksa null
-      safeFetch('gecmis.json')              // 21 Mayis oncesi yok, null
+      safeFetch('gecmis.json')              // 1 Haziran oncesi yok, null
     ]);
     _rawPortfoy = portfoy;
     _rawPrices = prices;
@@ -972,7 +972,7 @@ function benchmarkPanelHtml() {
       <div class="bench-chart-wrap"><canvas id="bench-canvas"></canvas></div>
       <div id="bench-table-container"></div>
       <div class="bench-info">
-        Portföy verisi <b>21 Mayıs 2026</b> itibarıyla kayıtlıdır.
+        Portföy verisi <b>1 Haziran 2026</b> itibarıyla kayıtlıdır.
         Daha uzun dönemli karşılaştırmalarda benchmark çizgileri tamdır,
         portföy çizgisi milat tarihinden itibaren başlar.
       </div>
@@ -1109,7 +1109,7 @@ function refreshBenchmark() {
   // Portfoy verisi var mi?
   const portfoyTarihler = Object.keys(portfoySer).filter(t => t >= baslangic && t <= bitis);
   if (Object.keys(portfoySer).length === 0) {
-    warnEl.innerHTML = `<div class="bench-warn">ℹ️ Portföy zaman serisi henüz yok — milat tarihi 21 Mayıs 2026. Bu tarihten itibaren her gece 18:35 kapanış sonrası snapshot eklenir.</div>`;
+    warnEl.innerHTML = `<div class="bench-warn">ℹ️ Portföy zaman serisi henüz yok — milat tarihi 1 Haziran 2026. Bu tarihten itibaren her gece 18:35 kapanış sonrası snapshot eklenir.</div>`;
   } else if (portfoyTarihler.length < 2) {
     warnEl.innerHTML = `<div class="bench-warn">ℹ️ Bu dönem için yeterli portföy snapshot yok (en az 2 gün gerek). Daha kısa veya YTD/3Y/5Y deneyin.</div>`;
   }
@@ -1314,8 +1314,8 @@ function refreshGecmis() {
   if (!tbody || !status) return;
 
   if (!_rawGecmis || !_rawGecmis.gunler || Object.keys(_rawGecmis.gunler).length === 0) {
-    tbody.innerHTML = `<tr><td colspan="${GECMIS_KOLONLAR.length}" class="gecmis-empty">📭 Geçmiş veri henüz yok. <b>Milat tarihi 21 Mayıs 2026</b>. Bu tarihten itibaren her iş günü 18:35 kapanışından sonra otomatik kayıt eklenecek.</td></tr>`;
-    status.innerHTML = `<b>Şu an itibarıyla 0 günlük kayıt var.</b> İlk satır 21 Mayıs 2026 akşamı oluşacak.`;
+    tbody.innerHTML = `<tr><td colspan="${GECMIS_KOLONLAR.length}" class="gecmis-empty">📭 Geçmiş veri henüz yok. <b>Milat tarihi 1 Haziran 2026</b>. Bu tarihten itibaren her iş günü 18:35 kapanışından sonra otomatik kayıt eklenecek.</td></tr>`;
+    status.innerHTML = `<b>Şu an itibarıyla 0 günlük kayıt var.</b> İlk satır 1 Haziran 2026 akşamı oluşacak.`;
     return;
   }
 
@@ -1414,7 +1414,7 @@ function refreshGrafik() {
 
   const portfoySer = portfoySerisi(secim, _gecmisData);
   if (Object.keys(portfoySer).length === 0) {
-    status.innerHTML = `📭 Portföy zaman serisi henüz yok — <b>milat tarihi 21 Mayıs 2026</b>. Bu tarihten itibaren her gün 18:35 kapanış sonrası snapshot eklenir.`;
+    status.innerHTML = `📭 Portföy zaman serisi henüz yok — <b>milat tarihi 1 Haziran 2026</b>. Bu tarihten itibaren her gün 18:35 kapanış sonrası snapshot eklenir.`;
     if (_grafikChart) { _grafikChart.destroy(); _grafikChart = null; }
     const canvas = document.getElementById('grafik-canvas');
     if (canvas) { const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height); }

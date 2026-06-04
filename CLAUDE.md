@@ -138,7 +138,7 @@ Repodaki canlı dosyalar:
   (her satır için `guncel_tl`, `onceki_tl`, `gunluk_kazanc_tl`,
   `gunluk_yuzde`).
 - `gecmis.json` — Günlük kapanış snapshot'ı. Sadece kapanış görevi
-  (TR saati 18:35) yazar. **Milat: 21 Mayıs 2026.**
+  (TR saati 18:35) yazar. **Milat: 1 Haziran 2026** (eski milat 21 Mayıs'tı, emeklilik tutarı yanlışlığı sonrası reset yapıldı, bkz §16).
 - `benchmark_gecmis.json` — BIST100, S&P500 (TL), Gram Altın, YAE, TÜFE
   serileri. 5 yıl geriye tek seferlik çekilir, sonra her gün son güne
   ekleme yapılır.
@@ -288,7 +288,7 @@ Renkler: portföy turkuaz vurgu, benchmarklar farklı renk tonları.
 **(c) Bilgi notu (grafik altında):**
 
 ```
-Portföy verisi 21 Mayıs 2026 itibarıyla kayıtlıdır.
+Portföy verisi 1 Haziran 2026 itibarıyla kayıtlıdır.
 Daha uzun dönemli karşılaştırmalarda benchmark çizgileri tamdır,
 portföy çizgisi milat tarihinden itibaren çıkar.
 ```
@@ -609,7 +609,7 @@ Sidebar artık **5 tab**:
 - **Chart.js çizgi grafik**: seçilen varlık (turkuaz, kalın, dolgu YOK, düz çizgi) + 4 benchmark (BIST100, Amerika Hisse AFA, Gram Altın, YAE; ince kesik çizgi, farklı renkler) — hepsi kümülatif % getiri, başlangıç %0.
   - TÜFE grafikte yok (aylık veri, günlük çizgiyle uyumsuz).
 - **7×7 karşılaştırma tablosu**: 7 dönem × (1 varlık + 5 benchmark + 1 "Fark") = 7 sütun + 7 satır.
-- Alt bilgi notu: portföy milat tarihi (21 Mayıs).
+- Alt bilgi notu: portföy milat tarihi (1 Haziran 2026).
 
 **📋 Geçmiş Veriler tabı (Excel benzeri tablo):**
 - 12 sütun (kullanıcı kesin listesi):
@@ -629,7 +629,7 @@ Sidebar artık **5 tab**:
 - "Vurguyu temizle" butonu.
 - Sıralama: en yeni en üstte.
 - Grafik yok, indir butonu yok (kullanıcı tercihi).
-- gecmis.json yoksa: "📭 Geçmiş veri henüz yok — milat tarihi 21 Mayıs 2026" mesajı.
+- gecmis.json yoksa: "📭 Geçmiş veri henüz yok — milat tarihi 1 Haziran 2026" mesajı.
 
 **📈 Grafik tabı:**
 - 15-öğeli dropdown (Benchmark ile aynı liste).
@@ -717,7 +717,7 @@ Python `http.server` cache header göndermiyor, ama tarayıcı yine de cache'ley
 **Veri yapısı (özet):**
 - **`prices.json`** — anlık fiyatlar (`hisseler`, `fonlar_ve_emeklilik`, `kripto`, `gram_altin_tl`, `usd_try`, `eur_try`, `kaynak_durumu`, vs.). Her güncellemede üzerine yazılır.
 - **`portfoy.json`** — `{portfoyler: {ozkan: [], derya: []}}`. Her satırda: `tip`, `tip_orjinal`, `kod`, `kod_orjinal`, `adet`, `maliyet` (birim), `guncel_tl`, `onceki_tl`, `gunluk_kazanc_tl`, `gunluk_yuzde`, `fiyat_eksik`.
-- **`gecmis.json`** — `{kayit_baslangic: "2026-05-21", gunler: {tarih: {ozkan: {kategoriler: {hisse, fon, ...}, toplam: X}, derya: {...}, genel_toplam: Y}}}`. **21 Mayıs'tan itibaren her iş günü 18:35 kapanışta bir satır**.
+- **`gecmis.json`** — `{kayit_baslangic: "2026-06-01", gunler: {tarih: {ozkan: {kategoriler: {hisse, fon, ...}, toplam: X}, derya: {...}, genel_toplam: Y}}}`. **1 Haziran 2026'dan itibaren her iş günü 18:35 kapanışta bir satır**.
 - **`benchmark_gecmis.json`** — `{kayit_baslangic: "2021-04-20", son_guncelleme, seriler: {bist100: {YYYY-MM-DD: değer}, amerika_hisse, gram_altin, yae, tufe_aylik_gerceklesen, tufe_aylik_beklenti}}`. Her gün 19:00 cron'unda son gün eklenir (son 10 gün yedek).
 - **`yilbasi_fiyatlari.json`** — Her yıl ilk fiyat çekiminde yılbaşı snapshot, YTD getiri için.
 
@@ -735,7 +735,7 @@ Python `http.server` cache header göndermiyor, ama tarayıcı yine de cache'ley
 | `requirements.txt` | Python bağımlılıkları (`gspread, google-auth, yfinance, borsapy, requests, pandas`). **tefas-crawler artık yok.** | 6 satır |
 | `portfoy.json` | Anlık portföy verisi. | ~7 KB |
 | `prices.json` | Anlık fiyatlar. | ~2 KB |
-| `gecmis.json` | Günlük kapanış snapshot'ı. **Henüz yok**, 21 Mayıs'tan itibaren oluşur. | — |
+| `gecmis.json` | Günlük kapanış snapshot'ı. **Reset edildi (4 Haziran)**, 1 Haziran 2026'dan itibaren tekrar dolar. | — |
 | `benchmark_gecmis.json` | 5 yıllık + günlük benchmark serileri. | ~130 KB |
 | `yilbasi_fiyatlari.json` | Yılbaşı fiyatları. | <1 KB |
 
@@ -775,7 +775,7 @@ Python `http.server` cache header göndermiyor, ama tarayıcı yine de cache'ley
 
 ### 12.10 Sonraki yapılacaklar (öncelik sırasıyla)
 
-1. **21 Mayıs sonrası ufak UX düzeltmeleri** — Gerçek `gecmis.json` verisiyle Geçmiş Veriler tablosu ve Grafik tabı test edilecek, küçük görsel/etkileşim düzeltmeleri çıkabilir.
+1. **1 Haziran sonrası ufak UX düzeltmeleri** — Gerçek `gecmis.json` verisiyle Geçmiş Veriler tablosu ve Grafik tabı test edilecek, küçük görsel/etkileşim düzeltmeleri çıkabilir.
 
 2. ~~**Genel (Aile) tabı**~~ ✅ (22 Mayıs, commit f57230f) — renderAile() fonksiyonu, 4 kart + kategori dağılım tablosu. Tab CSS'i `flex-wrap: wrap` yapıldı.
 
@@ -820,7 +820,7 @@ cat CLAUDE.md | head -50  # bağlam için
 4. Sheets'in `Ozkan_Portfoy`, `Derya_Portfoy`, `TUFE` sekmelerinin servisAccount ile paylaşıldığından emin ol.
 5. Cron'lar (cron-job.org + GitHub Actions schedule) zaten çalışır.
 6. İlk kurulum: benchmark'i `gecmis=true` ile manuel tetikle (5 yıllık seri çekmek için).
-7. `gecmis.json` 21 Mayıs sonrası kendiliğinden dolar.
+7. `gecmis.json` 1 Haziran 2026 sonrası kendiliğinden dolar.
 
 ### 12.12 Bu dosyayı güncellerken kurallar
 
@@ -1083,7 +1083,7 @@ GitHub Actions schedule'ı bazen 30 dk gecikiyor; cron-job.org garanti tetik at�
 - **CSS dark theme + 5 tab sidebar**: modern fintech estetiği (CLAUDE.md §5.6).
 - **Tüm hesap frontend'de**: backend sadece raw veri sağlar, frontend hesap ve render yapar. Bu sayede ihtiyaca göre frontend güncellemesi yeterli, backend'e dokunulmaz.
 - **Privacy modu**: kullanıcı ekran paylaşırken portföy büyüklüğünü gizler. Yüzdeler ve oranlar gösterilir, mutlak rakamlar normalize edilir.
-- **gecmis.json milat tarihi**: 21 Mayıs 2026'dan önce kayıt yok (sistem o zaman tasarlandı). Geçmiş verilerle backfill yapılmaz — sadece ileriye doğru kayıt tutulur.
+- **gecmis.json milat tarihi**: 1 Haziran 2026'dan önce kayıt yok (eski milat 21 Mayıs'tı; 4 Haziran'da emeklilik tutarı yanlışlığı nedeniyle reset, bkz §16). Geçmiş verilerle backfill yapılmaz — sadece ileriye doğru kayıt tutulur.
 - **borsapy birincil yfinance yedek**: ana script `fiyat_guncelle.py`'de kanıtlanmış pattern; benchmark da aynı pattern'e geçirildi.
 
 ### 13.14 Felaket senaryoları
@@ -1404,7 +1404,7 @@ Actions cron'larıyla günde 4 kez fiyat çekip, GitHub Pages üzerinde
 ✅ 6 tab dashboard (Özkan, Derya, Aile, Benchmark, Geçmiş Veriler, Grafik)
 ✅ Privacy modu (1M TL normalize)
 ✅ 4 zamanlı cron + 19:00 benchmark cron
-✅ gecmis.json (21 May'dan beri günlük snapshot)
+✅ gecmis.json (1 Haziran 2026'dan beri günlük snapshot — milat reset edildi, bkz §16)
 ✅ benchmark_gecmis.json (5 yıllık geçmiş + günlük ekleme)
 ✅ 3 katmanlı defansif yedek (snapshot/eksik-kontrol/sanity WARN)
 
@@ -1435,3 +1435,76 @@ Actions cron'larıyla günde 4 kez fiyat çekip, GitHub Pages üzerinde
 - **§15'i güncel tut:** Her büyük değişiklikten sonra §15.3-15.6 yenile.
 - **§12.6 ve §14.3 dersleri büyür:** Yapılmaması gereken her hata
   oraya ek (sebep + çözüm + tarih).
+
+---
+
+## 16. 4 HAZİRAN 2026 — MİLAT RESET (21 May → 1 Haziran)
+
+### 16.1 Sebep
+
+Kullanıcı, Sheets'teki emeklilik (BES) tutarlarında bir yanlışlık
+yapmış. 21 Mayıs - 4 Haziran arası tüm `gecmis.json` snapshot'ları
+yanlış emeklilik rakamlarıyla yazıldığı için kullanılamaz hale geldi.
+Reel rakamlardan sapma olduğundan trend grafikleri yanıltıcı.
+
+### 16.2 Yapılan değişiklikler
+
+**`gecmis.json` sıfırlandı:**
+- Eski içerik: 11 günlük snapshot (21, 22, 25-29 May + 1-4 Haziran)
+- Yeni içerik: `{"kayit_baslangic": "2026-06-01", "gunler": {}}`
+- Önceki snapshot'lar kalıcı olarak silindi (git history dışında).
+
+**`scripts/fiyat_guncelle.py` güncellendi:**
+- `gecmis_kaydet()` default `kayit_baslangic`: `"2026-05-21"` → `"2026-06-01"` (2 yerde)
+- `portfoy.json` "milat" alanı: `"2026-05-21"` → `"2026-06-01"`
+
+**`index.html` güncellendi:**
+- Benchmark tabı bilgi notu: "Portföy verisi 21 Mayıs..." → "1 Haziran 2026..."
+- Geçmiş Veriler tabı empty state: "Milat tarihi 21 Mayıs..." → "1 Haziran 2026..."
+- Grafik tabı empty state: aynı şekilde
+- Yorum satırlarında "21 Mayis" → "1 Haziran"
+
+**CLAUDE.md güncellendi:**
+- §3, §6.2, §12.4, §12.7, §12.8, §12.10, §12.11, §13.13, §15.4: aktif milat referansları
+- §11.4, §12.9, §14.x'teki tarihsel anlatı **dokunulmadı** (geçmiş olayları doğru
+  anlatıyor — o tarihlerde milat gerçekten 21 Mayıs'tı).
+
+**`benchmark_gecmis.json` DOKUNULMADI:**
+- 5 yıllık (Nisan 2021–4 Haziran 2026) benchmark serisi olduğu gibi durur.
+- Amacı: kullanıcı 1Y/3Y/5Y dönem karşılaştırmaları için tam benchmark
+  görsün, portföy çizgisi 1 Haziran sonrası ortaya çıksın. Mevcut tasarımın
+  parçası, bug değil özellik.
+
+### 16.3 Reset sonrası ilk akış
+
+1. Sheets'teki emeklilik tutarları doğru hale getirildi (kullanıcı yaptı).
+2. `gecmis.json` boşaltıldı, milat 1 Haziran 2026 yapıldı.
+3. **İlk snapshot** = 4 Haziran 2026 18:35 cron'undan sonraki manuel
+   tetikleme veya 5 Haziran 2026 18:35 normal cron.
+4. Daha önceki commit'lerdeki snapshot'lar git history'de hâlâ duruyor
+   (`git log -- gecmis.json` ile görülebilir) ama frontend bunu okumuyor.
+
+### 16.4 Öğrenilen ders
+
+**Veri kaynağı (Sheets) yanlışsa, hiçbir cron savunması bunu yakalayamaz.**
+- §14.1 snapshot yedeği: fiyat kaynağı çökmesini yakalar, kullanıcı verisi
+  yanlışlığını değil.
+- §14.2 eksik kalem kontrolü: `guncel_tl == None` arar, yanlış ama
+  geçerli sayı durumunda susar.
+- §14.8 %30 sanity WARN: ani değişim arar; yavaş süregelen yanlışlık
+  (sabit yanlış tutar) tetiklemez.
+
+**Doktrin:** Kullanıcı (Özkan), Sheets'teki rakamların doğru olduğundan
+emin olmalı. Otomasyon Sheets'i kutsal kaynak kabul ediyor (CLAUDE.md §0.6).
+Şüphe varsa: `portfoy.json` veya dashboard'daki rakamı manuel hesapla,
+karşılaştır.
+
+### 16.5 Önemli not — backfill yok
+
+Reset edilen 1-4 Haziran arası verisi geri gelmeyecek. İstenirse:
+- `portfoy.json` git history'deki commit'lerden çekilip manuel
+  `gecmis.json`'a yazılabilir (22 May'da yapıldığı gibi, §14.3.4'teki
+  retrospektif kurtarma yöntemi).
+- Ama Sheets emeklilik tutarı yanlış olduğu için bu da yanlış olacak.
+- Sonuç: 1-4 Haziran arası **kalıcı veri boşluğu**. Frontend grafiklerinde
+  o günlerde nokta olmayacak.
