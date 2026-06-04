@@ -1427,7 +1427,9 @@ function refreshGrafik() {
   const bitis = bugun > sonTarih ? bugun : sonTarih;
   const baslangic = donemBaslangic(donem, bitis);
 
-  const points = cumulativeSeri(portfoySer, baslangic, bitis);
+  // TL mutlak deger noktalari (yuzde degil)
+  const donemTarihler = Object.keys(portfoySer).filter(t => t >= baslangic && t <= bitis).sort();
+  const points = donemTarihler.map(t => ({ x: t, y: portfoySer[t] }));
   const secilenLabel = BENCH_SECIMLER.flatMap(g => g.items).find(it => it.v === secim)?.t || secim;
 
   if (points.length < 2) {
@@ -1438,8 +1440,20 @@ function refreshGrafik() {
     return;
   }
 
-  const donemGetiri = points[points.length-1].y;
-  status.innerHTML = `<b>${secilenLabel}</b> — ${donem} dönemde toplam değişim: <b style="color:${donemGetiri>=0?'#10b981':'#ef4444'}">${donemGetiri>=0?'+':''}${donemGetiri.toFixed(2)}%</b> (${points.length} gün)`;
+  const ilkTL = points[0].y;
+  const sonTL = points[points.length-1].y;
+  const farkTL = sonTL - ilkTL;
+  const farkPct = ilkTL > 0 ? ((sonTL / ilkTL) - 1) * 100 : 0;
+  const renk = farkTL >= 0 ? '#10b981' : '#ef4444';
+  status.innerHTML = `<b>${secilenLabel}</b> — ${donem} dönemde: <b style="color:${renk}">${farkTL>=0?'+':'-'}₺${fmt(Math.abs(farkTL))}</b> (<b style="color:${renk}">${farkPct>=0?'+':''}${farkPct.toFixed(2)}%</b>) — ${points.length} gün`;
+
+  // TL eksen icin kisa format: ₺1.2M, ₺500K, ₺250
+  const fmtTLkisa = v => {
+    const abs = Math.abs(v);
+    if (abs >= 1e6) return '₺' + (v/1e6).toFixed(2) + 'M';
+    if (abs >= 1e3) return '₺' + (v/1e3).toFixed(0) + 'K';
+    return '₺' + Math.round(v);
+  };
 
   const canvas = document.getElementById('grafik-canvas');
   if (_grafikChart) { _grafikChart.destroy(); _grafikChart = null; }
@@ -1467,7 +1481,7 @@ function refreshGrafik() {
         x: { type: 'time', time: { parser: 'yyyy-MM-dd', unit: 'month', displayFormats: { month: 'MMM yy' } },
              ticks: { color: '#64748b', maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
              grid: { color: '#f1f5f9' } },
-        y: { ticks: { color: '#64748b', callback: v => v.toFixed(0) + '%' },
+        y: { ticks: { color: '#64748b', callback: fmtTLkisa },
              grid: { color: '#f1f5f9' } },
       },
       plugins: {
@@ -1475,7 +1489,7 @@ function refreshGrafik() {
         tooltip: {
           callbacks: {
             title: items => items[0]?.parsed?.x ? new Date(items[0].parsed.x).toLocaleDateString('tr-TR') : '',
-            label: ctx => `${ctx.parsed.y >= 0 ? '+' : ''}${ctx.parsed.y.toFixed(2)}%`,
+            label: ctx => '₺' + fmt(ctx.parsed.y),
           },
         },
       },
