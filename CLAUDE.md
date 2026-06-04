@@ -735,7 +735,7 @@ Python `http.server` cache header göndermiyor, ama tarayıcı yine de cache'ley
 | `requirements.txt` | Python bağımlılıkları (`gspread, google-auth, yfinance, borsapy, requests, pandas`). **tefas-crawler artık yok.** | 6 satır |
 | `portfoy.json` | Anlık portföy verisi. | ~7 KB |
 | `prices.json` | Anlık fiyatlar. | ~2 KB |
-| `gecmis.json` | Günlük kapanış snapshot'ı. **Reset edildi (4 Haziran)**, 1 Haziran 2026'dan itibaren tekrar dolar. | — |
+| `gecmis.json` | Günlük kapanış snapshot'ı. Pre-1 Haziran silindi (§16), 1 Haziran 2026'dan itibaren mevcut. | ~1 KB |
 | `benchmark_gecmis.json` | 5 yıllık + günlük benchmark serileri. | ~130 KB |
 | `yilbasi_fiyatlari.json` | Yılbaşı fiyatları. | <1 KB |
 
@@ -1449,10 +1449,13 @@ Reel rakamlardan sapma olduğundan trend grafikleri yanıltıcı.
 
 ### 16.2 Yapılan değişiklikler
 
-**`gecmis.json` sıfırlandı:**
+**`gecmis.json` kısmen sıfırlandı:**
 - Eski içerik: 11 günlük snapshot (21, 22, 25-29 May + 1-4 Haziran)
-- Yeni içerik: `{"kayit_baslangic": "2026-06-01", "gunler": {}}`
-- Önceki snapshot'lar kalıcı olarak silindi (git history dışında).
+- Pre-1 Haziran snapshot'ları silindi (Sheets'teki eski emeklilik
+  tutarlarıyla yazıldığı için yanıltıcıydı).
+- **1-4 Haziran snapshot'ları korundu** — emeklilik düzeltmesi
+  1 Haziran'dan önce yapıldığı için bu günler doğru veridir.
+- Yeni `kayit_baslangic`: `"2026-06-01"`.
 
 **`scripts/fiyat_guncelle.py` güncellendi:**
 - `gecmis_kaydet()` default `kayit_baslangic`: `"2026-05-21"` → `"2026-06-01"` (2 yerde)
@@ -1475,14 +1478,14 @@ Reel rakamlardan sapma olduğundan trend grafikleri yanıltıcı.
   görsün, portföy çizgisi 1 Haziran sonrası ortaya çıksın. Mevcut tasarımın
   parçası, bug değil özellik.
 
-### 16.3 Reset sonrası ilk akış
+### 16.3 Reset sonrası durum
 
-1. Sheets'teki emeklilik tutarları doğru hale getirildi (kullanıcı yaptı).
-2. `gecmis.json` boşaltıldı, milat 1 Haziran 2026 yapıldı.
-3. **İlk snapshot** = 4 Haziran 2026 18:35 cron'undan sonraki manuel
-   tetikleme veya 5 Haziran 2026 18:35 normal cron.
-4. Daha önceki commit'lerdeki snapshot'lar git history'de hâlâ duruyor
-   (`git log -- gecmis.json` ile görülebilir) ama frontend bunu okumuyor.
+1. Sheets'teki emeklilik tutarları 1 Haziran'dan önce doğru hale getirildi.
+2. `gecmis.json` kısmen sıfırlandı — sadece 1 Haziran öncesi snapshot'lar silindi.
+3. Şu an dosyada **4 günlük doğru veri** var: 1, 2, 3, 4 Haziran 2026.
+4. Cron her gün 18:35'te yeni gün ekler.
+5. Silinen pre-1 Haziran snapshot'ları git history'de durur
+   (`git show 6551a06:gecmis.json` ile görülebilir) ama frontend bunu okumaz.
 
 ### 16.4 Öğrenilen ders
 
@@ -1499,12 +1502,12 @@ emin olmalı. Otomasyon Sheets'i kutsal kaynak kabul ediyor (CLAUDE.md §0.6).
 Şüphe varsa: `portfoy.json` veya dashboard'daki rakamı manuel hesapla,
 karşılaştır.
 
-### 16.5 Önemli not — backfill yok
+### 16.5 Kurtarma süreci notları
 
-Reset edilen 1-4 Haziran arası verisi geri gelmeyecek. İstenirse:
-- `portfoy.json` git history'deki commit'lerden çekilip manuel
-  `gecmis.json`'a yazılabilir (22 May'da yapıldığı gibi, §14.3.4'teki
-  retrospektif kurtarma yöntemi).
-- Ama Sheets emeklilik tutarı yanlış olduğu için bu da yanlış olacak.
-- Sonuç: 1-4 Haziran arası **kalıcı veri boşluğu**. Frontend grafiklerinde
-  o günlerde nokta olmayacak.
+İlk reset'te yanlışlıkla 1-4 Haziran (doğru) verisi de silinmişti.
+`git show 6551a06:gecmis.json` ile eski içerik çıkarıldı, sadece pre-1
+Haziran filtrelendi, 1 Haziran ve sonrası geri yüklendi.
+
+**Genel doktrin:** Reset operasyonlarında önce hangi günlerin
+silineceği netleştirilmeli. Toplu silmek yerine tarih filtresiyle
+seçici silmek daha güvenli. Git history her zaman yedektir.
