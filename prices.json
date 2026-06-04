@@ -1,11 +1,11 @@
 {
-  "son_guncelleme": "2026-06-04T18:36:34+03:00",
+  "son_guncelleme": "2026-06-04T21:02:26+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
     "btc_kaynak": "borsapy",
     "hisse_kaynak": "borsapy",
-    "altin_kaynak": "twelve_data",
+    "altin_kaynak": "yok",
     "fon_kaynak": "borsapy"
   },
   "kurlar": {
@@ -18,10 +18,7 @@
       "onceki": 53.5299
     }
   },
-  "gram_altin_tl": {
-    "guncel": 6610.087194756763,
-    "onceki": 6551.23993996309
-  },
+  "gram_altin_tl": null,
   "hisseler": {
     "INFO": {
       "guncel": 3.74,
@@ -40,35 +37,10 @@
     }
   },
   "fonlar_ve_emeklilik": {
-    "AJR": {
-      "guncel": 0.372033,
-      "onceki": 0.378063,
-      "yilbasi": 0.391022
-    },
     "FFC": {
       "guncel": 0.10607,
       "onceki": 0.106998,
       "yilbasi": 0.099452
-    },
-    "GNP": {
-      "guncel": 1.357495,
-      "onceki": 1.356126,
-      "yilbasi": 1.352387
-    },
-    "HBF": {
-      "guncel": 49.950952,
-      "onceki": 50.486224,
-      "yilbasi": 51.904464
-    },
-    "HES": {
-      "guncel": 0.750846,
-      "onceki": 0.765318,
-      "yilbasi": 0.801649
-    },
-    "MPP": {
-      "guncel": 24.34402,
-      "onceki": 24.500949,
-      "yilbasi": 22.672514
     },
     "NAU": {
       "guncel": 3.089981,
@@ -89,11 +61,36 @@
       "guncel": 4.757665,
       "onceki": 4.752656,
       "yilbasi": 4.637761
+    },
+    "AJR": {
+      "guncel": 0.372033,
+      "onceki": 0.372033,
+      "yilbasi": 0.391022
+    },
+    "GNP": {
+      "guncel": 1.357495,
+      "onceki": 1.357495,
+      "yilbasi": 1.352387
+    },
+    "HBF": {
+      "guncel": 49.950952,
+      "onceki": 49.950952,
+      "yilbasi": 51.904464
+    },
+    "HES": {
+      "guncel": 0.750846,
+      "onceki": 0.750846,
+      "yilbasi": 0.801649
+    },
+    "MPP": {
+      "guncel": 24.34402,
+      "onceki": 24.34402,
+      "yilbasi": 22.672514
     }
   },
   "kripto": {
     "BTC": {
-      "guncel": 2944696.0,
+      "guncel": 2922860.0,
       "onceki": 2945894.0,
       "yilbasi": 3720444.0
     }
