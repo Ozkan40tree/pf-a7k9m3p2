@@ -444,15 +444,18 @@ silinir, bu bölüm dosyadan çıkarılır.
 
 ### 11.1 Altın veri kaynağı
 
-- **Birincil:** yfinance `GC=F` (ons altın USD × USDTRY ÷ 31.1035)
-- **Yedek:** prices.json snapshot koruması (§14.1 — 3. yedek katman)
+> **Güncel (5 Haziran 2026):** Bkz §17 — borsapy birincil yapıldı.
+> Aşağıdaki eski hiyerarşi tarihsel referans olarak korundu.
+
+- ~~**Birincil:** yfinance `GC=F` (ons altın USD × USDTRY ÷ 31.1035)~~
+- ~~**Yedek:** prices.json snapshot koruması (§14.1 — 3. yedek katman)~~
 - **Kaynak kodu:** `scripts/fiyat_guncelle.py` → `gram_altin_cek()`
 
-Yedek tablosu (bkz. Bölüm 8.1):
+Eski yedek tablosu (5 Hazirana kadar geçerli):
 
 | Veri | Birincil | Yedek |
 |---|---|---|
-| Gram altın | yfinance `GC=F × USDTRY ÷ 31.1035` | **prices.json snapshot** (§14.1) |
+| Gram altın | yfinance `GC=F × USDTRY ÷ 31.1035` | prices.json snapshot |
 
 ### 11.2 Dashboard altın render
 
@@ -1391,7 +1394,7 @@ Actions cron'larıyla günde 4 kez fiyat çekip, GitHub Pages üzerinde
 | TEFAS fon | tefas-crawler | borsapy `Fund()` | prices.json snapshot (§14.1) |
 | USD/EUR | yfinance `=X` | TCMB XML | — |
 | BTC TL | yfinance × USDTRY | CoinGecko | — |
-| Gram altın | yfinance `GC=F` × USDTRY | snapshot koruması | — |
+| Gram altın | **borsapy `FX("gram-altin")`** (TL direkt, §17) | yfinance `GC=F` × USDTRY | snapshot |
 | Benchmark seriler | borsapy | yfinance | TCMB (sadece USDTRY) |
 
 **Defansif katmanlar:**
@@ -1511,3 +1514,59 @@ Haziran filtrelendi, 1 Haziran ve sonrası geri yüklendi.
 **Genel doktrin:** Reset operasyonlarında önce hangi günlerin
 silineceği netleştirilmeli. Toplu silmek yerine tarih filtresiyle
 seçici silmek daha güvenli. Git history her zaman yedektir.
+
+---
+
+## 17. 5 HAZİRAN 2026 — GRAM ALTIN borsapy BİRİNCİL
+
+### 17.1 Olay
+
+5 Haziran 12:31 cron'unda `gram_altin_tl: null` döndü
+(`altin_kaynak: "yok"`). Dashboard'da Derya'nın 302 gram altını ₺0
+olarak göründü, Derya toplamı ~₺1.9M eksik. Sebep: yfinance GC=F
+GitHub Actions IP'lerinden veri çekemedi (§12.6.3), eski yedek
+sistem yoktu (Twelve Data 25 May'da kaldırılmıştı, §11.1).
+
+### 17.2 Çözüm
+
+`gram_altin_cek()` yeniden yapılandırıldı. Yeni hiyerarşi:
+
+| Sıra | Kaynak | Tipi |
+|---|---|---|
+| 1 (birincil) | `bp.FX("gram-altin")` | TL direkt, USD kurundan bağımsız |
+| 2 (yedek 1) | yfinance `GC=F × USDTRY ÷ 31.1035` | USD kuruna bağımlı |
+| 3 (yedek 2) | `prices.json` snapshot | Son bilinen fiyat (günlük değişim 0) |
+
+**Birincil neden borsapy?** Benchmark script'i (`scripts/benchmark_fiyat.py`)
+zaten `bp.FX("gram-altin")` kullanıyor ve 5 yıllık seri başarıyla
+çekilmişti (§12.2). Bu sembol Türkiye gram altın TL fiyatını direkt
+veriyor — `bp.Ticker("ALTIN")` ise Darphane Sertifikası (~80 TL)
+verir, karıştırılmamalı (§11.1 ile aynı not).
+
+**Yeni fonksiyon:** `borsapy_gram_altin_fx()` (line ~382). Pattern
+`borsapy_kur()` ve `borsapy_btc_tl()` ile aynı.
+
+### 17.3 Mevcut prices.json fixed mi?
+
+Hayır — düzeltme deploy edildikten sonra **bir sonraki cron** (14:30
+veya manuel tetik) yeni `gram_altin_tl` değerini yazacak. O ana kadar
+dashboard Derya altın'ı ₺0 göstermeye devam eder.
+
+**Hızlı çözüm:** GitHub Actions → "Portfoy Fiyat Guncelleme" →
+"Run workflow" → `Run workflow` (normal mod, `kapanis: false`).
+1-2 dakikada cron çalışır, prices.json güncellenir, frontend doğru
+gösterir.
+
+### 17.4 Öğrenilen ders
+
+**12.6.3'ün uzantısı:** yfinance GitHub Actions IP'lerinden zaman zaman
+veri vermiyor. Sadece "GC=F bazen çalışır" gibi varsayım yapmak yetmez —
+her veri kaynağı için en az 2 katmanlı yedek olmalı. borsapy hisse,
+TEFAS, BTC, kur ve şimdi gram altın için birincil oldu; yfinance hepsi
+için ikincil yedek.
+
+**Doktrin:** "Yedek sistem var" demek "yedek test edildi" demek değil.
+12 May Twelve Data temizliği yapılırken (§5f7df88) snapshot yedeğinin
+yeterli olduğu varsayılmıştı, ama snapshot yedeği SADECE TEFAS için
+implemente edilmişti (§14.1) — gram altın için değil. 24 gün boyunca
+gizli kalan bug, 5 Haziran'da patlayarak ortaya çıktı.

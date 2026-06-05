@@ -381,6 +381,31 @@ def borsapy_gram_altin_KULLANMA():
     return None
 
 
+def borsapy_gram_altin_fx():
+    """
+    Gram altin TL: bp.FX('gram-altin') - direkt TL verir.
+    Benchmark script'i bunu basariyla kullaniyor (§12.2). USD kurundan
+    bagimsiz, dolayisiyla yfinance veya kurlar coktugunde de calisir.
+    Cikti: {"guncel":x, "onceki":y} veya None.
+    """
+    if not BORSAPY_OK:
+        return None
+    try:
+        fx = bp.FX("gram-altin")
+        hist = fx.history(period="5d")
+        if hist.empty or len(hist) < 1:
+            return None
+        kapanis = hist["Close"].dropna().tolist()
+        if not kapanis:
+            return None
+        guncel = float(kapanis[-1])
+        onceki = float(kapanis[-2]) if len(kapanis) >= 2 else guncel
+        return {"guncel": guncel, "onceki": onceki}
+    except Exception as e:
+        log(f"borsapy gram-altin hata: {e}", "WARN")
+        return None
+
+
 def borsapy_btc_tl():
     """Bitcoin TL: bp.Crypto('BTCTRY'). Direkt TL verir."""
     if not BORSAPY_OK:
@@ -545,26 +570,32 @@ def kur_cek():
 def gram_altin_cek(usd_try_guncel, usd_try_onceki):
     """
     Gram altin TL fiyati.
-    Birincil: yfinance GC=F (ons altin USD) × USDTRY ÷ 31.1035
-    Yedek: prices.json snapshot koruması (§14.1 — 3. yedek katman)
+    Birincil: borsapy FX('gram-altin') - TL direkt, USD kurundan bagimsiz.
+    Yedek 1: yfinance GC=F (ons altin USD) × USDTRY ÷ 31.1035
+    Yedek 2: prices.json snapshot (asagida _onceki_snapshot ile yuklenir)
     Not: borsapy 'ALTIN' sembolu Darphane Altin Sertifikasi (~80 TL) verir,
-    gercek gram altin (~6800 TL/gr) degil. Bu yuzden kullanmiyoruz.
+    gercek gram altin (~6800 TL/gr) degil. Bu yuzden FX('gram-altin') kullaniyoruz.
     """
+    # Birincil: borsapy FX('gram-altin') - USD kuruna bagimli degil
+    bp_altin = borsapy_gram_altin_fx()
+    if bp_altin:
+        return {**bp_altin, "kaynak": "borsapy"}
+
+    # Yedek 1: yfinance GC=F × USDTRY ÷ 31.1035
     if not usd_try_guncel:
-        log("Gram altin: USD kuru yok, hesaplanamiyor.", "ERROR")
+        log("Gram altin: borsapy basarisiz, USD kuru da yok, hesaplanamiyor.", "ERROR")
         return None
 
     OZ_TO_GRAM = 31.1035
-
-    # Birincil: yfinance GC=F
     altin_oz = yfinance_fiyat("GC=F")
     if altin_oz:
         guncel = (altin_oz["guncel"] * usd_try_guncel) / OZ_TO_GRAM
         onceki = (altin_oz["onceki"] * usd_try_onceki) / OZ_TO_GRAM
         return {"guncel": guncel, "onceki": onceki, "kaynak": "yfinance"}
 
-    # Yedek: snapshot koruması tefas_fiyat_toplu()'da yapılır (3. yedek katman)
-    log("Gram altin: yfinance GC=F basarisiz, fiyat eksik kalacak.", "ERROR")
+    # Yedek 2: snapshot - prices.json'dan onceki bilinen fiyat (3. yedek katman)
+    # Bu blok asagida ana akista (gram altin yazma yerinde) yapilir.
+    log("Gram altin: borsapy + yfinance basarisiz, snapshot yedegi denenecek.", "WARN")
     return None
 
 
@@ -1084,10 +1115,25 @@ def main():
 
     gram_altin = None
     if altin_var or True:  # her zaman cek - benchmark icin de lazim
-        if usd_g:
-            gram_altin = gram_altin_cek(usd_g, usd_o)
-            if gram_altin:
-                log(f"  Gram altin: {gram_altin['guncel']:,.2f} TL/gr")
+        gram_altin = gram_altin_cek(usd_g, usd_o)
+        if gram_altin:
+            log(f"  Gram altin: {gram_altin['guncel']:,.2f} TL/gr [{gram_altin.get('kaynak','?')}]")
+        else:
+            # Yedek 2: prices.json snapshot - onceki bilinen fiyati kullan
+            try:
+                if PRICES_FILE.exists():
+                    with open(PRICES_FILE, "r", encoding="utf-8") as f:
+                        eski_prices = json.load(f)
+                    eski_altin = eski_prices.get("gram_altin_tl")
+                    if eski_altin and isinstance(eski_altin, dict) and eski_altin.get("guncel"):
+                        gram_altin = {
+                            "guncel": eski_altin["guncel"],
+                            "onceki": eski_altin["guncel"],
+                            "kaynak": "onceki_snapshot",
+                        }
+                        log(f"  Gram altin (snapshot yedek): {gram_altin['guncel']:,.2f} TL/gr", "WARN")
+            except Exception as e:
+                log(f"  Gram altin snapshot yedek hatasi: {e}", "WARN")
 
     # 5. Yil basi fiyatlarini koru/guncelle
     log("[6/6] JSON dosyalari yaziliyor...")
