@@ -22,6 +22,9 @@ venv/
 *.swp
 .DS_Store
 
+# Claude lokal araclari (preview server, launch config)
+.claude/
+
 # Loglar
 *.log
 
