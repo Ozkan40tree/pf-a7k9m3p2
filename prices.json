@@ -1,12 +1,12 @@
 {
-  "son_guncelleme": "2026-06-08T10:33:08+03:00",
+  "son_guncelleme": "2026-06-08T12:32:38+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
     "btc_kaynak": "borsapy",
     "hisse_kaynak": "borsapy",
     "altin_kaynak": "borsapy",
-    "fon_kaynak": "onceki_snapshot"
+    "fon_kaynak": "borsapy"
   },
   "kurlar": {
     "usd_try": {
@@ -29,12 +29,12 @@
       "yilbasi": 3.82
     },
     "SAHOL": {
-      "guncel": 89.4,
+      "guncel": 89.7,
       "onceki": 90.0,
       "yilbasi": 95.25
     },
     "TRGYO": {
-      "guncel": 96.05,
+      "guncel": 97.1,
       "onceki": 96.4,
       "yilbasi": 99.95
     }
@@ -45,40 +45,40 @@
       "onceki": 0.372842,
       "yilbasi": 0.391022
     },
+    "FFC": {
+      "guncel": 0.102188,
+      "onceki": 0.103862,
+      "yilbasi": 0.099452
+    },
     "GNP": {
       "guncel": 1.363039,
       "onceki": 1.358821,
       "yilbasi": 1.352387
     },
-    "ZBJ": {
-      "guncel": 4.778434,
-      "onceki": 4.762894,
-      "yilbasi": 4.637761
-    },
-    "FFC": {
-      "guncel": 0.103862,
-      "onceki": 0.103862,
-      "yilbasi": 0.099452
-    },
     "HBF": {
-      "guncel": 49.971862,
+      "guncel": 49.795094,
       "onceki": 49.971862,
       "yilbasi": 51.904464
     },
     "HES": {
-      "guncel": 0.754077,
+      "guncel": 0.74103,
       "onceki": 0.754077,
       "yilbasi": 0.801649
     },
     "MPP": {
-      "guncel": 24.119405,
+      "guncel": 23.535646,
       "onceki": 24.119405,
       "yilbasi": 22.672514
     },
     "NAU": {
-      "guncel": 3.083688,
+      "guncel": 3.080792,
       "onceki": 3.083688,
       "yilbasi": 3.229706
+    },
+    "ZBJ": {
+      "guncel": 4.778434,
+      "onceki": 4.762894,
+      "yilbasi": 4.637761
     },
     "TFF": {
       "guncel": 42.450638,
@@ -93,7 +93,7 @@
   },
   "kripto": {
     "BTC": {
-      "guncel": 2912848.0,
+      "guncel": 2918886.0,
       "onceki": 2913244.0,
       "yilbasi": 3720444.0
     }
