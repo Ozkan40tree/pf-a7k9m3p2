@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSGB Bilgi Rehberi — Sahaya Hazırlık</title>
+<style>
+  :root{--bg:#0a0f1e;--panel:#111a30;--panel2:#0e1628;--line:#1e2c4a;--txt:#e6edf7;--muted:#8aa0c4;
+    --turkuaz:#2ee6c9;--turkuaz2:#15c3a8;--red:#ff5d6c;--amber:#ffb454;--green:#3ddc97;--mor:#a78bfa;--mavi:#5b8def;}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 80% -10%, #142244 0%, var(--bg) 55%);
+    color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:24px;line-height:1.5}
+  h1{font-size:23px;margin:0 0 2px} .sub{color:var(--muted);font-size:13px;margin-bottom:18px}
+  .turkuaz{color:var(--turkuaz)}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+  .tab{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:11px;padding:9px 15px;font-size:13px;cursor:pointer;font-weight:600}
+  .tab.active{background:linear-gradient(160deg,var(--turkuaz) 0%,var(--turkuaz2) 100%);color:#05231d;border-color:transparent}
+  .view{display:none} .view.active{display:block}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+  .card{background:linear-gradient(160deg,var(--panel) 0%,var(--panel2) 100%);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .card h3{margin:0 0 8px;font-size:15px;display:flex;align-items:center;gap:8px}
+  .card p{margin:6px 0;font-size:13.5px;color:#cdd9ee}
+  .ic{font-size:20px}
+  .sectitle{font-size:13px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin:24px 0 12px;font-weight:700}
+  .big{font-size:30px;font-weight:800;line-height:1}
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700}
+  .p-green{background:rgba(61,220,151,.15);color:var(--green)} .p-amber{background:rgba(255,180,84,.15);color:var(--amber)}
+  .p-red{background:rgba(255,93,108,.15);color:var(--red)} .p-mor{background:rgba(167,139,250,.15);color:var(--mor)}
+  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  th,td{padding:12px 13px;text-align:center;font-size:14px;border-bottom:1px solid var(--line);border-right:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;background:var(--panel2)} tr:last-child td{border-bottom:none} td:last-child,th:last-child{border-right:none}
+  td.lbl{text-align:left;font-weight:600;color:var(--txt)}
+  .matrix .yr{font-size:24px;font-weight:800}
+  .note{color:var(--muted);font-size:12.5px;margin-top:10px;line-height:1.6}
+  .arrowrow{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-bottom:10px}
+  .pain{background:rgba(255,93,108,.08);border:1px solid rgba(255,93,108,.3);border-radius:12px;padding:12px 14px;font-size:13.5px}
+  .sol{background:rgba(46,230,201,.08);border:1px solid rgba(46,230,201,.3);border-radius:12px;padding:12px 14px;font-size:13.5px}
+  .arr{color:var(--turkuaz);font-size:22px;font-weight:800}
+  /* quiz */
+  .quizbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+  .btn{background:var(--turkuaz);color:#05231d;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:8px 14px;cursor:pointer;font-size:13px}
+  .qcard{background:linear-gradient(160deg,var(--panel) 0%,var(--panel2) 100%);border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;transition:border-color .15s}
+  .qcard:hover{border-color:var(--turkuaz)}
+  .qcat{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+  .qsoru{font-size:14.5px;font-weight:700;margin-bottom:4px}
+  .qcevap{font-size:13.5px;color:#cdd9ee;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:none}
+  .qcard.open .qcevap{display:block}
+  .qhint{font-size:11px;color:var(--muted);margin-top:8px}
+  .qcard.open .qhint{display:none}
+  @media(max-width:820px){.g4,.g3,.g2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+  <h1>OSGB <span class="turkuaz">Bilgi Rehberi</span></h1>
+  <div class="sub">Sahaya bilgili çıkmak için çalışma rehberi · infografik + 20 soruluk quiz</div>
+
+  <div class="tabs">
+    <div class="tab active" data-v="s101" onclick="sw('s101')">📚 Sektör 101</div>
+    <div class="tab" data-v="sayilar" onclick="sw('sayilar')">⚖️ Mevzuat & Sayılar</div>
+    <div class="tab" data-v="dert" onclick="sw('dert')">😫 Dert → 💡 Çözüm</div>
+    <div class="tab" data-v="quiz" onclick="sw('quiz')">🎴 20 Soru (Quiz)</div>
+  </div>
+
+  <!-- SEKTÖR 101 -->
+  <div class="view active" id="v-s101">
+    <div class="sectitle">OSGB tek cümlede</div>
+    <div class="card"><p style="font-size:15px;color:var(--txt)"><b>OSGB (Ortak Sağlık ve Güvenlik Birimi):</b> Çalışma ve Sosyal Güvenlik Bakanlığı'nın <b>yetkilendirdiği</b>, işyerlerine iş sağlığı ve güvenliği hizmeti (<span class="turkuaz">iş güvenliği uzmanı + işyeri hekimi + diğer sağlık personeli</span>) sağlayan firmadır. Müşterileri = İSG hizmeti almak zorunda olan işyerleridir.</p></div>
+
+    <div class="sectitle">Kim kimdir?</div>
+    <div class="grid g4">
+      <div class="card"><h3><span class="ic">🦺</span>İş Güvenliği Uzmanı</h3><p>Risk değerlendirmesi, saha gözetimi, eğitim. A/B/C sınıfı sertifika.</p></div>
+      <div class="card"><h3><span class="ic">🩺</span>İşyeri Hekimi</h3><p>Sağlık gözetimi, periyodik muayene, işe giriş raporu.</p></div>
+      <div class="card"><h3><span class="ic">➕</span>Diğer Sağlık Personeli</h3><p>Hekime yardımcı (DSP) — sağlık taramaları, kayıtlar.</p></div>
+      <div class="card"><h3><span class="ic">👔</span>OSGB Sahibi / Müdürü</h3><p><b>Senin muhatabın.</b> İşi yönetir, maliyet & ceza sorumluluğu onda → satın alma kararını o verir.</p></div>
+    </div>
+
+    <div class="sectitle">OSGB nasıl para kazanır? (iş modeli)</div>
+    <div class="grid g2">
+      <div class="card"><h3><span class="ic">💵</span>Çalışan başına, aylık</h3>
+        <p>Her müşteri işyeriyle (genelde 1 yıllık) sözleşme. Ücret <b>çalışan başına / ay</b>:</p>
+        <p><span class="pill p-green">Az Tehlikeli ~50–100 ₺</span> &nbsp; <span class="pill p-amber">Tehlikeli ~100–200 ₺</span> &nbsp; <span class="pill p-red">Çok Tehlikeli ~150–300 ₺</span></p>
+        <p class="note">Çalışan/ay × çalışan sayısı. Tehlike sınıfı yükseldikçe ücret artar.</p></div>
+      <div class="card"><h3><span class="ic">🧮</span>Örnek hesap</h3>
+        <p>50 çalışanlı, <b>Tehlikeli</b> bir fabrika:</p>
+        <p class="big turkuaz">50 × ~150 ₺ = ~7.500 ₺/ay</p>
+        <p class="note">OSGB'nin geliri = (her müşterinin çalışanı × aylık ücret) toplamı. Müşteri sayısı arttıkça takip yükü de artar — senin çözümün tam burada.</p></div>
+    </div>
+
+    <div class="sectitle">Hatırla: senin sattığın şey</div>
+    <div class="card" style="border-color:var(--turkuaz)"><p style="font-size:14.5px"><b class="turkuaz">Sen İSG uzmanı değilsin, olmana da gerek yok.</b> OSGB'nin zaten uzmanı/hekimi var. Sen <b>operasyon katmanı</b> satıyorsun: hangi müşterinin neyi ne zaman yaptırması gerektiğini takip etmek, hatırlatmak, raporlamak. Yani sektörün <u>derdini ve diline</u> hakim olman yeterli — teknik İSG içeriğini onlar biliyor.</p></div>
+  </div>
+
+  <!-- MEVZUAT & SAYILAR -->
+  <div class="view" id="v-sayilar">
+    <div class="sectitle">Tehlike sınıfları</div>
+    <div class="card"><p>Her işyeri faaliyet koduna (NACE) göre bir tehlike sınıfındadır — <b>Tebliğ</b> belirler. Her şey bu sınıfa göre değişir:</p>
+      <p><span class="pill p-green">Az Tehlikeli</span> ofis, market &nbsp;→&nbsp; <span class="pill p-amber">Tehlikeli</span> tekstil, gıda &nbsp;→&nbsp; <span class="pill p-red">Çok Tehlikeli</span> inşaat, maden, kimya</p></div>
+
+    <div class="sectitle">⏳ Periyot kuralları — EZBERLE (yılda bir)</div>
+    <table class="matrix">
+      <tr><th>Yükümlülük</th><th><span class="pill p-green">Az Tehlikeli</span></th><th><span class="pill p-amber">Tehlikeli</span></th><th><span class="pill p-red">Çok Tehlikeli</span></th></tr>
+      <tr><td class="lbl">🩺 Periyodik sağlık muayenesi</td><td><span class="yr">5</span></td><td><span class="yr">3</span></td><td><span class="yr">1</span></td></tr>
+      <tr><td class="lbl">📘 İSG çalışan eğitimi</td><td><span class="yr">3</span></td><td><span class="yr">2</span></td><td><span class="yr">1</span></td></tr>
+      <tr><td class="lbl">📋 Risk değerlendirmesi</td><td><span class="yr">6</span></td><td><span class="yr">4</span></td><td><span class="yr">2</span></td></tr>
+    </table>
+    <p class="note"><b>Akılda tutma:</b> Tehlike arttıkça süre KISALIR. Sıralar: sağlık <b>5-3-1</b>, eğitim <b>3-2-1</b>, risk <b>6-4-2</b>. (Risk değ. ayrıca işyeri değişikliği/kaza olursa da yenilenir.)</p>
+
+    <div class="sectitle">⏱️ Uzman & hekim çalışma süresi (dakika / çalışan / ay)</div>
+    <div class="grid g2">
+      <div class="card"><h3><span class="ic">🦺</span>İş Güvenliği Uzmanı</h3>
+        <p><span class="pill p-green">Az 10 dk</span> &nbsp; <span class="pill p-amber">Tehl. 20 dk</span> &nbsp; <span class="pill p-red">Çok Tehl. 40 dk</span></p></div>
+      <div class="card"><h3><span class="ic">🩺</span>İşyeri Hekimi</h3>
+        <p><span class="pill p-green">Az 5 dk</span> &nbsp; <span class="pill p-amber">Tehl. 10 dk</span> &nbsp; <span class="pill p-red">Çok Tehl. 15 dk</span></p></div>
+    </div>
+
+    <div class="sectitle">💰 Ceza tabloları (2026 ~ , %25,49 zamlı) — SATIŞIN KOZU</div>
+    <div class="grid g3">
+      <div class="card"><h3><span class="ic">⚠️</span>Risk değ. yapmamak</h3><p class="big" style="color:var(--red)">~60.000 ₺</p><p class="note">tespit + <b>her ay tekrar</b></p></div>
+      <div class="card"><h3><span class="ic">👷</span>Uzman/hekim atamamak</h3><p class="big" style="color:var(--red)">~45.000 ₺</p><p class="note"><b>her ay</b></p></div>
+      <div class="card"><h3><span class="ic">📘</span>Eğitim vermemek</h3><p class="big" style="color:var(--red)">~2.500 ₺</p><p class="note"><b>çalışan başına</b></p></div>
+      <div class="card"><h3><span class="ic">🩺</span>Sağlık raporsuz çalıştırmak</h3><p class="big" style="color:var(--red)">~5.000 ₺</p><p class="note"><b>çalışan başına</b></p></div>
+      <div class="card"><h3><span class="ic">🚨</span>Acil durum planı yok</h3><p class="big" style="color:var(--red)">~50.000 ₺</p><p class="note">tek sefer</p></div>
+      <div class="card" style="border-color:var(--amber)"><h3><span class="ic">🔑</span>Anahtar mesaj</h3><p class="note">Eğitim & sağlık cezaları <b>çalışan başına</b> → 80 kişilik müşteride tek kalem yüz binlerce TL. Ceza korkusu = ödeme isteği.</p></div>
+    </div>
+
+    <div class="sectitle">🗂️ İSG-KATİP</div>
+    <div class="card"><p>ÇSGB'nin online sistemi. Uzman/hekim ↔ işyeri ↔ OSGB <b>atama ve sözleşmeleri</b> burada yapılır/onaylanır. <b>Önemli:</b> dışa kapalı/tek yönlü — operasyonel veri akışına açık değil. Bu yüzden senin sistemin KATİP'ten otomatik veri çekmez; <u>OSGB'nin kendi Excel'inden</u> beslenir.</p></div>
+  </div>
+
+  <!-- DERT → ÇÖZÜM -->
+  <div class="view" id="v-dert">
+    <div class="sectitle">OSGB'nin günlük derdi → senin çözümün</div>
+    <div class="arrowrow"><div class="pain">📅 Yüzlerce müşterinin muayene/eğitim/risk tarihleri Excel'de; kim ne zaman? kafada/dağınık.</div><div class="arr">→</div><div class="sol">Otomatik son-tarih takibi: kim, neyi, ne zamana kadar — tek ekranda öncelikli liste.</div></div>
+    <div class="arrowrow"><div class="pain">📞 Müşteriye hatırlatma elle: telefon, tek tek WhatsApp, unutulan aramalar.</div><div class="arr">→</div><div class="sol">Tek tık, İYS-uyumlu hazır hatırlatma mesajı (WhatsApp/e-posta).</div></div>
+    <div class="arrowrow"><div class="pain">😨 Hangi müşteride ceza riski var, görünmüyor — bir denetim tüm portföyü riske atıyor.</div><div class="arr">→</div><div class="sol">Aktif ceza riski ₺ panosu: süre aşımındaki her kalem ve TL karşılığı.</div></div>
+    <div class="arrowrow"><div class="pain">💸 Sözleşme yenilemeleri kaçıyor = doğrudan gelir kaybı.</div><div class="arr">→</div><div class="sol">Yenileme uyarıları önceden; kaçan müşteri yok.</div></div>
+    <div class="arrowrow"><div class="pain">📑 Müşteriye "ne yaptık" göstermek zor; değer görünmez.</div><div class="arr">→</div><div class="sol">Otomatik aylık uyum raporu (PDF) — OSGB'nin değerini görünür kılar.</div></div>
+    <div class="note">Hepsi <b>dışarı-yönlü</b> (hatırlat/raporla) ve <b>deterministik</b> (takvim/kural). Yorum/uzmanlık gerektiren işlere (risk değ. içeriği, denetim) girmiyoruz — onlar OSGB'nin işi.</div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="view" id="v-quiz">
+    <div class="quizbar">
+      <span style="color:var(--muted);font-size:13px">Karta tıkla → cevabı gör. Kendini sına.</span>
+      <button class="btn" onclick="toggleAll(true)">Tümünü aç</button>
+      <button class="btn-ghost" onclick="toggleAll(false)">Tümünü kapat</button>
+      <button class="btn-ghost" onclick="shuffleQ()">🔀 Karıştır</button>
+    </div>
+    <div class="grid g2" id="quizGrid"></div>
+  </div>
+
+<script>
+function sw(v){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.v===v));
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id==='v-'+v));}
+
+const QA=[
+ ['Sektör','OSGB nedir, ne iş yapar?','Bakanlığın yetkilendirdiği, işyerlerine İSG hizmeti (iş güvenliği uzmanı + işyeri hekimi + DSP) veren firma. Müşterileri İSG almak zorunda olan işyerleri.'],
+ ['Sektör','OSGB nasıl para kazanır?','İşyerleriyle (genelde 1 yıllık) sözleşme; çalışan başına aylık ücret. Az ~50-100, Tehlikeli ~100-200, Çok Tehlikeli ~150-300 ₺/çalışan/ay.'],
+ ['Mevzuat','Tehlike sınıfları ve nasıl belirlenir?','Az / Tehlikeli / Çok Tehlikeli. İşyerinin NACE faaliyet koduna göre Tebliğ ile belirlenir.'],
+ ['Mevzuat','Periyodik sağlık muayenesi ne sıklıkta?','Az 5, Tehlikeli 3, Çok Tehlikeli 1 yılda bir (5-3-1).'],
+ ['Mevzuat','İSG çalışan eğitimi ne sıklıkta yenilenir?','Az 3, Tehlikeli 2, Çok Tehlikeli 1 yılda bir (3-2-1).'],
+ ['Mevzuat','Risk değerlendirmesi ne sıklıkta yenilenir?','Az 6, Tehlikeli 4, Çok Tehlikeli 2 yılda bir (6-4-2). Ayrıca değişiklik/kaza olursa.'],
+ ['Mevzuat','Uzman/hekim çalışma süresi (dk/çalışan/ay)?','İş güvenliği uzmanı 10/20/40, işyeri hekimi 5/10/15 (Az/Tehlikeli/Çok Tehlikeli).'],
+ ['Mevzuat','İSG-KATİP nedir?','Bakanlığın online sistemi; uzman/hekim-işyeri-OSGB atama ve sözleşmeleri orada yapılır/onaylanır. Dışa kapalı/tek yönlü.'],
+ ['Ceza','Risk değerlendirmesi yapılmazsa ceza?','~60.000 ₺ — üstelik düzeltilmezse her ay tekrar uygulanır.'],
+ ['Ceza','Uzman/hekim atanmazsa ceza?','~45.000 ₺ ve her ay tekrar.'],
+ ['Ceza','Eğitim / sağlık raporu eksikse ceza?','İSG eğitimi ~2.500 ₺ ve sağlık raporu ~5.000 ₺ — ikisi de ÇALIŞAN BAŞINA (büyük firmada katlanır).'],
+ ['İtiraz','Bu bir yazılım mı?','Hayır. Yazılım satmıyorum; kurar, işletir, raporlarım — bir operatör/hizmet. Yazılımdan farkı bu.'],
+ ['İtiraz','"Bizim yazılımımız zaten var, farkın ne?"','Yazılımını değiştirme. Ben verinin üstüne müşteri hatırlatması + ceza riski takibi + aylık rapor katmanını eklerim — yazılımın yapmadığı dışarı-yönlü kısım.'],
+ ['İtiraz','Otomatik mesaj İYS/KVKK\'ya takılmaz mı?','Hayır. İşletmelere (tacir/esnaf) giden, yükümlülük hatırlatan hizmet bildirimleri önceden onay gerektirmez — reklam koymadığımız sürece.'],
+ ['İtiraz','Verilerimiz güvende mi?','Veri sizde kalır, ben işlerim; KVKK uyumlu çalışırız. (İlerde veri işleme sözleşmesi.)'],
+ ['İtiraz','Fiyat ne, pahalı değil mi?','Tek bir kaçan ceza bunun katı; bir personelin dörtte birinden az. İsterseniz pilotla başlayalım.'],
+ ['İtiraz','Kurulum ne kadar sürer, ne gerekiyor?','Mevcut Excel\'inizden veriyi alıp kısa sürede kurulur; ekibinizin yeni sistem öğrenmesine gerek yok.'],
+ ['İtiraz','Mevcut Excel\'imle çalışır mı?','Evet — sistem onu okuyacak şekilde. Veri kaynağınız değişmez.'],
+ ['İtiraz','İSG-KATİP\'e bağlanıyor mu?','Hayır; KATİP dışa kapalı/tek yönlü. Veri sizin tablonuzdan beslenir.'],
+ ['İtiraz','Mevzuat değişirse sistem güncel kalır mı?','Evet, periyot/ceza kurallarını ben güncel tutarım — bu hizmetin parçası.']
+];
+const CATCOL={'Sektör':'p-mor','Mevzuat':'p-green','Ceza':'p-red','İtiraz':'p-amber'};
+let order=QA.map((_,i)=>i);
+function renderQ(){
+  document.getElementById('quizGrid').innerHTML=order.map(i=>{const q=QA[i];
+    return `<div class="qcard" onclick="this.classList.toggle('open')">
+      <div class="qcat"><span class="pill ${CATCOL[q[0]]}">${q[0]}</span></div>
+      <div class="qsoru">${i+1}. ${q[1]}</div>
+      <div class="qhint">💡 cevabı görmek için tıkla</div>
+      <div class="qcevap">${q[2]}</div></div>`;}).join('');
+}
+function toggleAll(open){document.querySelectorAll('.qcard').forEach(c=>c.classList.toggle('open',open));}
+function shuffleQ(){for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}renderQ();}
+renderQ();
+</script>
+</body>
+</html>
