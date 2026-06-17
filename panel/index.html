@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSGB Uyum Paneli — Demo</title>
+<style>
+  :root{
+    --bg:#0a0f1e; --panel:#111a30; --panel2:#0e1628; --line:#1e2c4a;
+    --txt:#e6edf7; --muted:#8aa0c4; --turkuaz:#2ee6c9; --turkuaz2:#15c3a8;
+    --red:#ff5d6c; --amber:#ffb454; --green:#3ddc97; --mor:#a78bfa; --mavi:#5b8def;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 80% -10%, #142244 0%, var(--bg) 55%);
+    color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding:24px}
+  h1{font-size:22px;margin:0 0 2px} .sub{color:var(--muted);font-size:13px;margin-bottom:16px}
+  .turkuaz{color:var(--turkuaz)}
+  .topbar{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;margin-bottom:16px}
+  .ctrls{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}
+  input,select,textarea{background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    border-radius:10px;padding:8px 10px;font-size:13px;font-family:inherit}
+  input[type=text]{min-width:190px} textarea{width:100%;min-height:70px;resize:vertical}
+  .bell{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13px}
+  .bell b{color:var(--red)}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .tab{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:11px;padding:9px 16px;font-size:13px;cursor:pointer;font-weight:600}
+  .tab.active{background:linear-gradient(160deg,var(--turkuaz) 0%,var(--turkuaz2) 100%);color:#05231d;border-color:transparent}
+  .panel-view{display:none} .panel-view.active{display:block}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:14px;margin-bottom:20px}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .card{background:linear-gradient(160deg,var(--panel) 0%,var(--panel2) 100%);border:1px solid var(--line);border-radius:16px;padding:16px;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;animation:fadeUp .35s both}
+  .card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  .chartcard{animation:fadeUp .42s both}
+  .card .ic{position:absolute;right:12px;top:10px;font-size:22px;opacity:.5}
+  .card .k{font-size:12px;color:var(--muted)} .card .v{font-size:28px;font-weight:700;margin-top:6px}
+  .card.red .v{color:var(--red)} .card.amber .v{color:var(--amber)} .card.green .v{color:var(--green)} .card.turkuaz .v{color:var(--turkuaz)}
+  .chartgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .chartcard{background:linear-gradient(160deg,var(--panel) 0%,var(--panel2) 100%);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .chartcard.wide{grid-column:span 3}
+  .ck{font-size:12px;color:var(--muted);margin-bottom:10px}
+  .chartrow{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .legend{display:flex;flex-direction:column;gap:6px;font-size:12px}
+  .legend div{display:flex;align-items:center;gap:7px}
+  .lg{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .filterbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .sect{margin-bottom:22px}
+  .sect h2{font-size:14px;letter-spacing:.5px;text-transform:uppercase;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .dot.red{background:var(--red)} .dot.amber{background:var(--amber)} .dot.green{background:var(--green)}
+  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  th,td{padding:11px 13px;text-align:left;font-size:13px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;background:var(--panel2)} tr:last-child td{border-bottom:none}
+  tr.clickable{cursor:pointer} tr.clickable:hover td{background:rgba(46,230,201,.06)}
+  .badge{padding:3px 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+  .b-red{background:rgba(255,93,108,.15);color:var(--red)} .b-amber{background:rgba(255,180,84,.15);color:var(--amber)}
+  .b-green{background:rgba(61,220,151,.15);color:var(--green)} .b-gray{background:rgba(138,160,196,.15);color:var(--muted)}
+  .b-class{background:rgba(167,139,250,.15);color:var(--mor)} .b-mavi{background:rgba(91,141,239,.15);color:var(--mavi)}
+  .btn{background:var(--turkuaz);color:#05231d;border:none;border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer} .btn:hover{background:var(--turkuaz2)}
+  .btn-wa{background:#25D366;color:#05231d} .btn-mail{background:var(--mor);color:#1a1033} .btn-sm{padding:4px 9px;font-size:11px}
+  .empty{color:var(--muted);font-size:13px;padding:10px 2px}
+  .note{color:var(--muted);font-size:12px;margin-top:8px;line-height:1.6}
+  .rep-block{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+  .rep-block h3{margin:0 0 10px;font-size:15px}
+  .rep-li{padding:6px 0;border-bottom:1px solid var(--line);font-size:13px} .rep-li:last-child{border:none}
+  .rep-card{background:linear-gradient(160deg,var(--panel) 0%,var(--panel2) 100%);border:1px solid var(--line);border-radius:18px;padding:26px;max-width:880px}
+  .rep-title{font-size:23px;font-weight:800;color:var(--turkuaz)}
+  .rep-sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .rep-head{margin:0 0 6px}
+  .rep-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:22px 0}
+  .rep-kpi{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:18px 12px;text-align:center}
+  .rep-kpi .l{font-size:12px;color:var(--muted);margin-bottom:10px}
+  .rep-kpi .n{font-size:30px;font-weight:800;line-height:1}
+  .rep-listhead{font-size:13px;font-weight:700;margin:22px 0 10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+  .rep-foot{margin-top:12px;font-size:12.5px;color:var(--muted)}
+  @media(max-width:680px){.rep-kpis{grid-template-columns:repeat(2,1fr)}}
+  .crm-sec{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+  .crm-sec h4{margin:0 0 8px;font-size:13px;color:var(--turkuaz)}
+  .hatir{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:6px 0;border-bottom:1px dashed var(--line)}
+  .ovl{position:fixed;inset:0;background:rgba(4,8,18,.7);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:16px;max-width:620px;width:100%;padding:22px;max-height:90vh;overflow:auto}
+  .modal h3{margin:0 0 6px;font-size:16px} .modal .who{color:var(--muted);font-size:12px;margin-bottom:12px}
+  .msgbox{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:13px;line-height:1.6;white-space:pre-wrap}
+  .modal .row{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:7px 13px;cursor:pointer;font-size:13px}
+  .iys{margin-top:10px;font-size:11px;color:var(--green)}
+  @media(max-width:820px){.cards,.chartgrid{grid-template-columns:repeat(2,1fr)}.chartcard.wide{grid-column:span 2}}
+  @media print{body{background:#fff;color:#000;padding:0}.noprint{display:none!important}
+    .rep-block{border:1px solid #ccc;background:#fff;color:#000}.rep-li{border-color:#ddd}h1,.turkuaz{color:#000}
+    .rep-card{background:#fff;border:1px solid #ccc;max-width:100%}.rep-kpi{background:#f4f6fa;border-color:#ddd}
+    .rep-kpi .l,.rep-foot,.rep-listhead{color:#444}table{background:#fff}th{background:#f4f6fa;color:#444}td,th{border-color:#e3e7ee}
+    .card,.chartcard{background:#fff!important;border-color:#ddd;box-shadow:none;animation:none}.card .k,.ck,.rep-sub{color:#444}
+    svg text{fill:#000!important}}
+</style>
+</head>
+<body>
+  <h1>OSGB <span class="turkuaz">Uyum Paneli</span></h1>
+  <div class="sub">Yasal yükümlülük takibi · CRM · hatırlatma · uyum raporu — <b>demo</b></div>
+
+  <div class="topbar noprint">
+    <div class="ctrls">
+      <div><label>OSGB adınız</label><input type="text" id="osgbAdi" placeholder="Örn. Anka OSGB"></div>
+      <div><label>Bugün</label><input type="date" id="today" value="2026-06-15"></div>
+      <div><label>Kendi verini yükle (CSV)</label><input type="file" id="csv" accept=".csv"></div>
+    </div>
+    <div class="bell">🔔 Acil bildirim: <b id="bellCount">0</b></div>
+  </div>
+
+  <div class="tabs noprint">
+    <div class="tab active" data-tab="genel" onclick="switchTab('genel')">📊 Genel Bakış</div>
+    <div class="tab" data-tab="aksiyon" onclick="switchTab('aksiyon')">📋 Aksiyon Listesi</div>
+    <div class="tab" data-tab="musteriler" onclick="switchTab('musteriler')">👥 Müşteriler (CRM)</div>
+    <div class="tab" data-tab="rapor" onclick="switchTab('rapor')">📄 Aylık Rapor</div>
+  </div>
+
+  <div class="panel-view active" id="view-genel">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px" class="noprint"><button class="btn" onclick="openPenalty()">💰 Ceza tutarlarını düzenle</button></div>
+    <div class="cards" id="cards"></div>
+    <div class="chartgrid">
+      <div class="chartcard"><div class="ck">Uyum skoru</div><div class="chartrow" id="gauge"></div></div>
+      <div class="chartcard"><div class="ck">Yükümlülük durumu</div><div class="chartrow" id="donutDurum"></div></div>
+      <div class="chartcard"><div class="ck">Tehlike sınıfı dağılımı</div><div class="chartrow" id="donutSinif"></div></div>
+      <div class="chartcard wide"><div class="ck">Önümüzdeki 6 ay — yaklaşan yükümlülük yoğunluğu</div><div id="barAy"></div></div>
+    </div>
+  </div>
+
+  <div class="panel-view" id="view-aksiyon">
+    <div class="filterbar noprint">
+      <input type="text" id="ara" placeholder="🔍 Firma ara...">
+      <select id="sinifFiltre"><option value="">Tüm sınıflar</option><option>Az Tehlikeli</option><option>Tehlikeli</option><option>Çok Tehlikeli</option></select>
+      <button class="btn" onclick="exportCSV()">⬇️ CSV indir</button>
+    </div>
+    <div class="sect"><h2><span class="dot red"></span>Acil — süre aşımı veya ≤7 gün</h2><div id="acil"></div></div>
+    <div class="sect"><h2><span class="dot amber"></span>Yaklaşan — 8–30 gün</h2><div id="yaklasan"></div></div>
+    <div class="sect"><h2><span class="dot green"></span>İzlemede — 31–60 gün</h2><div id="izleme"></div></div>
+  </div>
+
+  <div class="panel-view" id="view-musteriler">
+    <div class="filterbar noprint">
+      <input type="text" id="ara2" placeholder="🔍 Firma ara...">
+      <select id="sinifFiltre2"><option value="">Tüm sınıflar</option><option>Az Tehlikeli</option><option>Tehlikeli</option><option>Çok Tehlikeli</option></select>
+    </div>
+    <div id="musteriTablo"></div>
+    <div class="note">Bir satıra tıkla → firma kartı: yükümlülükler, durum etiketi, notlar, hatırlatıcılar, gönderim takibi.</div>
+  </div>
+
+  <div class="panel-view" id="view-rapor">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px" class="noprint">
+      <div class="sub" style="margin:0">Aylık uyum raporu — OSGB'ye bırakılacak değer kanıtı</div>
+      <button class="btn" onclick="window.print()">🖨️ Yazdır / PDF</button>
+    </div>
+    <div id="raporIcerik"></div>
+  </div>
+
+  <div class="note noprint">
+    Periyot kuralları (resmi mevzuat): Sağlık muayenesi — Az 5 / Tehl. 3 / Çok Tehl. 1 yıl · İSG eğitimi — 3 / 2 / 1 yıl (2 Nisan 2026 güncel) · Risk değ. — 6 / 4 / 2 yıl.
+    Mesajlar İYS uyumludur (B2B hizmet bildirimi). Notlar/hatırlatıcılar bu tarayıcıda saklanır. Demo veri sahtedir.
+  </div>
+
+  <div class="ovl" id="ovl"><div class="modal" id="modalContent"></div></div>
+
+<script>
+const PERIYOT={'Az Tehlikeli':{saglik:5,egitim:3,risk:6},'Tehlikeli':{saglik:3,egitim:2,risk:4},'Çok Tehlikeli':{saglik:1,egitim:1,risk:2}};
+const ETIKET={saglik:'Periyodik sağlık muayenesi',egitim:'İSG çalışan eğitimi',risk:'Risk değerlendirmesi',sozlesme:'Sözleşme yenileme'};
+const SINIF_RENK={'Çok Tehlikeli':'#ff5d6c','Tehlikeli':'#ffb454','Az Tehlikeli':'#3ddc97'};
+const DURUM_RENK={'Aktif':'b-green','Riskli':'b-red','Beklemede':'b-amber'};
+let DATA=[
+ ["Akel Metal","Ahmet Akel","ahmet@akelmetal.com","Çok Tehlikeli",45,"2025-07-01","2025-06-20","2024-09-10","2026-12-31"],
+ ["Berk Tekstil","Berk Yıldız","0532 111 22 33","Tehlikeli",22,"2023-05-15","2024-07-01","2023-01-10","2026-07-31"],
+ ["Cömert Gıda","Canan Cömert","canan@comertgida.com","Az Tehlikeli",8,"2022-03-01","2024-02-01","2021-06-01","2026-06-30"],
+ ["Demir İnşaat","Davut Demir","0533 444 55 66","Çok Tehlikeli",120,"2026-01-10","2025-05-01","2024-06-01","2027-02-28"],
+ ["Eren Lojistik","Eren Aslan","eren@erenlojistik.com","Tehlikeli",15,"2024-06-25","2024-06-25","2022-12-01","2026-08-15"],
+ ["Filiz Kimya","Filiz Kaya","0534 777 88 99","Çok Tehlikeli",30,"2025-06-30","2025-12-01","2025-03-01","2026-06-20"],
+ ["Güneş Mobilya","Gökhan Güneş","gokhan@gunesmobilya.com","Az Tehlikeli",12,"2024-01-01","2023-06-01","2020-05-01","2026-09-30"],
+ ["Hakan Otomotiv","Hakan Toprak","0535 222 33 44","Tehlikeli",18,"2023-07-10","2024-08-01","2023-09-01","2026-07-05"],
+ ["İpek Ambalaj","İpek Sayar","ipek@ipekambalaj.com","Az Tehlikeli",6,"2023-02-01","2024-06-10","2022-01-01","2026-12-01"],
+ ["Kaya Madencilik","Kemal Kaya","0536 555 66 77","Çok Tehlikeli",80,"2025-06-10","2025-07-01","2024-07-01","2026-10-31"],
+ ["Lale Temizlik","Leyla Lale","leyla@laletemizlik.com","Az Tehlikeli",25,"2022-06-01","2023-06-15","2021-04-01","2026-07-20"],
+ ["Mert Elektrik","Mert Doğan","0537 888 99 00","Tehlikeli",10,"2024-07-20","2024-07-20","2023-07-01","2026-06-25"]
+];
+const COLS=['firma','yetkili','iletisim','sinif','calisan','saglik','egitim','risk','sozlesme'];
+let FIRMS=[];
+function rowObj(r){const o={};COLS.forEach((c,i)=>o[c]=r[i]);return o;}
+function addYears(d,y){const x=new Date(d);x.setUTCFullYear(x.getUTCFullYear()+y);return x;}
+function days(from,to){return Math.round((to-from)/86400000);}
+function fmtTR(d){return d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'});}
+function todayVal(){return new Date(document.getElementById('today').value||'2026-06-15');}
+function osgbAdi(){return (document.getElementById('osgbAdi').value||'').trim()||'[OSGB adınız]';}
+
+// ---- CRM (localStorage) ----
+const CRM_KEY='osgb_crm_v1';
+function loadCRM(){try{return JSON.parse(localStorage.getItem(CRM_KEY))||{}}catch(e){return {}}}
+function saveCRM(o){try{localStorage.setItem(CRM_KEY,JSON.stringify(o))}catch(e){}}
+function firmCRM(n){const c=loadCRM();return c[n]||{durum:'',not:'',hatirlaticilar:[],gonderildi:{}}}
+function setFirmCRM(n,patch){const c=loadCRM();c[n]={...firmCRM(n),...patch};saveCRM(c);}
+// ---- Ceza tutarları (localStorage, örnek değerler — saha öncesi netleşecek) ----
+const PENALTY_KEY='osgb_penalty_v1';
+// 2026 örnek değerler. saglik & egitim ÇALIŞAN BAŞINA; risk İŞYERİ BAŞINA. Düzenlenebilir.
+const PENALTY_DEF={saglik:5000,egitim:2500,risk:60000,sozlesme:0};
+const PER_CALISAN={saglik:true,egitim:true,risk:false,sozlesme:false};
+function loadPenalty(){try{return {...PENALTY_DEF,...(JSON.parse(localStorage.getItem(PENALTY_KEY))||{})}}catch(e){return {...PENALTY_DEF}}}
+function savePenalty(o){try{localStorage.setItem(PENALTY_KEY,JSON.stringify(o))}catch(e){}}
+function penaltyFor(tip,calisan,pen){return (pen[tip]||0)*(PER_CALISAN[tip]?(calisan||1):1);}
+function fmtTL(n){return '₺'+(n||0).toLocaleString('tr-TR');}
+
+function obligations(f,today){
+  const p=PERIYOT[f.sinif]||{saglik:0,egitim:0,risk:0};
+  const arr=[{tip:'saglik',due:addYears(f.saglik,p.saglik)},{tip:'egitim',due:addYears(f.egitim,p.egitim)},
+   {tip:'risk',due:addYears(f.risk,p.risk)},{tip:'sozlesme',due:new Date(f.sozlesme)}];
+  arr.forEach(o=>{o.kalan=days(today,o.due);o.st=o.kalan<=7?'acil':o.kalan<=30?'yaklasan':o.kalan<=60?'izleme':'ok';});
+  return arr;
+}
+function kalanBadge(k){
+  if(k<0)return `<span class="badge b-red">${-k} gün GECİKMİŞ</span>`;
+  if(k===0)return `<span class="badge b-red">BUGÜN</span>`;
+  if(k<=7)return `<span class="badge b-red">${k} gün</span>`;
+  if(k<=30)return `<span class="badge b-amber">${k} gün</span>`;
+  if(k<=60)return `<span class="badge b-green">${k} gün</span>`;
+  return `<span class="badge b-gray">${k} gün</span>`;
+}
+const sevSinif={'Çok Tehlikeli':3,'Tehlikeli':2,'Az Tehlikeli':1};
+function flaggedItems(today){
+  const items=[];
+  FIRMS.forEach((f,fi)=>obligations(f,today).forEach(o=>{if(['acil','yaklasan','izleme'].includes(o.st))items.push({fi,firma:f.firma,sinif:f.sinif,calisan:f.calisan,...o});}));
+  items.sort((a,b)=>a.kalan-b.kalan||sevSinif[b.sinif]-sevSinif[a.sinif]||b.calisan-a.calisan);
+  return items;
+}
+
+// ---- SVG grafikler ----
+function gauge(pct){
+  const r=52,C=2*Math.PI*r,len=pct/100*C,col=pct>=90?'#3ddc97':pct>=70?'#ffb454':'#ff5d6c';
+  return `<svg width="130" height="130" viewBox="0 0 140 140">
+    <circle cx="70" cy="70" r="52" fill="none" stroke="#1e2c4a" stroke-width="14"></circle>
+    <circle cx="70" cy="70" r="52" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${len} ${C-len}" transform="rotate(-90 70 70)"></circle>
+    <text x="70" y="66" text-anchor="middle" font-size="28" fill="#e6edf7" font-weight="700">%${pct}</text>
+    <text x="70" y="88" text-anchor="middle" font-size="11" fill="#8aa0c4">uyumlu</text></svg>`;
+}
+function donut(segs){
+  const total=segs.reduce((s,x)=>s+x.value,0)||1,r=50,C=2*Math.PI*r;let acc=0;
+  const circ=segs.filter(s=>s.value>0).map(s=>{const frac=s.value/total,len=frac*C,off=-acc*C;acc+=frac;
+    return `<circle cx=66 cy=66 r=50 fill=none stroke="${s.color}" stroke-width=16 stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${off}" transform="rotate(-90 66 66)"/>`;}).join('');
+  const svg=`<svg width="132" height="132" viewBox="0 0 132 132">${circ}<text x=66 y=72 text-anchor=middle font-size=24 fill=#e6edf7 font-weight=700>${total}</text></svg>`;
+  const leg=`<div class="legend">${segs.map(s=>`<div><span class="lg" style="background:${s.color}"></span>${s.label}: <b>${s.value}</b></div>`).join('')}</div>`;
+  return svg+leg;
+}
+function barChart(data){
+  const max=Math.max(1,...data.map(d=>d.value)),w=Math.max(360,data.length*56+40);
+  const bars=data.map((d,i)=>{const bh=Math.round(d.value/max*86),x=24+i*56,y=112-bh;
+    return `<rect x="${x}" y="${y}" width="38" height="${bh}" rx="6" fill="#2ee6c9"/>
+      <text x="${x+19}" y="${y-6}" text-anchor=middle font-size=13 fill=#e6edf7 font-weight=600>${d.value}</text>
+      <text x="${x+19}" y="130" text-anchor=middle font-size=11 fill=#8aa0c4>${d.label}</text>`;}).join('');
+  return `<svg width="${w}" height="142" viewBox="0 0 ${w} 142">${bars}</svg>`;
+}
+
+function renderGenel(){
+  const today=todayVal();const all=flaggedItems(today);
+  let counts={acil:0,yaklasan:0,izleme:0,ok:0},overdue=0,totalObl=0;const sinif={'Az Tehlikeli':0,'Tehlikeli':0,'Çok Tehlikeli':0};
+  const PEN=loadPenalty();let cezaRiski=0;
+  FIRMS.forEach(f=>{sinif[f.sinif]++;obligations(f,today).forEach(o=>{totalObl++;counts[o.st]++;if(o.kalan<0){overdue++;cezaRiski+=penaltyFor(o.tip,f.calisan,PEN);}});});
+  const uyum=Math.round((totalObl-overdue)/totalObl*100);
+  const asim=all.filter(i=>i.kalan<0).length,yakN=all.filter(i=>i.kalan>=8&&i.kalan<=30).length;
+  const soz=new Set(all.filter(i=>i.tip==='sozlesme').map(i=>i.firma)).size;
+  document.getElementById('cards').innerHTML=`
+    <div class="card turkuaz"><div class="ic">🏢</div><div class="k">Toplam müşteri işyeri</div><div class="v">${FIRMS.length}</div></div>
+    <div class="card red"><div class="ic">⚠️</div><div class="k">Süre aşımı (ceza riski)</div><div class="v">${asim}</div></div>
+    <div class="card amber"><div class="ic">⏰</div><div class="k">Bu ay yaklaşan</div><div class="v">${yakN}</div></div>
+    <div class="card green"><div class="ic">💼</div><div class="k">Sözleşme yenileme fırsatı</div><div class="v">${soz}</div></div>
+    <div class="card red"><div class="ic">💰</div><div class="k">Aktif ceza riski</div><div class="v" style="font-size:23px">${fmtTL(cezaRiski)}</div></div>`;
+  document.getElementById('bellCount').textContent=counts.acil;
+  document.getElementById('gauge').innerHTML=gauge(uyum);
+  document.getElementById('donutDurum').innerHTML=donut([
+    {label:'Acil',value:counts.acil,color:'#ff5d6c'},{label:'Yaklaşan',value:counts.yaklasan,color:'#ffb454'},
+    {label:'İzlemede',value:counts.izleme,color:'#5b8def'},{label:'Temiz',value:counts.ok,color:'#2ee6c9'}]);
+  document.getElementById('donutSinif').innerHTML=donut([
+    {label:'Çok Tehlikeli',value:sinif['Çok Tehlikeli'],color:'#ff5d6c'},{label:'Tehlikeli',value:sinif['Tehlikeli'],color:'#ffb454'},
+    {label:'Az Tehlikeli',value:sinif['Az Tehlikeli'],color:'#3ddc97'}]);
+  const base=new Date(Date.UTC(today.getUTCFullYear(),today.getUTCMonth(),1)),months=[];
+  for(let i=0;i<6;i++){const m=new Date(Date.UTC(base.getUTCFullYear(),base.getUTCMonth()+i,1));
+    months.push({y:m.getUTCFullYear(),mo:m.getUTCMonth(),label:m.toLocaleDateString('tr-TR',{month:'short',timeZone:'UTC'}),value:0});}
+  FIRMS.forEach(f=>obligations(f,today).forEach(o=>{if(o.kalan<0)return;const idx=months.findIndex(x=>x.y===o.due.getUTCFullYear()&&x.mo===o.due.getUTCMonth());if(idx>=0)months[idx].value++;}));
+  document.getElementById('barAy').innerHTML=barChart(months);
+}
+
+function applyFilter(items,araId,filtreId){
+  const q=(document.getElementById(araId).value||'').toLowerCase(),s=document.getElementById(filtreId).value;
+  return items.filter(it=>(!q||it.firma.toLowerCase().includes(q))&&(!s||it.sinif===s));
+}
+function rowsTable(list){
+  if(!list.length)return '<div class="empty">Kayıt yok.</div>';
+  let h='<table><tr><th>Firma</th><th>Yükümlülük</th><th>Son tarih</th><th>Durum</th><th>Sınıf</th><th>Çalışan</th><th></th></tr>';
+  list.forEach(it=>{const g=firmCRM(it.firma).gonderildi[it.tip];
+    h+=`<tr><td><b>${it.firma}</b></td><td>${ETIKET[it.tip]}${g?' <span class="badge b-green">✓ gönderildi</span>':''}</td><td>${fmtTR(it.due)}</td>
+    <td>${kalanBadge(it.kalan)}</td><td><span class="badge b-class">${it.sinif}</span></td><td>${it.calisan}</td>
+    <td><button class="btn" onclick="openMsg(${it.fi},'${it.tip}')">Mesaj</button></td></tr>`;});
+  return h+'</table>';
+}
+function renderAksiyon(){
+  const f=applyFilter(flaggedItems(todayVal()),'ara','sinifFiltre');
+  document.getElementById('acil').innerHTML=rowsTable(f.filter(i=>i.st==='acil'));
+  document.getElementById('yaklasan').innerHTML=rowsTable(f.filter(i=>i.st==='yaklasan'));
+  document.getElementById('izleme').innerHTML=rowsTable(f.filter(i=>i.st==='izleme'));
+}
+function enYakin(o){return o.slice().sort((a,b)=>a.kalan-b.kalan)[0];}
+function renderMusteriler(){
+  const today=todayVal(),q=(document.getElementById('ara2').value||'').toLowerCase(),s=document.getElementById('sinifFiltre2').value;
+  let h='<table><tr><th>Firma</th><th>Sınıf</th><th>Çalışan</th><th>Durum etiketi</th><th>En yakın yükümlülük</th><th>Öncelik</th><th>Uyum</th><th>Not</th></tr>';
+  FIRMS.forEach((f,fi)=>{if(q&&!f.firma.toLowerCase().includes(q))return;if(s&&f.sinif!==s)return;
+    const obls=obligations(f,today),ey=enYakin(obls),crm=firmCRM(f.firma);
+    const hp=Math.round(obls.filter(o=>o.kalan>=0).length/obls.length*100),hcol=hp>=90?'#3ddc97':hp>=70?'#ffb454':'#ff5d6c';
+    const bar=`<div style="background:#1e2c4a;border-radius:6px;height:8px;width:60px;display:inline-block;vertical-align:middle"><div style="height:8px;border-radius:6px;width:${hp}%;background:${hcol}"></div></div> <span style="font-size:11px;color:var(--muted)">%${hp}</span>`;
+    const durumB=crm.durum?`<span class="badge ${DURUM_RENK[crm.durum]||'b-gray'}">${crm.durum}</span>`:'<span class="badge b-gray">—</span>';
+    const notIc=(crm.not?'📝':'')+(crm.hatirlaticilar&&crm.hatirlaticilar.length?' 🔔'+crm.hatirlaticilar.length:'');
+    h+=`<tr class="clickable" onclick="openDetail(${fi})"><td><b>${f.firma}</b></td><td><span class="badge b-class">${f.sinif}</span></td>
+      <td>${f.calisan}</td><td>${durumB}</td><td>${ETIKET[ey.tip]} · ${fmtTR(ey.due)}</td><td>${kalanBadge(ey.kalan)}</td><td>${bar}</td><td>${notIc||'—'}</td></tr>`;});
+  document.getElementById('musteriTablo').innerHTML=h+'</table>';
+}
+function renderRapor(){
+  const today=todayVal(),all=flaggedItems(today),PEN=loadPenalty();
+  let totalObl=0,overdue=0,cezaTop=0;const counts={acil:0,yaklasan:0,izleme:0,ok:0};const sinif={'Az Tehlikeli':0,'Tehlikeli':0,'Çok Tehlikeli':0};
+  FIRMS.forEach(f=>{sinif[f.sinif]++;obligations(f,today).forEach(o=>{totalObl++;counts[o.st]++;if(o.kalan<0){overdue++;cezaTop+=penaltyFor(o.tip,f.calisan,PEN);}});});
+  const uyum=Math.round((totalObl-overdue)/totalObl*100),uyumCol=uyum>=90?'var(--green)':uyum>=70?'var(--amber)':'var(--red)';
+  const buAyList=all.filter(i=>i.kalan<=30),oncelik=buAyList.slice(0,12),fazla=buAyList.length-oncelik.length;
+  const base=new Date(Date.UTC(today.getUTCFullYear(),today.getUTCMonth(),1)),months=[];
+  for(let i=0;i<6;i++){const m=new Date(Date.UTC(base.getUTCFullYear(),base.getUTCMonth()+i,1));months.push({y:m.getUTCFullYear(),mo:m.getUTCMonth(),label:m.toLocaleDateString('tr-TR',{month:'short',timeZone:'UTC'}),value:0});}
+  FIRMS.forEach(f=>obligations(f,today).forEach(o=>{if(o.kalan<0)return;const idx=months.findIndex(x=>x.y===o.due.getUTCFullYear()&&x.mo===o.due.getUTCMonth());if(idx>=0)months[idx].value++;}));
+  const rows=oncelik.map(i=>{const ceza=i.kalan<0?penaltyFor(i.tip,i.calisan,PEN):0;
+    return `<tr><td><b>${i.firma}</b></td><td>${ETIKET[i.tip]}</td><td>${kalanBadge(i.kalan)}</td><td><span class="badge b-class">${i.sinif}</span></td><td style="text-align:right;color:var(--red);font-weight:600">${ceza?fmtTL(ceza):'—'}</td></tr>`;
+  }).join('')||'<tr><td colspan="5" class="empty">Bu ay öncelikli aksiyon yok 🎉</td></tr>';
+  document.getElementById('raporIcerik').innerHTML=`
+   <div class="rep-head"><div class="rep-title">${osgbAdi()}</div><div class="rep-sub">Aylık Uyum Raporu · ${fmtTR(today)}</div></div>
+   <div class="cards">
+     <div class="card turkuaz"><div class="ic">🏢</div><div class="k">Müşteri işyeri</div><div class="v">${FIRMS.length}</div></div>
+     <div class="card" style="border-color:${uyumCol}"><div class="ic">✅</div><div class="k">Uyum skoru</div><div class="v" style="color:${uyumCol}">%${uyum}</div></div>
+     <div class="card red"><div class="ic">💰</div><div class="k">Aktif ceza riski</div><div class="v" style="font-size:22px">${fmtTL(cezaTop)}</div></div>
+     <div class="card amber"><div class="ic">⏰</div><div class="k">Bu ay aksiyon</div><div class="v">${buAyList.length}</div></div>
+   </div>
+   <div class="chartgrid">
+     <div class="chartcard"><div class="ck">Uyum skoru</div><div class="chartrow">${gauge(uyum)}</div></div>
+     <div class="chartcard"><div class="ck">Yükümlülük durumu</div><div class="chartrow">${donut([{label:'Acil',value:counts.acil,color:'#ff5d6c'},{label:'Yaklaşan',value:counts.yaklasan,color:'#ffb454'},{label:'İzlemede',value:counts.izleme,color:'#5b8def'},{label:'Temiz',value:counts.ok,color:'#2ee6c9'}])}</div></div>
+     <div class="chartcard"><div class="ck">Tehlike sınıfı dağılımı</div><div class="chartrow">${donut([{label:'Çok Tehlikeli',value:sinif['Çok Tehlikeli'],color:'#ff5d6c'},{label:'Tehlikeli',value:sinif['Tehlikeli'],color:'#ffb454'},{label:'Az Tehlikeli',value:sinif['Az Tehlikeli'],color:'#3ddc97'}])}</div></div>
+     <div class="chartcard wide"><div class="ck">Önümüzdeki 6 ay — yaklaşan yükümlülük yoğunluğu</div>${barChart(months)}</div>
+   </div>
+   <div class="rep-listhead">Öncelikli aksiyonlar</div>
+   <table><tr><th>Firma</th><th>Yükümlülük</th><th>Durum</th><th>Sınıf</th><th style="text-align:right">Ceza riski</th></tr>${rows}</table>
+   ${fazla>0?`<div class="rep-foot">+ ${fazla} kalem daha — tamamı "Aksiyon Listesi" sekmesinde.</div>`:''}
+   <div class="rep-foot">Önlenebilir toplam ceza riski: <b style="color:var(--red)">${fmtTL(cezaTop)}</b> · Ceza tutarları örnektir, düzenlenebilir.</div>`;
+}
+function renderAll(){renderGenel();renderAksiyon();renderMusteriler();renderRapor();}
+
+// ---- modal: mesaj ----
+function openMsg(fi,tip){
+  const f=FIRMS[fi],o=obligations(f,todayVal()).find(x=>x.tip===tip),tarih=fmtTR(o.due);let durum;
+  if(o.kalan<0)durum=`${-o.kalan} gün önce dolmuştur`;else if(o.kalan===0)durum='bugün dolmaktadır';else durum=`${o.kalan} gün içinde (${tarih}) dolmaktadır`;
+  let cek=tip==='sozlesme'?`OSGB hizmet sözleşmeniz ${durum}. Hizmetin kesintisiz sürmesi için yenileme sürecine ilişkin bilgilendiriyoruz.`
+    :`iş yerinizin "${ETIKET[tip]}" yenileme tarihi ${durum}. 6331 sayılı İSG Kanunu gereği bu işlemin zamanında yapılması yasal yükümlülüğünüzdür.`;
+  const msg=`Sayın ${f.yetkili}, ${f.firma} için ${cek} Planlama için sizi bilgilendiriyoruz; randevu/detay için bu mesaja yanıt verebilirsiniz. — ${osgbAdi()}`;
+  window._lastMsg=msg;
+  let chan;
+  if(f.iletisim.includes('@'))chan=`<a class="btn btn-mail" href="mailto:${f.iletisim}?subject=${encodeURIComponent('İSG yükümlülük hatırlatması')}&body=${encodeURIComponent(msg)}">E-posta ile gönder</a>`;
+  else{const tel='90'+f.iletisim.replace(/\D/g,'').replace(/^0/,'');chan=`<a class="btn btn-wa" target="_blank" href="https://wa.me/${tel}?text=${encodeURIComponent(msg)}">WhatsApp'ta aç</a>`;}
+  document.getElementById('modalContent').innerHTML=`<h3>${ETIKET[tip]} — hatırlatma</h3>
+    <div class="who">${f.firma} · ${f.yetkili} · ${f.iletisim}</div>
+    <div class="msgbox">${msg}</div><div class="iys">✔ İYS uyumlu — hizmet bildirimi, reklam yok.</div>
+    <div class="row"><button class="btn-ghost" onclick="closeModal()">Kapat</button>
+      <button class="btn-ghost" onclick="markSent(${fi},'${tip}')">Gönderildi işaretle</button>
+      <button class="btn" onclick="navigator.clipboard.writeText(window._lastMsg)">Kopyala</button>${chan}</div>`;
+  document.getElementById('ovl').style.display='flex';
+}
+function markSent(fi,tip){const f=FIRMS[fi],g=firmCRM(f.firma).gonderildi;g[tip]={date:document.getElementById('today').value};setFirmCRM(f.firma,{gonderildi:g});renderAll();closeModal();}
+
+// ---- modal: müşteri detay (CRM) ----
+function openDetail(fi){
+  const f=FIRMS[fi],obls=obligations(f,todayVal()),crm=firmCRM(f.firma);
+  const rows=obls.map(o=>{const g=crm.gonderildi[o.tip];
+    return `<tr><td>${ETIKET[o.tip]}</td><td>${fmtTR(o.due)}</td><td>${kalanBadge(o.kalan)}</td>
+    <td>${g?`<span class="badge b-green">✓ ${g.date}</span>`:''}</td>
+    <td><button class="btn btn-sm" onclick="openMsg(${fi},'${o.tip}')">Mesaj</button></td></tr>`;}).join('');
+  const hatir=(crm.hatirlaticilar||[]).map(h=>`<div class="hatir"><span>📌 <b>${h.tarih||''}</b> ${h.metin}</span><button class="btn-ghost btn-sm" onclick="delHatir(${fi},${h.id})">sil</button></div>`).join('')||'<div class="note">Henüz hatırlatıcı yok.</div>';
+  const opt=v=>`<option ${crm.durum===v?'selected':''}>${v}</option>`;
+  document.getElementById('modalContent').innerHTML=`<h3>${f.firma}</h3>
+    <div class="who">${f.sinif} · ${f.calisan} çalışan · ${f.yetkili} · ${f.iletisim}</div>
+    <table><tr><th>Yükümlülük</th><th>Sonraki tarih</th><th>Durum</th><th>Gönderim</th><th></th></tr>${rows}</table>
+    <div class="crm-sec"><h4>Durum etiketi</h4>
+      <select onchange="setFirmCRM('${f.firma.replace(/'/g,"")}',{durum:this.value});renderMusteriler()">
+      <option value="">— seç —</option>${opt('Aktif')}${opt('Riskli')}${opt('Beklemede')}</select></div>
+    <div class="crm-sec"><h4>Not</h4>
+      <textarea id="crmNot" placeholder="Bu müşteriyle ilgili serbest not..." onchange="setFirmCRM('${f.firma.replace(/'/g,"")}',{not:this.value});renderMusteriler()">${crm.not||''}</textarea></div>
+    <div class="crm-sec"><h4>Hatırlatıcılar</h4>${hatir}
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <input type="date" id="hTarih"><input type="text" id="hMetin" placeholder="Hatırlatıcı metni...">
+        <button class="btn" onclick="addHatir(${fi})">Ekle</button></div></div>
+    <div class="row"><button class="btn-ghost" onclick="closeModal()">Kapat</button></div>`;
+  document.getElementById('ovl').style.display='flex';
+}
+function addHatir(fi){const f=FIRMS[fi],c=firmCRM(f.firma);const h=c.hatirlaticilar||[];
+  const metin=document.getElementById('hMetin').value.trim();if(!metin)return;
+  h.push({id:Date.now(),tarih:document.getElementById('hTarih').value,metin});setFirmCRM(f.firma,{hatirlaticilar:h});openDetail(fi);renderMusteriler();}
+function delHatir(fi,id){const f=FIRMS[fi],c=firmCRM(f.firma);setFirmCRM(f.firma,{hatirlaticilar:(c.hatirlaticilar||[]).filter(x=>x.id!==id)});openDetail(fi);renderMusteriler();}
+function closeModal(){document.getElementById('ovl').style.display='none';}
+function openPenalty(){const p=loadPenalty();
+  document.getElementById('modalContent').innerHTML=`<h3>Ceza tutarları (örnek — düzenlenebilir)</h3>
+    <div class="who">2026 örnek değerler. Sağlık ve eğitim ÇALIŞAN BAŞINA, risk değerlendirmesi İŞYERİ BAŞINA hesaplanır. Kesin tutarlar tehlike sınıfı/çalışan sayısına göre değişir.</div>
+    <div class="crm-sec" style="display:grid;gap:12px">
+      <label>Periyodik sağlık muayenesi (çalışan başına)<br><input type="number" id="pen_saglik" value="${p.saglik}" style="width:100%"></label>
+      <label>İSG çalışan eğitimi (çalışan başına)<br><input type="number" id="pen_egitim" value="${p.egitim}" style="width:100%"></label>
+      <label>Risk değerlendirmesi (işyeri başına)<br><input type="number" id="pen_risk" value="${p.risk}" style="width:100%"></label>
+    </div>
+    <div class="row"><button class="btn-ghost" onclick="closeModal()">İptal</button><button class="btn" onclick="savePenaltyForm()">Kaydet</button></div>`;
+  document.getElementById('ovl').style.display='flex';
+}
+function savePenaltyForm(){savePenalty({saglik:+document.getElementById('pen_saglik').value||0,egitim:+document.getElementById('pen_egitim').value||0,risk:+document.getElementById('pen_risk').value||0,sozlesme:0});closeModal();renderAll();}
+function exportCSV(){
+  const items=flaggedItems(todayVal());
+  const rows=[['Firma','Yükümlülük','Son tarih','Kalan gün','Tehlike sınıfı','Çalışan']];
+  items.forEach(i=>rows.push([i.firma,ETIKET[i.tip],fmtTR(i.due),i.kalan,i.sinif,i.calisan]));
+  const csv=rows.map(r=>r.map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='osgb_aksiyon_listesi.csv';document.body.appendChild(a);a.click();a.remove();
+}
+
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
+  document.querySelectorAll('.panel-view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));
+}
+['today','osgbAdi','ara','sinifFiltre','ara2','sinifFiltre2'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('input',renderAll);el.addEventListener('change',renderAll);});
+document.getElementById('csv').addEventListener('change',e=>{const file=e.target.files[0];if(!file)return;const rd=new FileReader();
+  rd.onload=()=>{const lines=rd.result.split(/\r?\n/).filter(l=>l.trim());lines.shift();
+    DATA=lines.map(l=>{const c=l.split(',');return [c[0],c[1],c[2],c[3],Number(c[4]),c[5],c[6],c[7],c[8]];});FIRMS=DATA.map(rowObj);renderAll();};
+  rd.readAsText(file,'UTF-8');});
+document.getElementById('ovl').addEventListener('click',e=>{if(e.target.id==='ovl')closeModal();});
+FIRMS=DATA.map(rowObj);renderAll();
+</script>
+</body>
+</html>
