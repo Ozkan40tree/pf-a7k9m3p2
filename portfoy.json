@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-06-19T15:58:03+03:00",
+  "olusturma_tarihi": "2026-06-19T16:31:05+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -10,10 +10,10 @@
         "kod_orjinal": "INFO",
         "adet": 100179.0,
         "maliyet": 3.9,
-        "guncel_tl": 515921.85000000003,
+        "guncel_tl": 509911.11,
         "onceki_tl": 488873.51999999996,
-        "gunluk_kazanc_tl": 27048.330000000075,
-        "gunluk_yuzde": 5.532786885245917,
+        "gunluk_kazanc_tl": 21037.590000000026,
+        "gunluk_yuzde": 4.303278688524595,
         "fiyat_eksik": false
       },
       {
@@ -23,10 +23,10 @@
         "kod_orjinal": "TRGYO",
         "adet": 3919.0,
         "maliyet": 81.44,
-        "guncel_tl": 383082.25,
+        "guncel_tl": 384062.0,
         "onceki_tl": 387393.14999999997,
-        "gunluk_kazanc_tl": -4310.899999999965,
-        "gunluk_yuzde": -1.112797167425383,
+        "gunluk_kazanc_tl": -3331.149999999965,
+        "gunluk_yuzde": -0.8598887202832485,
         "fiyat_eksik": false
       },
       {
@@ -36,10 +36,10 @@
         "kod_orjinal": "SAHOL",
         "adet": 2044.0,
         "maliyet": 95.31,
-        "guncel_tl": 205422.0,
+        "guncel_tl": 207057.19999999998,
         "onceki_tl": 209510.0,
-        "gunluk_kazanc_tl": -4088.0,
-        "gunluk_yuzde": -1.951219512195122,
+        "gunluk_kazanc_tl": -2452.8000000000175,
+        "gunluk_yuzde": -1.1707317073170815,
         "fiyat_eksik": false
       },
       {
@@ -115,9 +115,9 @@
         "adet": 10201424.0,
         "maliyet": null,
         "guncel_tl": 1067660.632992,
-        "onceki_tl": 1053654.07784,
-        "gunluk_kazanc_tl": 14006.55515200016,
-        "gunluk_yuzde": 1.329331461490067,
+        "onceki_tl": 1067660.632992,
+        "gunluk_kazanc_tl": 0.0,
+        "gunluk_yuzde": 0.0,
         "fiyat_eksik": false
       },
       {
@@ -140,10 +140,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 191270.05350600003,
+        "guncel_tl": 191284.78173000002,
         "onceki_tl": 191967.14560800002,
-        "gunluk_kazanc_tl": -697.0921019999951,
-        "gunluk_yuzde": -0.3631309408660314,
+        "gunluk_kazanc_tl": -682.3638780000038,
+        "gunluk_yuzde": -0.3554586780143107,
         "fiyat_eksik": false
       },
       {
@@ -168,10 +168,10 @@
         "kod_orjinal": "INFO",
         "adet": 65327.0,
         "maliyet": 3.9,
-        "guncel_tl": 336434.05000000005,
+        "guncel_tl": 332514.43,
         "onceki_tl": 318795.76,
-        "gunluk_kazanc_tl": 17638.290000000037,
-        "gunluk_yuzde": 5.532786885245914,
+        "gunluk_kazanc_tl": 13718.669999999984,
+        "gunluk_yuzde": 4.3032786885245855,
         "fiyat_eksik": false
       },
       {
@@ -181,10 +181,10 @@
         "kod_orjinal": "TRGYO",
         "adet": 2508.0,
         "maliyet": 83.733,
-        "guncel_tl": 245157.0,
+        "guncel_tl": 245784.0,
         "onceki_tl": 247915.8,
-        "gunluk_kazanc_tl": -2758.7999999999884,
-        "gunluk_yuzde": -1.1127971674253874,
+        "gunluk_kazanc_tl": -2131.7999999999884,
+        "gunluk_yuzde": -0.8598887202832528,
         "fiyat_eksik": false
       },
       {
@@ -194,10 +194,10 @@
         "kod_orjinal": "SAHOL",
         "adet": 1333.0,
         "maliyet": 95.25,
-        "guncel_tl": 133966.5,
+        "guncel_tl": 135032.9,
         "onceki_tl": 136632.5,
-        "gunluk_kazanc_tl": -2666.0,
-        "gunluk_yuzde": -1.951219512195122,
+        "gunluk_kazanc_tl": -1599.6000000000058,
+        "gunluk_yuzde": -1.1707317073170775,
         "fiyat_eksik": false
       },
       {
@@ -221,9 +221,9 @@
         "adet": 7299919.0,
         "maliyet": null,
         "guncel_tl": 763994.922702,
-        "onceki_tl": 753972.133915,
-        "gunluk_kazanc_tl": 10022.788786999998,
-        "gunluk_yuzde": 1.3293314614900515,
+        "onceki_tl": 763994.922702,
+        "gunluk_kazanc_tl": 0.0,
+        "gunluk_yuzde": 0.0,
         "fiyat_eksik": false
       },
       {
