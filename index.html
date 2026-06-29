@@ -520,6 +520,7 @@ function renderPortfoy(name, items, prices) {
   const kripto        = items.filter(x => x.tip === 'kripto').map(x => enrichItem(x, prices));
   const altin         = items.filter(x => x.tip === 'altin').map(x => enrichItem(x, prices));
   const alacak        = items.filter(x => x.tip === 'alacak').map(x => enrichItem(x, prices));
+  const nakit         = items.filter(x => x.tip === 'nakit').map(x => enrichItem(x, prices));
 
   const hisseTop     = sum(hisseler, 'tg');
   const yurtdisiTop  = sum(yurtdisiList, 'tg');
@@ -530,9 +531,11 @@ function renderPortfoy(name, items, prices) {
   const kriptoTop = sum(kripto, 'tg');
   const altinTop  = sum(altin, 'tg');
   const alacakTop = sum(alacak, 'tg');
-  const toplam = hisseTop + fonTop + kriptoTop + altinTop + alacakTop;
+  const nakitTop  = sum(nakit, 'tg');
+  const toplam = hisseTop + fonTop + kriptoTop + altinTop + alacakTop + nakitTop;
 
-  const maliyet = sum(hisseler,'tm') + sum(fonlarRaw,'tm') + sum(kripto,'tm') + sum(altin,'tm') + sum(alacak,'tm');
+  // Nakit maliyetsizdir; nominal degeri maliyet sayilir ki K/Z sasmasin.
+  const maliyet = sum(hisseler,'tm') + sum(fonlarRaw,'tm') + sum(kripto,'tm') + sum(altin,'tm') + sum(alacak,'tm') + nakitTop;
   const kz = toplam - maliyet;
   const kzp = maliyet > 0 ? (toplam/maliyet - 1) * 100 : 0;
   const gunlukKZ = sum(hisseler, 'gunlukKZ') + sum(fonlarRaw, 'gunlukKZ') + sum(kripto, 'gunlukKZ') + sum(altin, 'gunlukKZ');
@@ -579,7 +582,8 @@ function renderPortfoy(name, items, prices) {
     ...fonlarRaw.map(f => ({l:f.kod, v:f.tg})),
     ...(kriptoTop > 0 ? kripto.map(c => ({l:c.kod, v:c.tg})) : []),
     ...(altinTop > 0 ? altin.map(a => ({l:a.kod, v:a.tg})) : []),
-    ...(alacakTop > 0 ? alacak.map(a => ({l:a.kod, v:a.tg})) : [])
+    ...(alacakTop > 0 ? alacak.map(a => ({l:a.kod, v:a.tg})) : []),
+    ...(nakitTop > 0 ? nakit.map(n => ({l:'Nakit '+n.kod, v:n.tg})) : [])
   ];
   if (distItems.length > 0) {
     const distTotal = distItems.reduce((s,x) => s+x.v, 0);
@@ -752,6 +756,19 @@ function renderPortfoy(name, items, prices) {
     html += `</tbody></table></div></div>`;
   }
 
+  // Nakit (varsa) — satilan hisse takas bekleyen tutar vb.
+  if (nakit.length > 0) {
+    html += `<div class="section">
+      <h3>💵 Nakit <span class="subtotal">₺${fmt(nakitTop)}</span></h3>
+      <div style="overflow-x:auto"><table><thead><tr>
+        <th>Döviz</th><th>Tutar ₺</th>
+      </tr></thead><tbody>`;
+    nakit.forEach(n => {
+      html += `<tr><td>${n.kod}</td><td>${fmt(n.tg)}</td></tr>`;
+    });
+    html += `</tbody></table></div></div>`;
+  }
+
   return { html, toplam, maliyet, kz, gunlukKZ };
 }
 
@@ -781,7 +798,10 @@ function renderAile(portfoyler, prices) {
   // Alacak (sadece Özkan)
   const alacakTop = sum(tip(oz,'alacak'), 'tg');
 
-  const aileToplam = aileAktifTop + aileEmTop + alacakTop;
+  // Nakit (her iki kişi de olabilir) — satilan hisse takas bekleyen tutar vb.
+  const nakitTop = sum(tip(oz,'nakit'), 'tg') + sum(tip(dr,'nakit'), 'tg');
+
+  const aileToplam = aileAktifTop + aileEmTop + alacakTop + nakitTop;
 
   // Günlük K/Z
   const aileGK = sum(oz,'gunlukKZ') + sum(dr,'gunlukKZ');
@@ -811,11 +831,11 @@ function renderAile(portfoyler, prices) {
     </div>`;
 
   // Kategori dağılım tablosu
-  const tipSirasi = ['hisse','fon','yurtdisifonu','altinfonu','kripto','altin','emeklilik','alacak'];
+  const tipSirasi = ['hisse','fon','yurtdisifonu','altinfonu','kripto','altin','nakit','emeklilik','alacak'];
   const tipLabel  = {
     hisse:'📈 Hisse', fon:'🏦 Fon', yurtdisifonu:'🌍 Yurtdışı Fon',
     altinfonu:'🏦 Altın Fonu', kripto:'₿ Kripto',
-    altin:'🥇 Altın', emeklilik:'🏛️ Emeklilik', alacak:'💰 Alacak'
+    altin:'🥇 Altın', nakit:'💵 Nakit', emeklilik:'🏛️ Emeklilik', alacak:'💰 Alacak'
   };
 
   html += `<div class="section">
