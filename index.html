@@ -781,9 +781,10 @@ function renderAile(portfoyler, prices) {
   const oz = (portfoyler.ozkan || []).map(x => enrichItem(x, prices));
   const dr = (portfoyler.derya || []).map(x => enrichItem(x, prices));
 
-  // Aile Aktif Yatırım: Özkan(hisse+fon+yurtdısı+altınfonu+kripto) + Derya(hisse+altın)
-  const aktifOz = [...tip(oz,'hisse'), ...tip(oz,'fon'), ...tip(oz,'yurtdisifonu'), ...tip(oz,'altinfonu'), ...tip(oz,'kripto')];
-  const aktifDr = [...tip(dr,'hisse'), ...tip(dr,'altin')];
+  // Aile Aktif Yatırım: Özkan(hisse+fon+yurtdışı+altınfonu+kripto+nakit) + Derya(hisse+altın+nakit)
+  // Nakit geçici olduğu için (satılan hisse takas bekliyor) aktif yatırıma dahil — kullanıcı tercihi.
+  const aktifOz = [...tip(oz,'hisse'), ...tip(oz,'fon'), ...tip(oz,'yurtdisifonu'), ...tip(oz,'altinfonu'), ...tip(oz,'kripto'), ...tip(oz,'nakit')];
+  const aktifDr = [...tip(dr,'hisse'), ...tip(dr,'altin'), ...tip(dr,'nakit')];
   const aktifOzTop = sum(aktifOz, 'tg');
   const aktifDrTop = sum(aktifDr, 'tg');
   const aileAktifTop = aktifOzTop + aktifDrTop;
@@ -798,10 +799,9 @@ function renderAile(portfoyler, prices) {
   // Alacak (sadece Özkan)
   const alacakTop = sum(tip(oz,'alacak'), 'tg');
 
-  // Nakit (her iki kişi de olabilir) — satilan hisse takas bekleyen tutar vb.
-  const nakitTop = sum(tip(oz,'nakit'), 'tg') + sum(tip(dr,'nakit'), 'tg');
-
-  const aileToplam = aileAktifTop + aileEmTop + alacakTop + nakitTop;
+  // Nakit artik aktif yatirim icinde (yukarida aktifOz/aktifDr'ye dahil edildi),
+  // bu yuzden aileToplam'a ayrica eklenmez.
+  const aileToplam = aileAktifTop + aileEmTop + alacakTop;
 
   // Günlük K/Z
   const aileGK = sum(oz,'gunlukKZ') + sum(dr,'gunlukKZ');
@@ -973,7 +973,7 @@ let _benchChart = null;
 const BENCH_SECIMLER = [
   { grup: 'ÖZKAN', items: [
     { v: 'ozkan_genel',       t: 'Özkan – Genel Toplam' },
-    { v: 'ozkan_aktif',       t: 'Özkan – Aktif Yatırım (Hisse+Fon+Yurtdışı+AltınFonu+Kripto)' },
+    { v: 'ozkan_aktif',       t: 'Özkan – Aktif Yatırım (Hisse+Fon+Yurtdışı+AltınFonu+Kripto+Nakit)' },
     { v: 'ozkan_hfy',         t: 'Özkan – Hisse+Fon+Yurtdışı' },
     { v: 'ozkan_hisse',       t: 'Özkan – Hisse' },
     { v: 'ozkan_fon',         t: 'Özkan – Fon' },
@@ -1078,7 +1078,7 @@ function portfoySerisi(secim, gecmis) {
     let val = null;
     switch (secim) {
       case 'ozkan_genel':     val = Number(o.toplam || 0); break;
-      case 'ozkan_aktif':     val = get(ok,'hisse')+get(ok,'fon')+get(ok,'altinfonu')+get(ok,'yurtdisifonu')+get(ok,'kripto'); break;
+      case 'ozkan_aktif':     val = get(ok,'hisse')+get(ok,'fon')+get(ok,'altinfonu')+get(ok,'yurtdisifonu')+get(ok,'kripto')+get(ok,'nakit'); break;
       case 'ozkan_hfy':       val = get(ok,'hisse')+get(ok,'fon')+get(ok,'yurtdisifonu'); break;
       case 'ozkan_hisse':     val = get(ok,'hisse'); break;
       case 'ozkan_fon':       val = get(ok,'fon'); break;
@@ -1092,7 +1092,7 @@ function portfoySerisi(secim, gecmis) {
       case 'derya_emeklilik': val = get(dk,'emeklilik'); break;
       case 'aile_toplam':     val = Number(gun.genel_toplam || 0); break;
       case 'aile_aktif':
-        val = get(ok,'hisse')+get(ok,'fon')+get(ok,'altinfonu')+get(ok,'yurtdisifonu')+get(ok,'kripto')+get(dk,'hisse')+get(dk,'altin');
+        val = get(ok,'hisse')+get(ok,'fon')+get(ok,'altinfonu')+get(ok,'yurtdisifonu')+get(ok,'kripto')+get(ok,'nakit')+get(dk,'hisse')+get(dk,'altin')+get(dk,'nakit');
         break;
     }
     if (val != null && val > 0) seri[tarih] = val;

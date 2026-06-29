@@ -122,10 +122,15 @@ sabitlenmiştir.
 
 ### 2.3 Tip-bazlı kategori grupları (dashboard ve benchmark için)
 
-- **Aktif Yatırım:** Hisse + Fon + YurtdisiFonu + AltinFonu + Kripto
+- **Aktif Yatırım:** Hisse + Fon + YurtdisiFonu + AltinFonu + Kripto + **Nakit** (29 Haz 2026: nakit eklendi, bkz §18) + (Derya tarafında Altın)
 - **Hisse+Fon+Yurtdışı:** Hisse + Fon + YurtdisiFonu
 - **Pasif/Uzun Vade:** Emeklilik + Alacak
 - **Genel Toplam:** tüm tipler dahil
+
+> **Nakit notu (§18):** Nakit gerçek bir yatırım değil ama geçici (satılan
+> hisse takas bekliyor) ve varlık görünürlüğü için **Aktif Yatırım** grubuna
+> dahil edilir. Genel Toplam'a zaten girer; ayrıca "Aktif Yatırım" alt
+> grubunda da sayılır (kategori dağılım tablosunda kendi satırı korunur).
 
 ---
 
@@ -241,7 +246,7 @@ atla.
 ```
 ÖZKAN
   Özkan – Genel Toplam
-  Özkan – Aktif Yatırım (Hisse+Fon+Yurtdışı+AltınFonu+Kripto)
+  Özkan – Aktif Yatırım (Hisse+Fon+Yurtdışı+AltınFonu+Kripto+Nakit)
   Özkan – Hisse+Fon+Yurtdışı
   Özkan – Hisse
   Özkan – Fon
@@ -1570,3 +1575,71 @@ için ikincil yedek.
 yeterli olduğu varsayılmıştı, ama snapshot yedeği SADECE TEFAS için
 implemente edilmişti (§14.1) — gram altın için değil. 24 gün boyunca
 gizli kalan bug, 5 Haziran'da patlayarak ortaya çıktı.
+
+---
+
+## 18. 29 HAZİRAN 2026 — NAKİT TİPİ FRONTEND ENTEGRASYONU
+
+### 18.1 Olay
+
+Kullanıcı bazı hisseleri sattı; takasta bekleyen tutarı (henüz hesaba
+geçmemiş) Sheets'e **Nakit** tipi olarak ekledi ki toplam varlık şaşmasın.
+Backend (`fiyat_guncelle.py`) nakit'i sorunsuz okuyup `portfoy.json`'a
+yazıyordu (Özkan TL nakit, Derya TL nakit), ama **frontend (`index.html`)
+nakit tipini hiçbir toplama katmıyor ve hiç göstermiyordu**. Sonuç:
+dashboard toplamı gerçeğin ~1.2M TL altında görünüyordu.
+
+### 18.2 Yapılan değişiklikler (sadece frontend)
+
+**`index.html` — `renderPortfoy()`:**
+- `nakit` filtrelemesi + `nakitTop` eklendi.
+- `toplam`'a `nakitTop` dahil edildi.
+- K/Z şaşmaması için: nakit maliyetsizdir, nominal değeri maliyet sayılır
+  (`maliyet += nakitTop`), böylece K/Z katkısı sıfır.
+- Dağılım (donut/çubuk) ve ayrı **💵 Nakit** bölümü eklendi (Alacak'tan sonra).
+- ozetDeger ("Emeklilik ve Alacak Hariç ... Varlık") zaten `toplam - em - alacak`
+  olduğu için nakit otomatik dahil (likit varlık).
+
+**`index.html` — `renderAile()`:**
+- Aile toplamına nakit dahil edildi.
+- Kategori dağılım tablosuna `nakit` satırı (`💵 Nakit`) eklendi.
+
+**`index.html` — `gecmisDegerleri()` / `portfoySerisi()`:**
+- Değişiklik gerekmedi: bunlar `o.toplam` / `genel_toplam` ham değerlerini
+  kullanıyor, script bunları zaten nakit dahil hesaplıyor (`_kisi_toplam`
+  tüm tipleri toplar).
+
+### 18.3 Nakit "Aktif Yatırım" grubuna alındı (aynı gün, ikinci tur)
+
+Kullanıcı isteği: nakit geçici olduğu ve varlık görünürlüğü amacıyla
+**Aktif Yatırım** grubuna dahil edilsin (Özkan + Aile/Genel).
+
+**Değişen yerler:**
+- `renderAile()`: `aktifOz`'a `nakit`, `aktifDr`'ye `nakit` eklendi.
+  **Çift sayım önlemi:** nakit artık `aileAktifTop` içinde olduğu için
+  `aileToplam = aileAktifTop + aileEmTop + alacakTop` (ayrı `nakitTop`
+  eklemesi kaldırıldı).
+- `portfoySerisi()`: `ozkan_aktif` ve `aile_aktif` serilerine `nakit` eklendi.
+- `BENCH_SECIMLER`: "Özkan – Aktif Yatırım (...+Nakit)" etiketi güncellendi.
+- §2.3 tanımı güncellendi.
+
+**Not:** Nakit hem "Aktif Yatırım" grubunda sayılır hem de kategori dağılım
+tablosunda kendi satırını korur (gruplama ≠ kategori, çelişki değil).
+
+### 18.4 Geçmiş veri durumu
+
+Nakit Sheets'e 29 Haziran'da eklendiği için **sadece 29 Haziran ve sonraki
+snapshot'lar** nakit içerir. 1–26 Haziran snapshot'larına dokunulmadı
+(kullanıcı tercihi: "sadece bugünü düzelt"). O günlerde Sheets'te nakit
+yoktu, snapshot'lar o anki durumu dürüstçe yansıtıyor. Geçmiş grafiğinde
+fon satış günlerinde (10/15/22 Haz) düşüş görünür — bu gerçek veri, bug değil.
+
+### 18.5 Öğrenilen ders
+
+**Yeni bir Tip değeri eklenince frontend'in TÜM toplama/gösterme
+noktaları taranmalı.** `nakit` CLAUDE.md §2'de geçerli tip listesinde
+vardı ve backend onu okuyordu, ama frontend hiç beklemiyordu:
+`renderPortfoy.toplam` (533), dağılım, render blokları, `renderAile`,
+benchmark serileri — hepsi sabit tip listeleriyle yazılmıştı. Doktrin:
+yeni tip eklenince `grep -n "alacak\|emeklilik"` ile tüm tip-bazlı
+listeler bulunup yeni tip her birine değerlendirilmeli.
