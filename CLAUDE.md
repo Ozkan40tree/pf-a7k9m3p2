@@ -205,6 +205,15 @@ atla.
 | 3 | Emeklilik | Emeklilik | sadece TL gelişimi |
 | 4 | Genel Toplam | hepsi | TL + dönemsel % |
 
+**Üst özet kartları (29 Haz 2026, bkz §19):** Derya tabında üstte 3 kart:
+1. **Emeklilik Hariç Derya Varlık** = toplam − emeklilik
+2. **Emeklilik ve Altın Hariç Derya Varlık** = toplam − emeklilik − altın (= hisse + nakit)
+3. **Günlük K/Z** (en sağda)
+
+> Özkan tabında üst kartlar farklı: ozet | Günlük K/Z | Günün Yıldızı | Günün
+> En Zayıfı. Derya'da Günün Yıldızı/Zayıfı **kaldırıldı**, yerine "Em+Altın
+> Hariç" kartı geldi.
+
 ### 5.3 Genel (Aile) tabı
 
 | # | Kart | İçerik |
@@ -257,6 +266,7 @@ atla.
 
 DERYA
   Derya – Genel
+  Derya – Emeklilik ve Altın Hariç   (29 Haz 2026, §19)
   Derya – Hisse
   Derya – Altın
   Derya – Emeklilik
@@ -627,6 +637,7 @@ Sidebar artık **5 tab**:
   4. Özkan Emeklilik
   5. Kripto (sadece Özkan'da)
   6. Derya (em hariç)
+  6b. Derya (em+altın hariç) — 29 Haz 2026 eklendi (§19), toplam 13 sütun
   7. Derya Toplam
   8. Derya Emeklilik
   9. Derya Altın
@@ -1643,3 +1654,52 @@ vardı ve backend onu okuyordu, ama frontend hiç beklemiyordu:
 benchmark serileri — hepsi sabit tip listeleriyle yazılmıştı. Doktrin:
 yeni tip eklenince `grep -n "alacak\|emeklilik"` ile tüm tip-bazlı
 listeler bulunup yeni tip her birine değerlendirilmeli.
+
+---
+
+## 19. 29 HAZİRAN 2026 — DERYA TABI ÜST KARTLARI + "EM+ALTIN HARİÇ" SINIFLANDIRMASI
+
+### 19.1 İstek
+
+Kullanıcı Derya tabındaki üst özet kartlarını yeniden düzenlemek istedi:
+- **Günlük K/Z** en sağa alınsın.
+- **Günün Yıldızı** ve **Günün En Zayıfı** kaldırılsın (sadece Derya'da).
+- Yerine **"Emeklilik ve Altın Hariç Derya Varlık"** kartı (= toplam −
+  emeklilik − altın = hisse + nakit).
+- Bu yeni sınıflandırma Benchmark, Geçmiş Veriler ve Grafik'e de eklensin.
+
+### 19.2 Yapılan değişiklikler (`index.html`, sadece frontend)
+
+**`renderPortfoy()` — kart düzeni isme göre ayrıştı:**
+- `name === 'derya'`: `ozetCard` (Em Hariç) + Em+Altın Hariç kartı +
+  `gunlukKZCard` (sağda). Yıldız/Zayıf render edilmez.
+- Diğerleri (Özkan): eski düzen korundu (ozet | Günlük K/Z | Yıldız | Zayıf).
+- `gunlukKZCard` ve `ozetCard` değişkenlere alındı (tekrar kullanım).
+
+**`BENCH_SECIMLER`** (Benchmark + Grafik dropdown, ortak):
+- DERYA grubuna `{ v: 'derya_ea_altin', t: 'Derya – Emeklilik ve Altın Hariç' }`
+  eklendi.
+
+**`portfoySerisi()`** (grafik/benchmark zaman serisi):
+- `case 'derya_ea_altin': val = d.toplam − emeklilik − altın` eklendi.
+
+**`GECMIS_KOLONLAR` + `gecmisDegerleri()`** (Geçmiş Veriler tablosu):
+- Yeni sütun `derya_ea_altin` ("Derya (em+altın hariç)"), "Derya (em hariç)"
+  ile "Derya Toplam" arasına eklendi. Tablo 12 → **13 sütun**.
+- `derya_ea_altin: deryaTop − deryaEm − altin`.
+
+### 19.3 Doğrulama (preview ile)
+
+Bugün (29 Haz) için üç yerde de **birebir ₺852.659**:
+- Derya tabı "Em+Altın Hariç" kartı
+- Benchmark/Grafik "Derya – Emeklilik ve Altın Hariç" serisi
+- Geçmiş Veriler "Derya (em+altın hariç)" sütunu
+
+(Derya em hariç ₺2.703.098 − altın ₺1.850.439 = ₺852.659 = hisse ₺378.385
++ nakit ₺474.274.)
+
+### 19.4 Not — geçmiş günlerde nakit yok
+
+"Em+Altın Hariç" = hisse + nakit. Nakit sadece 29 Haziran'dan itibaren
+var (§18.4), o yüzden geçmiş günlerde bu sütun ≈ sadece Derya hissesi
+olur. Bu doğru/dürüst veri, bug değil.

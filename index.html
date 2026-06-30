@@ -561,20 +561,35 @@ function renderPortfoy(name, items, prices) {
     ozetDeger = toplam;
   }
 
-  let html = `
-    <div class="cards-row">
-      <div class="card dark">
-        <div class="clabel">${ozetBaslik}</div>
-        <div class="cval">₺${fmt(ozetDeger)}</div>
-      </div>
+  const gunlukKZCard = `
       <div class="card">
         <div class="clabel">Günlük K/Z</div>
         <div class="cval ${tlClass(gunlukKZ)}">${tlSign(gunlukKZ)}₺${fmt(Math.abs(gunlukKZ))}</div>
         <div style="margin-top:4px">${badge(gunlukP)}</div>
-      </div>
-      ${best ? `<div class="card"><div class="clabel">Günün Yıldızı</div><div class="cval">${best.k}</div><div style="margin-top:4px">${badge(best.v)}</div></div>` : ''}
-      ${worst && worst.k !== best.k ? `<div class="card"><div class="clabel">Günün En Zayıfı</div><div class="cval">${worst.k}</div><div style="margin-top:4px">${badge(worst.v)}</div></div>` : ''}
-    </div>`;
+      </div>`;
+  const ozetCard = `
+      <div class="card dark">
+        <div class="clabel">${ozetBaslik}</div>
+        <div class="cval">₺${fmt(ozetDeger)}</div>
+      </div>`;
+
+  let cardsInner;
+  if (name === 'derya') {
+    // Derya: Em Hariç | Em+Altın Hariç | Günlük K/Z (sağda). Günün Yıldızı/Zayıfı yok.
+    const emAltinHaric = toplam - emeklilikTop - altinTop;
+    cardsInner = ozetCard + `
+      <div class="card">
+        <div class="clabel">Emeklilik ve Altın Hariç Derya Varlık</div>
+        <div class="cval">₺${fmt(emAltinHaric)}</div>
+      </div>` + gunlukKZCard;
+  } else {
+    // Özkan ve diğerleri: ozet | Günlük K/Z | Günün Yıldızı | Günün En Zayıfı
+    cardsInner = ozetCard + gunlukKZCard +
+      `${best ? `<div class="card"><div class="clabel">Günün Yıldızı</div><div class="cval">${best.k}</div><div style="margin-top:4px">${badge(best.v)}</div></div>` : ''}` +
+      `${worst && worst.k !== best.k ? `<div class="card"><div class="clabel">Günün En Zayıfı</div><div class="cval">${worst.k}</div><div style="margin-top:4px">${badge(worst.v)}</div></div>` : ''}`;
+  }
+
+  let html = `<div class="cards-row">${cardsInner}</div>`;
 
   // Dağılım
   const distItems = [
@@ -984,6 +999,7 @@ const BENCH_SECIMLER = [
   ]},
   { grup: 'DERYA', items: [
     { v: 'derya_genel',       t: 'Derya – Genel' },
+    { v: 'derya_ea_altin',    t: 'Derya – Emeklilik ve Altın Hariç' },
     { v: 'derya_hisse',       t: 'Derya – Hisse' },
     { v: 'derya_altin',       t: 'Derya – Altın' },
     { v: 'derya_emeklilik',   t: 'Derya – Emeklilik' },
@@ -1087,6 +1103,7 @@ function portfoySerisi(secim, gecmis) {
       case 'ozkan_kripto':    val = get(ok,'kripto'); break;
       case 'ozkan_emeklilik': val = get(ok,'emeklilik'); break;
       case 'derya_genel':     val = Number(d.toplam || 0); break;
+      case 'derya_ea_altin':  val = Number(d.toplam || 0) - get(dk,'emeklilik') - get(dk,'altin'); break;
       case 'derya_hisse':     val = get(dk,'hisse'); break;
       case 'derya_altin':     val = get(dk,'altin'); break;
       case 'derya_emeklilik': val = get(dk,'emeklilik'); break;
@@ -1311,6 +1328,7 @@ const GECMIS_KOLONLAR = [
   { key: 'ozkan_em',     ad: 'Özkan Emeklilik' },
   { key: 'kripto',       ad: 'Kripto' },
   { key: 'derya_e',      ad: 'Derya (em hariç)' },
+  { key: 'derya_ea_altin', ad: 'Derya (em+altın hariç)' },
   { key: 'derya_top',    ad: 'Derya Toplam' },
   { key: 'derya_em',     ad: 'Derya Emeklilik' },
   { key: 'derya_altin',  ad: 'Derya Altın' },
@@ -1338,6 +1356,7 @@ function gecmisDegerleri(gun) {
     ozkan_em:    ozkanEm,
     kripto:      g(ok,'kripto'),
     derya_e:     deryaTop - deryaEm,
+    derya_ea_altin: deryaTop - deryaEm - g(dk,'altin'),
     derya_top:   deryaTop,
     derya_em:    deryaEm,
     derya_altin: g(dk,'altin'),
