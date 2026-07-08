@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-07-08T12:44:28+03:00",
+  "olusturma_tarihi": "2026-07-08T14:21:54+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -8,10 +8,10 @@
         "tip": "nakit",
         "kod": "TL",
         "kod_orjinal": "TL",
-        "adet": 721288.0,
+        "adet": 0.0,
         "maliyet": null,
-        "guncel_tl": 721288.0,
-        "onceki_tl": 721288.0,
+        "guncel_tl": 0.0,
+        "onceki_tl": 0.0,
         "gunluk_kazanc_tl": 0.0,
         "gunluk_yuzde": 0.0,
         "fiyat_eksik": false
@@ -23,10 +23,10 @@
         "kod_orjinal": "TRGYO",
         "adet": 3919.0,
         "maliyet": 81.44,
-        "guncel_tl": 387001.25,
+        "guncel_tl": 387393.14999999997,
         "onceki_tl": 396994.7,
-        "gunluk_kazanc_tl": -9993.450000000012,
-        "gunluk_yuzde": -2.517275419545906,
+        "gunluk_kazanc_tl": -9601.550000000047,
+        "gunluk_yuzde": -2.418558736426468,
         "fiyat_eksik": false
       },
       {
@@ -36,10 +36,10 @@
         "kod_orjinal": "SAHOL",
         "adet": 2044.0,
         "maliyet": 95.31,
-        "guncel_tl": 184471.0,
+        "guncel_tl": 184675.4,
         "onceki_tl": 189683.19999999998,
-        "gunluk_kazanc_tl": -5212.1999999999825,
-        "gunluk_yuzde": -2.747844827586198,
+        "gunluk_kazanc_tl": -5007.799999999988,
+        "gunluk_yuzde": -2.640086206896546,
         "fiyat_eksik": false
       },
       {
@@ -47,12 +47,12 @@
         "tip": "fon",
         "kod": "ZBJ",
         "kod_orjinal": "ZBJ",
-        "adet": 2067.0,
-        "maliyet": 2.22,
-        "guncel_tl": 10203.197745,
-        "onceki_tl": 10192.08762,
-        "gunluk_kazanc_tl": 11.110124999999243,
-        "gunluk_yuzde": 0.10900735368677339,
+        "adet": 2686.0,
+        "maliyet": 2.75966,
+        "guncel_tl": 13258.72721,
+        "onceki_tl": 13244.28996,
+        "gunluk_kazanc_tl": 14.43724999999904,
+        "gunluk_yuzde": 0.10900735368677356,
         "fiyat_eksik": false
       },
       {
@@ -140,10 +140,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 191206.472289,
+        "guncel_tl": 192108.70751100002,
         "onceki_tl": 194861.70188100002,
-        "gunluk_kazanc_tl": -3655.229592000018,
-        "gunluk_yuzde": -1.8758070758471708,
+        "gunluk_kazanc_tl": -2752.9943700000003,
+        "gunluk_yuzde": -1.4127939679400034,
         "fiyat_eksik": false
       },
       {
@@ -157,6 +157,19 @@
         "onceki_tl": 135000.0,
         "gunluk_kazanc_tl": 0.0,
         "gunluk_yuzde": 0.0,
+        "fiyat_eksik": false
+      },
+      {
+        "tip_orjinal": "Fon",
+        "tip": "fon",
+        "kod": "PNU",
+        "kod_orjinal": "PNU",
+        "adet": 494895.0,
+        "maliyet": 1.158102,
+        "guncel_tl": 576814.474455,
+        "onceki_tl": 576066.1932150001,
+        "gunluk_kazanc_tl": 748.2812399999239,
+        "gunluk_yuzde": 0.12989501012440935,
         "fiyat_eksik": false
       }
     ],
@@ -181,10 +194,10 @@
         "kod_orjinal": "TRGYO",
         "adet": 2508.0,
         "maliyet": 83.733,
-        "guncel_tl": 247665.0,
+        "guncel_tl": 247915.8,
         "onceki_tl": 254060.4,
-        "gunluk_kazanc_tl": -6395.399999999994,
-        "gunluk_yuzde": -2.517275419545901,
+        "gunluk_kazanc_tl": -6144.600000000006,
+        "gunluk_yuzde": -2.4185587364264585,
         "fiyat_eksik": false
       },
       {
@@ -194,10 +207,10 @@
         "kod_orjinal": "SAHOL",
         "adet": 1333.0,
         "maliyet": 95.25,
-        "guncel_tl": 120303.25,
+        "guncel_tl": 120436.54999999999,
         "onceki_tl": 123702.4,
-        "gunluk_kazanc_tl": -3399.149999999994,
-        "gunluk_yuzde": -2.7478448275862024,
+        "gunluk_kazanc_tl": -3265.850000000006,
+        "gunluk_yuzde": -2.6400862068965565,
         "fiyat_eksik": false
       },
       {
@@ -243,18 +256,18 @@
   },
   "tufe": [
     {
-      "ay": "2025-04",
+      "ay": "2026-04",
       "gerceklesen": 37.86,
       "beklenti": 23.39
     },
     {
-      "ay": "2025-05",
+      "ay": "2026-05",
       "gerceklesen": 32.61,
       "beklenti": 23.82
     },
     {
-      "ay": "2025-06",
-      "gerceklesen": null,
+      "ay": "2026-06",
+      "gerceklesen": 32.11,
       "beklenti": 23.81
     }
   ]
