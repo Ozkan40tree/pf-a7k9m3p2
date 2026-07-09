@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-07-09T10:33:33+03:00",
+  "olusturma_tarihi": "2026-07-09T12:31:29+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -23,10 +23,10 @@
         "kod_orjinal": "TRGYO",
         "adet": 3919.0,
         "maliyet": 81.44,
-        "guncel_tl": 388568.85000000003,
+        "guncel_tl": 392291.89999999997,
         "onceki_tl": 387197.2,
-        "gunluk_kazanc_tl": 1371.6500000000233,
-        "gunluk_yuzde": 0.354251012145755,
+        "gunluk_kazanc_tl": 5094.699999999953,
+        "gunluk_yuzde": 1.3157894736841984,
         "fiyat_eksik": false
       },
       {
@@ -36,10 +36,10 @@
         "kod_orjinal": "SAHOL",
         "adet": 2044.0,
         "maliyet": 95.31,
-        "guncel_tl": 184368.80000000002,
+        "guncel_tl": 183551.19999999998,
         "onceki_tl": 183960.0,
-        "gunluk_kazanc_tl": 408.80000000001746,
-        "gunluk_yuzde": 0.22222222222223173,
+        "gunluk_kazanc_tl": -408.80000000001746,
+        "gunluk_yuzde": -0.22222222222223173,
         "fiyat_eksik": false
       },
       {
@@ -62,10 +62,10 @@
         "kod_orjinal": "HBF",
         "adet": 4515.0,
         "maliyet": 29.8066,
-        "guncel_tl": 213537.146235,
+        "guncel_tl": 210446.81836499998,
         "onceki_tl": 213537.146235,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": -3090.3278700000083,
+        "gunluk_yuzde": -1.44720856510795,
         "fiyat_eksik": false
       },
       {
@@ -76,9 +76,9 @@
         "adet": 6751.0,
         "maliyet": 26.76218258,
         "guncel_tl": 277358.509313,
-        "onceki_tl": 278184.55492200004,
-        "gunluk_kazanc_tl": -826.0456090000225,
-        "gunluk_yuzde": -0.29694157866946885,
+        "onceki_tl": 277358.509313,
+        "gunluk_kazanc_tl": 0.0,
+        "gunluk_yuzde": 0.0,
         "fiyat_eksik": false
       },
       {
@@ -101,10 +101,10 @@
         "kod_orjinal": "MPP",
         "adet": 26014.0,
         "maliyet": 18.1055,
-        "guncel_tl": 584554.168542,
+        "guncel_tl": 581846.319254,
         "onceki_tl": 584554.168542,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": -2707.8492880000267,
+        "gunluk_yuzde": -0.4632332525750295,
         "fiyat_eksik": false
       },
       {
@@ -140,10 +140,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 193641.692076,
+        "guncel_tl": 193627.48986,
         "onceki_tl": 191788.69739400002,
-        "gunluk_kazanc_tl": 1852.9946819999896,
-        "gunluk_yuzde": 0.9661646943632453,
+        "gunluk_kazanc_tl": 1838.7924659999844,
+        "gunluk_yuzde": 0.958759557255072,
         "fiyat_eksik": false
       },
       {
@@ -166,10 +166,10 @@
         "kod_orjinal": "PNU",
         "adet": 494895.0,
         "maliyet": 1.158102,
-        "guncel_tl": 576814.474455,
+        "guncel_tl": 577505.84277,
         "onceki_tl": 576814.474455,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": 691.3683149999706,
+        "gunluk_yuzde": 0.11985973750974369,
         "fiyat_eksik": false
       }
     ],
@@ -194,10 +194,10 @@
         "kod_orjinal": "TRGYO",
         "adet": 2508.0,
         "maliyet": 83.733,
-        "guncel_tl": 248668.2,
+        "guncel_tl": 251050.8,
         "onceki_tl": 247790.4,
-        "gunluk_kazanc_tl": 877.8000000000175,
-        "gunluk_yuzde": 0.35425101214575605,
+        "gunluk_kazanc_tl": 3260.399999999994,
+        "gunluk_yuzde": 1.3157894736842082,
         "fiyat_eksik": false
       },
       {
@@ -207,10 +207,10 @@
         "kod_orjinal": "SAHOL",
         "adet": 1333.0,
         "maliyet": 95.25,
-        "guncel_tl": 120236.6,
+        "guncel_tl": 119703.4,
         "onceki_tl": 119970.0,
-        "gunluk_kazanc_tl": 266.6000000000058,
-        "gunluk_yuzde": 0.22222222222222707,
+        "gunluk_kazanc_tl": -266.6000000000058,
+        "gunluk_yuzde": -0.22222222222222707,
         "fiyat_eksik": false
       },
       {
