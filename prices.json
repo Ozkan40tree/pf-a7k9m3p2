@@ -1,12 +1,12 @@
 {
-  "son_guncelleme": "2026-07-09T12:31:29+03:00",
+  "son_guncelleme": "2026-07-09T14:31:58+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
     "btc_kaynak": "borsapy",
     "hisse_kaynak": "borsapy",
     "altin_kaynak": "borsapy",
-    "fon_kaynak": "onceki_snapshot"
+    "fon_kaynak": "borsapy"
   },
   "kurlar": {
     "usd_try": {
@@ -24,17 +24,27 @@
   },
   "hisseler": {
     "SAHOL": {
-      "guncel": 89.8,
+      "guncel": 89.5,
       "onceki": 90.0,
       "yilbasi": 95.25
     },
     "TRGYO": {
-      "guncel": 100.1,
+      "guncel": 99.55,
       "onceki": 98.8,
       "yilbasi": 99.95
     }
   },
   "fonlar_ve_emeklilik": {
+    "AJR": {
+      "guncel": 0.370264,
+      "onceki": 0.379007,
+      "yilbasi": 0.391022
+    },
+    "FFC": {
+      "guncel": 0.09852,
+      "onceki": 0.099657,
+      "yilbasi": 0.099452
+    },
     "HBF": {
       "guncel": 46.610591,
       "onceki": 47.295049,
@@ -50,40 +60,30 @@
       "onceki": 22.470753,
       "yilbasi": 22.672514
     },
+    "NAU": {
+      "guncel": 2.861278,
+      "onceki": 2.900246,
+      "yilbasi": 3.229706
+    },
     "PNU": {
       "guncel": 1.166926,
       "onceki": 1.165529,
       "yilbasi": 1.165529
     },
-    "AJR": {
-      "guncel": 0.379007,
-      "onceki": 0.379007,
-      "yilbasi": 0.391022
-    },
-    "FFC": {
-      "guncel": 0.099657,
-      "onceki": 0.099657,
-      "yilbasi": 0.099452
-    },
-    "NAU": {
-      "guncel": 2.900246,
-      "onceki": 2.900246,
-      "yilbasi": 3.229706
-    },
     "TFF": {
       "guncel": 41.084063,
-      "onceki": 41.084063,
+      "onceki": 41.206422,
       "yilbasi": 38.596631
     },
     "ZBJ": {
-      "guncel": 4.936235,
+      "guncel": 4.941535,
       "onceki": 4.936235,
       "yilbasi": 4.637761
     }
   },
   "kripto": {
     "BTC": {
-      "guncel": 2944860.0,
+      "guncel": 2933793.0,
       "onceki": 2916894.0,
       "yilbasi": 3720444.0
     }
