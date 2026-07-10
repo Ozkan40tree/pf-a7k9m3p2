@@ -1,5 +1,5 @@
 {
-  "son_guncelleme": "2026-07-10T13:32:58+03:00",
+  "son_guncelleme": "2026-07-10T14:31:24+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
@@ -24,12 +24,12 @@
   },
   "hisseler": {
     "SAHOL": {
-      "guncel": 90.8,
+      "guncel": 90.45,
       "onceki": 89.15,
       "yilbasi": 95.25
     },
     "TRGYO": {
-      "guncel": 101.3,
+      "guncel": 100.9,
       "onceki": 101.7,
       "yilbasi": 99.95
     }
@@ -83,7 +83,7 @@
   },
   "kripto": {
     "BTC": {
-      "guncel": 3016999.0,
+      "guncel": 3014370.0,
       "onceki": 2964776.0,
       "yilbasi": 3720444.0
     }
