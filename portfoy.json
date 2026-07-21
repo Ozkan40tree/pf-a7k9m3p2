@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-07-21T10:32:43+03:00",
+  "olusturma_tarihi": "2026-07-21T12:32:49+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -23,10 +23,10 @@
         "kod_orjinal": "TRGYO",
         "adet": 3919.0,
         "maliyet": 81.44,
-        "guncel_tl": 384649.85000000003,
+        "guncel_tl": 383278.2,
         "onceki_tl": 385825.55,
-        "gunluk_kazanc_tl": -1175.6999999999534,
-        "gunluk_yuzde": -0.30472320975113065,
+        "gunluk_kazanc_tl": -2547.3499999999767,
+        "gunluk_yuzde": -0.6602336211274699,
         "fiyat_eksik": false
       },
       {
@@ -102,9 +102,9 @@
         "adet": 26014.0,
         "maliyet": 18.1055,
         "guncel_tl": 564095.042018,
-        "onceki_tl": 552241.112568,
-        "gunluk_kazanc_tl": 11853.929450000054,
-        "gunluk_yuzde": 2.1465133942812753,
+        "onceki_tl": 564095.042018,
+        "gunluk_kazanc_tl": 0.0,
+        "gunluk_yuzde": 0.0,
         "fiyat_eksik": false
       },
       {
@@ -140,10 +140,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 204034.229385,
+        "guncel_tl": 205011.88100400002,
         "onceki_tl": 201725.18576700002,
-        "gunluk_kazanc_tl": 2309.043617999996,
-        "gunluk_yuzde": 1.1446481554698014,
+        "gunluk_kazanc_tl": 3286.695237000007,
+        "gunluk_yuzde": 1.62929344915625,
         "fiyat_eksik": false
       },
       {
@@ -166,10 +166,10 @@
         "kod_orjinal": "PNU",
         "adet": 494895.0,
         "maliyet": 1.158102,
-        "guncel_tl": 585879.46617,
+        "guncel_tl": 586630.221885,
         "onceki_tl": 585879.46617,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": 750.7557149999775,
+        "gunluk_yuzde": 0.12814166707493665,
         "fiyat_eksik": false
       },
       {
@@ -179,10 +179,10 @@
         "kod_orjinal": "KEZ",
         "adet": 1932825.0,
         "maliyet": null,
-        "guncel_tl": 1011284.9652,
+        "guncel_tl": 1022058.53175,
         "onceki_tl": 1011284.9652,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": 10773.566549999989,
+        "gunluk_yuzde": 1.0653343934436244,
         "fiyat_eksik": false
       }
     ],
@@ -207,10 +207,10 @@
         "kod_orjinal": "TRGYO",
         "adet": 2508.0,
         "maliyet": 83.733,
-        "guncel_tl": 246160.2,
+        "guncel_tl": 245282.4,
         "onceki_tl": 246912.6,
-        "gunluk_kazanc_tl": -752.3999999999942,
-        "gunluk_yuzde": -0.30472320975114037,
+        "gunluk_kazanc_tl": -1630.2000000000116,
+        "gunluk_yuzde": -0.6602336211274806,
         "fiyat_eksik": false
       },
       {
