@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-07-22T19:59:26+03:00",
+  "olusturma_tarihi": "2026-07-22T22:58:49+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -140,10 +140,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 205309.93028700002,
+        "guncel_tl": 204331.09515,
         "onceki_tl": 206331.174819,
-        "gunluk_kazanc_tl": -1021.2445319999824,
-        "gunluk_yuzde": -0.49495406251423196,
+        "gunluk_kazanc_tl": -2000.0796689999988,
+        "gunluk_yuzde": -0.9693540836737491,
         "fiyat_eksik": false
       },
       {
@@ -289,6 +289,19 @@
         "onceki_tl": 100364.15662000001,
         "gunluk_kazanc_tl": 897.8440310000005,
         "gunluk_yuzde": 0.8945863356371623,
+        "fiyat_eksik": false
+      },
+      {
+        "tip_orjinal": "HisseFonu",
+        "tip": "hissefonu",
+        "kod": "NNF",
+        "kod_orjinal": "NNF",
+        "adet": 8173.0,
+        "maliyet": 23.21,
+        "guncel_tl": 190749.467194,
+        "onceki_tl": 190459.472808,
+        "gunluk_kazanc_tl": 289.99438600000576,
+        "gunluk_yuzde": 0.15226041620536554,
         "fiyat_eksik": false
       }
     ]
