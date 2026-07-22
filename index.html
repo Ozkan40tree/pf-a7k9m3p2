@@ -512,6 +512,7 @@ function enrichItem(it, prices) {
 function renderPortfoy(name, items, prices) {
   // Items: tek liste, tipe gore ayir
   const hisseler      = items.filter(x => x.tip === 'hisse').map(x => enrichItem(x, prices));
+  const hisseFonuList = items.filter(x => x.tip === 'hissefonu').map(x => enrichItem(x, prices));
   const yurtdisiList  = items.filter(x => x.tip === 'yurtdisifonu').map(x => enrichItem(x, prices));
   const fonList       = items.filter(x => x.tip === 'fon').map(x => enrichItem(x, prices));
   const altinFonuList = items.filter(x => x.tip === 'altinfonu').map(x => enrichItem(x, prices));
@@ -523,6 +524,7 @@ function renderPortfoy(name, items, prices) {
   const nakit         = items.filter(x => x.tip === 'nakit').map(x => enrichItem(x, prices));
 
   const hisseTop     = sum(hisseler, 'tg');
+  const hisseFonuTop = sum(hisseFonuList, 'tg');
   const yurtdisiTop  = sum(yurtdisiList, 'tg');
   const fonOnlyTop   = sum(fonList, 'tg');
   const altinFonuTop = sum(altinFonuList, 'tg');
@@ -532,17 +534,18 @@ function renderPortfoy(name, items, prices) {
   const altinTop  = sum(altin, 'tg');
   const alacakTop = sum(alacak, 'tg');
   const nakitTop  = sum(nakit, 'tg');
-  const toplam = hisseTop + fonTop + kriptoTop + altinTop + alacakTop + nakitTop;
+  const toplam = hisseTop + hisseFonuTop + fonTop + kriptoTop + altinTop + alacakTop + nakitTop;
 
   // Nakit maliyetsizdir; nominal degeri maliyet sayilir ki K/Z sasmasin.
-  const maliyet = sum(hisseler,'tm') + sum(fonlarRaw,'tm') + sum(kripto,'tm') + sum(altin,'tm') + sum(alacak,'tm') + nakitTop;
+  const maliyet = sum(hisseler,'tm') + sum(hisseFonuList,'tm') + sum(fonlarRaw,'tm') + sum(kripto,'tm') + sum(altin,'tm') + sum(alacak,'tm') + nakitTop;
   const kz = toplam - maliyet;
   const kzp = maliyet > 0 ? (toplam/maliyet - 1) * 100 : 0;
-  const gunlukKZ = sum(hisseler, 'gunlukKZ') + sum(fonlarRaw, 'gunlukKZ') + sum(kripto, 'gunlukKZ') + sum(altin, 'gunlukKZ');
+  const gunlukKZ = sum(hisseler, 'gunlukKZ') + sum(hisseFonuList, 'gunlukKZ') + sum(fonlarRaw, 'gunlukKZ') + sum(kripto, 'gunlukKZ') + sum(altin, 'gunlukKZ');
   const gunlukP = (toplam - gunlukKZ) > 0 ? gunlukKZ / (toplam - gunlukKZ) * 100 : 0;
 
   const allDaily = [
     ...hisseler.map(h => ({k:h.kod, v:h.gunlukP})),
+    ...hisseFonuList.map(f => ({k:f.kod, v:f.gunlukP})),
     ...fonlarRaw.map(f => ({k:f.kod, v:f.gunlukP}))
   ];
   const best  = allDaily.length ? [...allDaily].sort((a,b) => b.v - a.v)[0] : null;
@@ -594,6 +597,7 @@ function renderPortfoy(name, items, prices) {
   // Dağılım
   const distItems = [
     ...hisseler.map(h => ({l:h.kod, v:h.tg})),
+    ...hisseFonuList.map(f => ({l:f.kod, v:f.tg})),
     ...fonlarRaw.map(f => ({l:f.kod, v:f.tg})),
     ...(kriptoTop > 0 ? kripto.map(c => ({l:c.kod, v:c.tg})) : []),
     ...(altinTop > 0 ? altin.map(a => ({l:a.kod, v:a.tg})) : []),
@@ -650,6 +654,9 @@ function renderPortfoy(name, items, prices) {
       <td>${badge(t_kzp)}</td><td></td>
     </tr></tfoot></table></div></div>`;
   }
+
+  // Hisse Fonu: hisse senedi fonları (TEFAS), hisselerin hemen altında
+  html += renderFonBlok('📈 Hisse Fonu', hisseFonuList);
 
   // Fonlar & Emeklilik: 4 ayrı blok (YurtdışıFon, Fon, AltınFonu, Emeklilik)
   // Helper: tek bir tip için tam tablo bloğu üretir.
@@ -796,10 +803,10 @@ function renderAile(portfoyler, prices) {
   const oz = (portfoyler.ozkan || []).map(x => enrichItem(x, prices));
   const dr = (portfoyler.derya || []).map(x => enrichItem(x, prices));
 
-  // Aile Aktif Yatırım: Özkan(hisse+fon+yurtdışı+altınfonu+kripto+nakit) + Derya(hisse+altın+nakit)
+  // Aile Aktif Yatırım: Özkan(hisse+hissefonu+fon+yurtdışı+altınfonu+kripto+nakit) + Derya(hisse+hissefonu+altın+yurtdışı+nakit)
   // Nakit geçici olduğu için (satılan hisse takas bekliyor) aktif yatırıma dahil — kullanıcı tercihi.
-  const aktifOz = [...tip(oz,'hisse'), ...tip(oz,'fon'), ...tip(oz,'yurtdisifonu'), ...tip(oz,'altinfonu'), ...tip(oz,'kripto'), ...tip(oz,'nakit')];
-  const aktifDr = [...tip(dr,'hisse'), ...tip(dr,'altin'), ...tip(dr,'nakit')];
+  const aktifOz = [...tip(oz,'hisse'), ...tip(oz,'hissefonu'), ...tip(oz,'fon'), ...tip(oz,'yurtdisifonu'), ...tip(oz,'altinfonu'), ...tip(oz,'kripto'), ...tip(oz,'nakit')];
+  const aktifDr = [...tip(dr,'hisse'), ...tip(dr,'hissefonu'), ...tip(dr,'yurtdisifonu'), ...tip(dr,'altin'), ...tip(dr,'nakit')];
   const aktifOzTop = sum(aktifOz, 'tg');
   const aktifDrTop = sum(aktifDr, 'tg');
   const aileAktifTop = aktifOzTop + aktifDrTop;
@@ -846,9 +853,9 @@ function renderAile(portfoyler, prices) {
     </div>`;
 
   // Kategori dağılım tablosu
-  const tipSirasi = ['hisse','fon','yurtdisifonu','altinfonu','kripto','altin','nakit','emeklilik','alacak'];
+  const tipSirasi = ['hisse','hissefonu','fon','yurtdisifonu','altinfonu','kripto','altin','nakit','emeklilik','alacak'];
   const tipLabel  = {
-    hisse:'📈 Hisse', fon:'🏦 Fon', yurtdisifonu:'🌍 Yurtdışı Fon',
+    hisse:'📈 Hisse', hissefonu:'📈 Hisse Fonu', fon:'🏦 Fon', yurtdisifonu:'🌍 Yurtdışı Fon',
     altinfonu:'🏦 Altın Fonu', kripto:'₿ Kripto',
     altin:'🥇 Altın', nakit:'💵 Nakit', emeklilik:'🏛️ Emeklilik', alacak:'💰 Alacak'
   };
@@ -1094,7 +1101,7 @@ function portfoySerisi(secim, gecmis) {
     let val = null;
     switch (secim) {
       case 'ozkan_genel':     val = Number(o.toplam || 0); break;
-      case 'ozkan_aktif':     val = get(ok,'hisse')+get(ok,'fon')+get(ok,'altinfonu')+get(ok,'yurtdisifonu')+get(ok,'kripto')+get(ok,'nakit'); break;
+      case 'ozkan_aktif':     val = get(ok,'hisse')+get(ok,'hissefonu')+get(ok,'fon')+get(ok,'altinfonu')+get(ok,'yurtdisifonu')+get(ok,'kripto')+get(ok,'nakit'); break;
       case 'ozkan_hfy':       val = get(ok,'hisse')+get(ok,'fon')+get(ok,'yurtdisifonu'); break;
       case 'ozkan_hisse':     val = get(ok,'hisse'); break;
       case 'ozkan_fon':       val = get(ok,'fon'); break;
@@ -1109,7 +1116,8 @@ function portfoySerisi(secim, gecmis) {
       case 'derya_emeklilik': val = get(dk,'emeklilik'); break;
       case 'aile_toplam':     val = Number(gun.genel_toplam || 0); break;
       case 'aile_aktif':
-        val = get(ok,'hisse')+get(ok,'fon')+get(ok,'altinfonu')+get(ok,'yurtdisifonu')+get(ok,'kripto')+get(ok,'nakit')+get(dk,'hisse')+get(dk,'altin')+get(dk,'nakit');
+        val = get(ok,'hisse')+get(ok,'hissefonu')+get(ok,'fon')+get(ok,'altinfonu')+get(ok,'yurtdisifonu')+get(ok,'kripto')+get(ok,'nakit')
+            + get(dk,'hisse')+get(dk,'hissefonu')+get(dk,'yurtdisifonu')+get(dk,'altin')+get(dk,'nakit');
         break;
     }
     if (val != null && val > 0) seri[tarih] = val;

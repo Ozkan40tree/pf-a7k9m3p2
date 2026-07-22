@@ -66,7 +66,7 @@ TR_TZ = timezone(timedelta(hours=3))
 
 # Tip normalizasyon - gecerli tipler
 GECERLI_TIPLER = {
-    "hisse", "fon", "altinfonu", "yurtdisifonu",
+    "hisse", "fon", "altinfonu", "yurtdisifonu", "hissefonu",
     "emeklilik", "altin", "alacak", "nakit", "kripto",
 }
 
@@ -856,7 +856,7 @@ def portfoy_json_olustur(ozkan_satirlar, derya_satirlar, prices, tufe_data):
             if f:
                 guncel_birim = f.get("guncel")
                 onceki_birim = f.get("onceki")
-        elif tip in ("fon", "altinfonu", "yurtdisifonu", "emeklilik"):
+        elif tip in ("fon", "altinfonu", "yurtdisifonu", "emeklilik", "hissefonu"):
             f = safe_get(prices, "fonlar_ve_emeklilik", kod)
             if f:
                 guncel_birim = f.get("guncel")
@@ -1070,7 +1070,7 @@ def main():
     hisse_kodlari = sorted({s["kod"] for s in tum_satirlar if s["tip"] == "hisse"})
     tefas_kodlari = sorted({
         s["kod"] for s in tum_satirlar
-        if s["tip"] in ("fon", "altinfonu", "yurtdisifonu", "emeklilik")
+        if s["tip"] in ("fon", "altinfonu", "yurtdisifonu", "emeklilik", "hissefonu")
     })
     kripto_kodlari = sorted({s["kod"] for s in tum_satirlar if s["tip"] == "kripto"})
     altin_var = any(s["tip"] == "altin" for s in tum_satirlar)

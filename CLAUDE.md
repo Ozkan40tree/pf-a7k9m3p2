@@ -54,7 +54,7 @@ kurallara uyar.
 **Geçerli Tip değerleri:**
 
 ```
-Hisse, Fon, AltinFonu, YurtdisiFonu, Emeklilik, Altin, Alacak, Nakit, Kripto
+Hisse, Fon, AltinFonu, YurtdisiFonu, HisseFonu, Emeklilik, Altin, Alacak, Nakit, Kripto
 ```
 
 ### 2.1 Tip normalizasyon kuralı
@@ -86,6 +86,7 @@ Yani şunlar hepsi aynı kabul edilir:
 | Fon | TEFAS kodu | adet | zorunlu | tefas-crawler |
 | AltinFonu | TEFAS kodu | adet | zorunlu | tefas-crawler |
 | YurtdisiFonu | TEFAS kodu | adet | zorunlu | tefas-crawler |
+| HisseFonu | TEFAS kodu | adet | zorunlu | tefas-crawler (borsapy) — bkz §20 |
 | Emeklilik | TEFAS BES kodu | adet | boş | tefas-crawler |
 | Altin | `24ayar` | gram | boş | yfinance (`GC=F` × USDTRY ÷ 31.1035) |
 | Alacak | serbest etiket | TL tutar | boş | sabit (TL) |
@@ -122,7 +123,7 @@ sabitlenmiştir.
 
 ### 2.3 Tip-bazlı kategori grupları (dashboard ve benchmark için)
 
-- **Aktif Yatırım:** Hisse + Fon + YurtdisiFonu + AltinFonu + Kripto + **Nakit** (29 Haz 2026: nakit eklendi, bkz §18) + (Derya tarafında Altın)
+- **Aktif Yatırım:** Hisse + **HisseFonu** (22 Tem 2026, §20) + Fon + YurtdisiFonu + AltinFonu + Kripto + **Nakit** (29 Haz 2026: nakit eklendi, bkz §18) + (Derya tarafında Altın)
 - **Hisse+Fon+Yurtdışı:** Hisse + Fon + YurtdisiFonu
 - **Pasif/Uzun Vade:** Emeklilik + Alacak
 - **Genel Toplam:** tüm tipler dahil
@@ -930,7 +931,7 @@ Service account, Python script'in Sheets'e erişmesi için gereken
 
 **Tip geçerli değerleri (§2):**
 ```
-Hisse, Fon, AltinFonu, YurtdisiFonu, Emeklilik, Altin, Alacak, Nakit, Kripto
+Hisse, Fon, AltinFonu, YurtdisiFonu, HisseFonu, Emeklilik, Altin, Alacak, Nakit, Kripto
 ```
 
 **Örnek satırlar (Ozkan_Portfoy):**
@@ -1703,3 +1704,69 @@ Bugün (29 Haz) için üç yerde de **birebir ₺852.659**:
 "Em+Altın Hariç" = hisse + nakit. Nakit sadece 29 Haziran'dan itibaren
 var (§18.4), o yüzden geçmiş günlerde bu sütun ≈ sadece Derya hissesi
 olur. Bu doğru/dürüst veri, bug değil.
+
+---
+
+## 20. 22 TEMMUZ 2026 — YENİ "HisseFonu" TİPİ (NNF)
+
+### 20.1 Olay
+
+Kullanıcı Derya için 8173 adet **NNF** (hisse senedi fonu, TEFAS) satın aldı
+(maliyet 23,21 TL) ama Sheets'e yazmayı unuttu. Ayrıca 15 Tem'de Derya'nın
+nakiti (474K) bozuldu → ~301K yurtdışı fon + ~173K NNF alındı. NNF kayıtlı
+olmadığı için "Derya Em+Altın Hariç" tutarı 15/07'de 845K → 672K düştü
+(sahte düşüş). Çözüm: yeni **HisseFonu** tipi + Sheets'e NNF eklemek.
+
+### 20.2 Neden yeni tip? (Fon değil)
+
+NNF teknik olarak bir TEFAS fonu (fiyatı `borsapy.Fund` ile çekilir), ama
+kullanıcı bunu **hisselerin hemen altında** ayrı bir "📈 Hisse Fonu"
+bölümünde görmek istedi (hisse senedi fonu olduğu için). Mevcut "Fon" tipi
+ayrı "🏦 Fon" bloğunda gösterilir; bu yüzden yeni tip açıldı.
+
+### 20.3 Backend (`fiyat_guncelle.py`) — 3 satır
+
+`hissefonu`, fiyat kaynağı olarak TEFAS grubuna eklendi (Fon gibi davranır):
+- `GECERLI_TIPLER`'e `"hissefonu"` eklendi.
+- `_hesapla`: `tip in ("fon","altinfonu","yurtdisifonu","emeklilik","hissefonu")`
+  → `prices.fonlar_ve_emeklilik` içinden fiyat okur.
+- `tefas_kodlari` toplanırken `"hissefonu"` dahil edildi (borsapy.Fund fiyat çeker).
+
+### 20.4 Frontend (`index.html`)
+
+- **`renderPortfoy()`:** `hisseFonuList` filtresi + `hisseFonuTop`; `toplam`,
+  `maliyet`, `gunlukKZ`, dağılım ve `allDaily`'ye dahil. Render: hisseler
+  tablosunun **hemen altında** `renderFonBlok('📈 Hisse Fonu', hisseFonuList)`.
+- **`renderAile()`:** Aktif yatırıma `hissefonu` eklendi (Özkan + Derya).
+  Kategori dağılım `tipSirasi`/`tipLabel`'a `hissefonu` ('📈 Hisse Fonu').
+  **Bonus fix:** Derya'nın `yurtdisifonu`'su aktif yatırıma dahil değildi
+  (eski bug), bu turda eklendi.
+- **`portfoySerisi()`:** `ozkan_aktif` ve `aile_aktif` serilerine `hissefonu`
+  eklendi (+ aile_aktif'e Derya `yurtdisifonu` eklendi). `derya_ea_altin`,
+  `*_genel`, `aile_toplam` zaten ham `toplam` kullandığı için otomatik dahil.
+- **`gecmisDegerleri()`:** Değişiklik gerekmedi (`d.toplam` ham değer).
+
+### 20.5 Geçmiş veri düzeltmesi (gecmis.json)
+
+NNF 15 Tem'den itibaren portföyde ama gecmis.json snapshot'ları onu içermiyor.
+15–22 Tem arası Derya snapshot'larına `hissefonu` kategorisi (NNF o günkü
+TEFAS fiyatı × 8173) eklenip `derya.toplam` ve `genel_toplam` güncellendi.
+NNF fiyat geçmişi borsapy.Fund("NNF") ile çekildi (GitHub Actions Python 3.11;
+lokal 3.9 borsapy.history'yi çalıştıramıyor).
+
+### 20.6 Kurulum sırası (önemli)
+
+1. Backend+frontend push edildi (NNF yokken zararsız: `hissefonu` boş liste
+   → `renderFonBlok` boş string döner, hiçbir şey görünmez/bozulmaz).
+2. Kullanıcı Sheets `Derya_Portfoy`'a satır ekler: `Tip=HisseFonu, Kod=NNF,
+   Adet=8173, Maliyet=23,21`.
+3. Sonraki cron (veya manuel tetik) NNF'yi çeker → dashboard'da görünür.
+4. Geçmiş düzeltmesi ayrı yapıldı (§20.5).
+
+### 20.7 Öğrenilen ders
+
+§18.5'in tekrarı doğrulandı: yeni tip eklemek backend (3 nokta) + frontend
+(renderPortfoy, renderAile, portfoySerisi) taraması gerektirir. Bu turda ayrıca
+**Derya yurtdisifonu'nun aktif yatırıma dahil olmadığı gizli bug** ortaya çıktı
+— yeni tip eklerken tüm tip-bazlı toplama listelerini gözden geçirmek bu tür
+eski hataları da yakalatıyor.
