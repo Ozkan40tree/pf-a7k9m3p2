@@ -1,5 +1,5 @@
 {
-  "son_guncelleme": "2026-08-07T14:31:24+03:00",
+  "son_guncelleme": "2026-08-07T15:07:54+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
@@ -24,12 +24,12 @@
   },
   "hisseler": {
     "SAHOL": {
-      "guncel": 88.55,
+      "guncel": 88.65,
       "onceki": 88.1,
       "yilbasi": 95.25
     },
     "TRGYO": {
-      "guncel": 91.45,
+      "guncel": 91.35,
       "onceki": 91.8,
       "yilbasi": 99.95
     }
@@ -40,10 +40,20 @@
       "onceki": 0.10025,
       "yilbasi": 0.099452
     },
+    "GHU": {
+      "guncel": 0.320582,
+      "onceki": 0.317561,
+      "yilbasi": 0.319144
+    },
     "HBF": {
       "guncel": 49.15175,
       "onceki": 48.322052,
       "yilbasi": 51.904464
+    },
+    "HES": {
+      "guncel": 0.743373,
+      "onceki": 0.747562,
+      "yilbasi": 0.801649
     },
     "IJC": {
       "guncel": 16.118953,
@@ -55,10 +65,20 @@
       "onceki": 0.511438,
       "yilbasi": 0.512718
     },
+    "MPP": {
+      "guncel": 21.524362,
+      "onceki": 21.88611,
+      "yilbasi": 22.672514
+    },
     "NAU": {
       "guncel": 3.00124,
       "onceki": 2.956746,
       "yilbasi": 3.229706
+    },
+    "NNF": {
+      "guncel": 22.972126,
+      "onceki": 22.844318,
+      "yilbasi": 23.338978
     },
     "PNU": {
       "guncel": 1.211957,
@@ -74,31 +94,11 @@
       "guncel": 5.100333,
       "onceki": 5.094812,
       "yilbasi": 4.637761
-    },
-    "GHU": {
-      "guncel": 0.320582,
-      "onceki": 0.320582,
-      "yilbasi": 0.319144
-    },
-    "HES": {
-      "guncel": 0.743373,
-      "onceki": 0.743373,
-      "yilbasi": 0.801649
-    },
-    "MPP": {
-      "guncel": 21.524362,
-      "onceki": 21.524362,
-      "yilbasi": 22.672514
-    },
-    "NNF": {
-      "guncel": 22.972126,
-      "onceki": 22.972126,
-      "yilbasi": 23.338978
     }
   },
   "kripto": {
     "BTC": {
-      "guncel": 3091130.0,
+      "guncel": 3092240.0,
       "onceki": 3058645.0,
       "yilbasi": 3720444.0
     }
