@@ -1,5 +1,5 @@
 {
-  "son_guncelleme": "2026-08-11T14:33:20+03:00",
+  "son_guncelleme": "2026-08-11T15:08:45+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
@@ -24,12 +24,12 @@
   },
   "hisseler": {
     "SAHOL": {
-      "guncel": 87.4,
+      "guncel": 87.15,
       "onceki": 88.5,
       "yilbasi": 95.25
     },
     "TRGYO": {
-      "guncel": 90.95,
+      "guncel": 90.9,
       "onceki": 90.75,
       "yilbasi": 99.95
     }
@@ -40,10 +40,25 @@
       "onceki": 0.100793,
       "yilbasi": 0.099452
     },
+    "GHU": {
+      "guncel": 0.319515,
+      "onceki": 0.31905,
+      "yilbasi": 0.319144
+    },
+    "HBF": {
+      "guncel": 50.333231,
+      "onceki": 49.802412,
+      "yilbasi": 51.904464
+    },
     "HES": {
       "guncel": 0.751021,
       "onceki": 0.745353,
       "yilbasi": 0.801649
+    },
+    "HVT": {
+      "guncel": 4.67318,
+      "onceki": 4.667388,
+      "yilbasi": 4.667388
     },
     "IJC": {
       "guncel": 16.682618,
@@ -54,6 +69,21 @@
       "guncel": 0.51845,
       "onceki": 0.515198,
       "yilbasi": 0.512718
+    },
+    "MPP": {
+      "guncel": 21.569239,
+      "onceki": 21.559935,
+      "yilbasi": 22.672514
+    },
+    "NAU": {
+      "guncel": 3.072778,
+      "onceki": 3.03589,
+      "yilbasi": 3.229706
+    },
+    "NNF": {
+      "guncel": 22.881304,
+      "onceki": 22.973491,
+      "yilbasi": 23.338978
     },
     "PNU": {
       "guncel": 1.218513,
@@ -69,41 +99,11 @@
       "guncel": 5.122864,
       "onceki": 5.117179,
       "yilbasi": 4.637761
-    },
-    "GHU": {
-      "guncel": 0.319515,
-      "onceki": 0.319515,
-      "yilbasi": 0.319144
-    },
-    "HBF": {
-      "guncel": 50.333231,
-      "onceki": 50.333231,
-      "yilbasi": 51.904464
-    },
-    "HVT": {
-      "guncel": 4.67318,
-      "onceki": 4.67318,
-      "yilbasi": 4.667388
-    },
-    "MPP": {
-      "guncel": 21.569239,
-      "onceki": 21.569239,
-      "yilbasi": 22.672514
-    },
-    "NAU": {
-      "guncel": 3.072778,
-      "onceki": 3.072778,
-      "yilbasi": 3.229706
-    },
-    "NNF": {
-      "guncel": 22.881304,
-      "onceki": 22.881304,
-      "yilbasi": 23.338978
     }
   },
   "kripto": {
     "BTC": {
-      "guncel": 3067000.0,
+      "guncel": 3071395.0,
       "onceki": 3048043.0,
       "yilbasi": 3720444.0
     }
