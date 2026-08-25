@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-08-25T12:32:53+03:00",
+  "olusturma_tarihi": "2026-08-25T12:59:24+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -127,10 +127,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 252408.22635,
+        "guncel_tl": 250082.153223,
         "onceki_tl": 249312.47201700002,
-        "gunluk_kazanc_tl": 3095.75433299999,
-        "gunluk_yuzde": 1.2417165928180671,
+        "gunluk_kazanc_tl": 769.6812059999793,
+        "gunluk_yuzde": 0.30872150108378715,
         "fiyat_eksik": false
       },
       {
@@ -180,9 +180,9 @@
         "adet": 62972.0,
         "maliyet": 4.61,
         "guncel_tl": 299162.84361599997,
-        "onceki_tl": 299162.84361599997,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "onceki_tl": 298814.356568,
+        "gunluk_kazanc_tl": 348.48704799998086,
+        "gunluk_yuzde": 0.11662326134610505,
         "fiyat_eksik": false
       }
     ],
@@ -207,10 +207,10 @@
         "kod_orjinal": "TRGYO",
         "adet": 2508.0,
         "maliyet": 83.733,
-        "guncel_tl": 242272.8,
+        "guncel_tl": 242649.0,
         "onceki_tl": 244028.4,
-        "gunluk_kazanc_tl": -1755.6000000000058,
-        "gunluk_yuzde": -0.7194244604316571,
+        "gunluk_kazanc_tl": -1379.3999999999942,
+        "gunluk_yuzde": -0.5652620760534406,
         "fiyat_eksik": false
       },
       {
@@ -220,10 +220,10 @@
         "kod_orjinal": "SAHOL",
         "adet": 1333.0,
         "maliyet": 95.25,
-        "guncel_tl": 124635.5,
+        "guncel_tl": 125035.4,
         "onceki_tl": 125635.25,
-        "gunluk_kazanc_tl": -999.75,
-        "gunluk_yuzde": -0.7957559681697612,
+        "gunluk_kazanc_tl": -599.8500000000058,
+        "gunluk_yuzde": -0.4774535809018614,
         "fiyat_eksik": false
       },
       {
@@ -273,9 +273,9 @@
         "adet": 12034.0,
         "maliyet": 16.61,
         "guncel_tl": 189613.829306,
-        "onceki_tl": 189613.829306,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "onceki_tl": 194206.328624,
+        "gunluk_kazanc_tl": -4592.499317999987,
+        "gunluk_yuzde": -2.3647526579277742,
         "fiyat_eksik": false
       },
       {
