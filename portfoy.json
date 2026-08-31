@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-08-31T16:31:26+03:00",
+  "olusturma_tarihi": "2026-08-31T18:15:02+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -114,10 +114,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 247647.52519500002,
+        "guncel_tl": 248189.707941,
         "onceki_tl": 246104.02047000002,
-        "gunluk_kazanc_tl": 1543.5047250000061,
-        "gunluk_yuzde": 0.627175745464166,
+        "gunluk_kazanc_tl": 2085.687470999983,
+        "gunluk_yuzde": 0.8474820797388101,
         "fiyat_eksik": false
       },
       {
@@ -188,32 +188,6 @@
         "fiyat_eksik": false
       },
       {
-        "tip_orjinal": "Hisse",
-        "tip": "hisse",
-        "kod": "TRGYO",
-        "kod_orjinal": "TRGYO",
-        "adet": 2508.0,
-        "maliyet": 83.733,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
-      },
-      {
-        "tip_orjinal": "Hisse",
-        "tip": "hisse",
-        "kod": "SAHOL",
-        "kod_orjinal": "SAHOL",
-        "adet": 1333.0,
-        "maliyet": 95.25,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
-      },
-      {
         "tip_orjinal": "Emeklilik",
         "tip": "emeklilik",
         "kod": "HES",
@@ -270,12 +244,12 @@
         "tip": "yurtdisifonu",
         "kod": "TFF",
         "kod_orjinal": "TFF",
-        "adet": 2443.0,
+        "adet": 2433.0,
         "maliyet": 41.08,
-        "guncel_tl": 107358.353242,
-        "onceki_tl": 106831.92583000001,
-        "gunluk_kazanc_tl": 526.42741199999,
-        "gunluk_yuzde": 0.49276225988632444,
+        "guncel_tl": 106918.900302,
+        "onceki_tl": 106394.62773000001,
+        "gunluk_kazanc_tl": 524.2725719999871,
+        "gunluk_yuzde": 0.4927622598863217,
         "fiyat_eksik": false
       },
       {
@@ -289,6 +263,19 @@
         "onceki_tl": 192825.38467499998,
         "gunluk_kazanc_tl": 460.1235540000198,
         "gunluk_yuzde": 0.2386218779107019,
+        "fiyat_eksik": false
+      },
+      {
+        "tip_orjinal": "HisseFonu",
+        "tip": "hissefonu",
+        "kod": "KPC",
+        "kod_orjinal": "KPC",
+        "adet": 24672.0,
+        "maliyet": 21.99,
+        "guncel_tl": 548130.17568,
+        "onceki_tl": 542525.7581760001,
+        "gunluk_kazanc_tl": 5604.417503999895,
+        "gunluk_yuzde": 1.0330233024957634,
         "fiyat_eksik": false
       }
     ]
