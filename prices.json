@@ -1,5 +1,5 @@
 {
-  "son_guncelleme": "2026-09-07T12:32:45+03:00",
+  "son_guncelleme": "2026-09-07T14:31:07+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
@@ -24,15 +24,25 @@
   },
   "hisseler": {},
   "fonlar_ve_emeklilik": {
-    "HBF": {
-      "guncel": 52.203537,
-      "onceki": 51.883963,
-      "yilbasi": 51.904464
+    "FFC": {
+      "guncel": 0.102153,
+      "onceki": 0.100427,
+      "yilbasi": 0.099452
+    },
+    "GHU": {
+      "guncel": 0.323594,
+      "onceki": 0.322589,
+      "yilbasi": 0.319144
     },
     "HES": {
       "guncel": 0.728646,
       "onceki": 0.726606,
       "yilbasi": 0.801649
+    },
+    "HVT": {
+      "guncel": 4.81834,
+      "onceki": 4.805109,
+      "yilbasi": 4.667388
     },
     "IJC": {
       "guncel": 15.717185,
@@ -54,6 +64,16 @@
       "onceki": 21.903672,
       "yilbasi": 22.672514
     },
+    "NAU": {
+      "guncel": 3.168974,
+      "onceki": 3.141899,
+      "yilbasi": 3.229706
+    },
+    "PNU": {
+      "guncel": 1.26437,
+      "onceki": 1.258676,
+      "yilbasi": 1.165529
+    },
     "TFF": {
       "guncel": 44.014882,
       "onceki": 43.352733,
@@ -64,35 +84,15 @@
       "onceki": 5.254547,
       "yilbasi": 4.637761
     },
-    "FFC": {
-      "guncel": 0.100427,
-      "onceki": 0.100427,
-      "yilbasi": 0.099452
-    },
-    "GHU": {
-      "guncel": 0.322589,
-      "onceki": 0.322589,
-      "yilbasi": 0.319144
-    },
-    "HVT": {
-      "guncel": 4.81834,
-      "onceki": 4.81834,
-      "yilbasi": 4.667388
-    },
-    "NAU": {
-      "guncel": 3.168974,
-      "onceki": 3.168974,
-      "yilbasi": 3.229706
-    },
-    "PNU": {
-      "guncel": 1.26437,
-      "onceki": 1.26437,
-      "yilbasi": 1.165529
+    "HBF": {
+      "guncel": 52.203537,
+      "onceki": 52.203537,
+      "yilbasi": 51.904464
     }
   },
   "kripto": {
     "BTC": {
-      "guncel": 3838892.0,
+      "guncel": 3835000.0,
       "onceki": 3884700.0,
       "yilbasi": 3720444.0
     }
