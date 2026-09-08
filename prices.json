@@ -1,12 +1,12 @@
 {
-  "son_guncelleme": "2026-09-08T10:32:53+03:00",
+  "son_guncelleme": "2026-09-08T12:31:17+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
     "btc_kaynak": "borsapy",
     "hisse_kaynak": "yok",
     "altin_kaynak": "borsapy",
-    "fon_kaynak": "onceki_snapshot"
+    "fon_kaynak": "borsapy"
   },
   "kurlar": {
     "usd_try": {
@@ -24,10 +24,45 @@
   },
   "hisseler": {},
   "fonlar_ve_emeklilik": {
+    "FFC": {
+      "guncel": 0.103134,
+      "onceki": 0.102153,
+      "yilbasi": 0.099452
+    },
     "GHU": {
       "guncel": 0.325923,
       "onceki": 0.323594,
       "yilbasi": 0.319144
+    },
+    "HBF": {
+      "guncel": 51.559201,
+      "onceki": 52.203537,
+      "yilbasi": 51.904464
+    },
+    "HES": {
+      "guncel": 0.735263,
+      "onceki": 0.728646,
+      "yilbasi": 0.801649
+    },
+    "HVT": {
+      "guncel": 4.824712,
+      "onceki": 4.81834,
+      "yilbasi": 4.667388
+    },
+    "IJC": {
+      "guncel": 15.802037,
+      "onceki": 15.717185,
+      "yilbasi": 16.488548
+    },
+    "KEZ": {
+      "guncel": 0.533752,
+      "onceki": 0.528353,
+      "yilbasi": 0.512718
+    },
+    "KPC": {
+      "guncel": 21.558382,
+      "onceki": 21.356767,
+      "yilbasi": 21.685601
     },
     "MPP": {
       "guncel": 22.093581,
@@ -53,46 +88,11 @@
       "guncel": 5.275076,
       "onceki": 5.269004,
       "yilbasi": 4.637761
-    },
-    "FFC": {
-      "guncel": 0.102153,
-      "onceki": 0.102153,
-      "yilbasi": 0.099452
-    },
-    "HBF": {
-      "guncel": 52.203537,
-      "onceki": 52.203537,
-      "yilbasi": 51.904464
-    },
-    "HES": {
-      "guncel": 0.728646,
-      "onceki": 0.728646,
-      "yilbasi": 0.801649
-    },
-    "HVT": {
-      "guncel": 4.81834,
-      "onceki": 4.81834,
-      "yilbasi": 4.667388
-    },
-    "IJC": {
-      "guncel": 15.717185,
-      "onceki": 15.717185,
-      "yilbasi": 16.488548
-    },
-    "KEZ": {
-      "guncel": 0.528353,
-      "onceki": 0.528353,
-      "yilbasi": 0.512718
-    },
-    "KPC": {
-      "guncel": 21.356767,
-      "onceki": 21.356767,
-      "yilbasi": 21.685601
     }
   },
   "kripto": {
     "BTC": {
-      "guncel": 3800117.0,
+      "guncel": 3799410.0,
       "onceki": 3829365.0,
       "yilbasi": 3720444.0
     }
