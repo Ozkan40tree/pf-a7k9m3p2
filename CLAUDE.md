@@ -1394,6 +1394,7 @@ Actions cron'larıyla günde 4 kez fiyat çekip, GitHub Pages üzerinde
 | Önemli öğrenilen dersler ("yapma!" listesi) | §12.6, §14.3 |
 | Devam eden rutin görevler | §14.7 |
 | Aktif yapılacak iş listesi | §15.5 (aşağıda) |
+| Veri kaynağı alternatifleri (borsapy yedek planı, borsa-mcp) | §21 |
 
 ### 15.3 Aktif konfigürasyon (özet)
 
@@ -1436,6 +1437,9 @@ Actions cron'larıyla günde 4 kez fiyat çekip, GitHub Pages üzerinde
    geri bildirimine göre. Şu an erteleme.
 2. **Tab içi mini trend grafikleri** — Düşük öncelik, Grafik tabıyla örtüşüyor.
 3. **Benchmark "Özel tarih aralığı"** — v2.
+4. **Veri kaynağı yedek katmanları** (12 Eyl 2026, §21.7) — Acil değil,
+   "ileride belki". Öncelik: pytefas (TEFAS) → TCMB EVDS (kur) → doviz.com
+   (altın) → isyatirimhisse (hisse). Her biri ayrı adım, ayrı commit.
 
 ### 15.6 Son commit'ler (27 May itibarıyla)
 
@@ -1770,3 +1774,145 @@ lokal 3.9 borsapy.history'yi çalıştıramıyor).
 **Derya yurtdisifonu'nun aktif yatırıma dahil olmadığı gizli bug** ortaya çıktı
 — yeni tip eklerken tüm tip-bazlı toplama listelerini gözden geçirmek bu tür
 eski hataları da yakalatıyor.
+
+---
+
+## 21. 12 EYLÜL 2026 — VERİ KAYNAĞI ALTERNATİFLERİ ARAŞTIRMASI (borsapy yedekleri)
+
+> **Durum:** Sadece araştırma. **Hiçbir kod/dosya değiştirilmedi.** Kullanıcı
+> "ileride belki yaparız" dedi; bu bölüm o gün için hazır referanstır.
+> Araştırma salt-okunur web fetch + curl probe ile yapıldı (12 Eyl 2026).
+
+### 21.1 Soru
+
+borsapy'nin yazarının yeni projesi `borsa-mcp` ne? borsapy'ye alternatif var mı?
+Aranan: yurtiçi hisse (BIST), yurtiçi fon (TEFAS), gram altın, döviz fiyatı.
+
+### 21.2 Kısa cevap
+
+**borsapy'yi değiştirme.** Üretimde Haziran'dan beri sorunsuz, aktif bakımda
+(Ağu 2026 issue'ları var), 4 veri türünü tek kütüphanede kapsayan başka
+seçenek yok. Alternatifler **yedek katman** olarak değerli (bkz §21.7).
+
+### 21.3 borsa-mcp nedir?
+
+`https://github.com/saidsurucu/borsa-mcp` — aynı yazarın **LLM'ler için MCP
+sunucusu** (Claude/ChatGPT'nin "THYAO fiyatı ne?" diye sorabildiği araç seti).
+26 araç, 650+★, MIT, ücretsiz uzak endpoint `borsa.surucu.dev/mcp` (kayıtsız).
+
+**Bizim için kullanılamaz:** Python kütüphanesi değil, sunucu — cron script'ine
+`import` edilemez. Giriş noktaları `app.py` / `unified_mcp_server.py`.
+
+**Değerli sinyal — yazarın yeni kaynak tercihleri:**
+
+| Veri | borsapy | borsa-mcp (yazarın yeni tercihi) |
+|---|---|---|
+| BIST hisse | TradingView WS | KAP + yfinance (borsapy sadece tarama) |
+| TEFAS | TEFAS | TEFAS resmi API (`tefas_provider.py`) |
+| Altın / döviz | canlidoviz + TradingView | **doviz.com API v12** (`dovizcom_legacy_provider.py`) |
+| Kripto | BtcTurk | BtcTurk + Coinbase |
+| Makro | TCMB EVDS | TCMB EVDS (`tcmb_provider.py`) |
+
+### 21.4 borsapy bugünkü durum (12 Eyl 2026)
+
+- 723★, Apache 2.0. ⚠️ README: "kişisel/eğitim amaçlı, ticari kullanım Borsa
+  İstanbul lisansı gerektirir" — kişisel dashboard için sorun değil.
+- Kaynaklar: hisse = TradingView WebSocket (~15 dk gecikme), fon = TEFAS
+  (4 istek/~45 sn limit), metal = "banka kurları + TradingView", kripto = BtcTurk.
+- 5 açık issue: #13, #17 TradingView auth/stream; #19, #20 finansal tablo;
+  #18 özellik talebi. **Gram altın / döviz / rate limit / bulut IP hakkında
+  açık issue yok.**
+- ✅ Üretim kanıtı: GitHub Actions'tan hisse, TEFAS, gram altın (§17), BTC,
+  kur — hepsi Haziran'dan beri akıyor.
+
+### 21.5 Alternatifler — kategori bazında
+
+**📈 BIST hisse**
+
+| Kütüphane | Kaynak | Durum | Verdict |
+|---|---|---|---|
+| `urazakgul/isyatirimhisse` | İş Yatırım sitesi (scraping) | v5.0.1 Şub 2026, 160★, MIT, 0 issue, endeks+finansal tablo var | ⚠️ Tek gerçek alternatif. "Aşırı istek → IP engeli" uyarısı. **Yedek olur, birincil olmaz.** |
+| `rongardF/tvdatafeed` | TradingView | 661★, **45 açık issue** | ❌ borsapy ile **aynı kaynak** — ikiz, alternatif değil. |
+| yfinance | Yahoo | — | ❌ Actions'tan engelli (§12.6.3) |
+| financelib | — | 404 | ❌ Ölü |
+| Borsa İstanbul resmi | — | Lisanslı/ücretli | ❌ Ücretsiz yok |
+
+**🏦 TEFAS fon**
+
+| Kütüphane | Kaynak | Durum | Verdict |
+|---|---|---|---|
+| **`mirzazad/pytefas`** | **TEFAS resmi JSON API** (`tefas.gov.tr/api/funds/...`) | Son commit 16 Haz 2026, v0.4.0, MIT, 18★, 0 issue | ✅ **En güçlü aday.** 6 istek/dk limitini otomatik yönetir, uzun aralığı 28 günlük parçalara böler, BES (EMK) + YAT/BYF/GYF/GSYF destekli. Kod: `Crawler().fetch(date, columns="info", kind="YAT", fund_code="AAK")` |
+| `burakyilmaz321/tefas-crawler` | TEFAS yeni API (2026'da yeniden yazıldı) | 128★, 8 açık issue, sabit lookback {1,3,6,12,36,60} ay | ⚠️ Düzeltilmiş ama bizi daha önce yaktı (§12.6.2). 2. yedek. |
+| `eneshenderson/Tefas-API` | Playwright/Chromium tarayıcı otomasyonu (WAF aşmak için) | 9★ | ❌ Cron için ağır/kırılgan |
+
+**🥇 Gram altın**
+
+| Kaynak | Tip | Durum | Verdict |
+|---|---|---|---|
+| **doviz.com API v12** | Token'lı API | `GET https://api.doviz.com/api/v12/assets/gram-altin/daily?limit=1` (güncel), `/assets/{asset}/archive?start=&end=` (geçmiş OHLC: `close/open/highest/lowest/update_date`), 60 sn cache | ⚠️ **İyi veri, kırılgan erişim.** Token'sız → 401 (doğrulandı). borsa-mcp token'ı doviz.com ana sayfa JS'inden **regex ile çekiyor** (64-hex) + `dovizcom_auth.py`'de sabit yedek token'lar gömülü, 1 saat geçerlilik, 401'de yenileme. Resmi API key mekanizması değil — JS değişirse kırılır. **2-3. katman yedek olabilir, birincil olmaz.** |
+| TCMB EVDS `TP.MK.KUL.YTL` | Resmi | **Aylık, ~2 ay gecikmeli** | ❌ Günlük dashboard için işe yaramaz |
+| `ahmetilhn/altin-fiyatlari-api` (Gramvey) | Ücretsiz, keysiz | Repo **arşivlenmiş** (27 Oca 2026), `goldapi.gramvey.com` public DNS'te **çözümlenmiyor** | ❌ Ölü |
+| `ykpkilic/hasfiyat-altin-api-sdk` | API key | Fiyat planı açıklanmamış, 1★ | ❌ Belirsiz/ücretli |
+| canlidoviz | — | `api.canlidoviz.com` public DNS'te **yok** | ❌ Emekli görünüyor |
+| Bigpara/Milliyet/genelpara scraper'ları | HTML scraping | Küçük bakımsız repolar | ❌ Güvenilmez |
+
+**Altın için dürüst sonuç:** Ücretsiz + resmi + günlük gram altın API'si **yok**.
+borsapy (TradingView) ve doviz.com (token-scraping) dışında ciddi seçenek yok.
+
+**💱 Döviz**
+
+| Kaynak | Tip | Durum | Verdict |
+|---|---|---|---|
+| **TCMB EVDS** — `fatihmete/evds` (v0.4, EVDS3 uyumlu, MIT, 62★) veya `kaymal/tcmb-py` (MIT, 17★) | **Resmi**, ücretsiz API key (`evds3.tcmb.gov.tr` → Profilim → API Key) | Seri: `TP.DK.USD.A.YTL`, `TP.DK.EUR.A.YTL`. Kod: `evdsAPI(key).get_data([...], startdate, enddate)`. Bilinen: SSL hatasında `legacySSL=True` | ✅ **En güvenilir yedek.** Günlük (gün içi değil). Bulut IP'den engellenme riski en düşük. |
+| TCMB `today.xml` | Resmi, keysiz | HTTP 200 doğrulandı | ✅ Zaten kullanıyoruz (§8.1) |
+| doviz.com v12 `/assets/USD/daily` | Token'lı | §21.5 altın satırıyla aynı | ⚠️ Gün içi var ama kırılgan |
+
+### 21.6 Doğrulanamayanlar (dürüst liste)
+
+1. **GitHub Actions IP'lerinden erişim** — test etmek workflow çalıştırmak demek,
+   yapılmadı. Sezgisel sıra: resmi JSON API (TEFAS, TCMB) > token-scraping
+   (doviz.com) > HTML scraping (İş Yatırım) > Yahoo (engelli). borsapy'nin
+   TradingView'i üretimde çalıştığı kanıtlı.
+2. **EVDS'de günlük altın serisi** — aylık `TP.MK.KUL.YTL` bulundu, günlük
+   bulunamadı (2 arama). Varsa EVDS portalı veya API key ile `get_series()`.
+3. **borsapy'nin gram-altin'ı hangi host'tan çektiği** — README "banka kurları +
+   TradingView" diyor; canlidoviz ölü olduğuna göre TradingView olmalı.
+   Kaynak kodu okunmadı; üretim kanıtı yeterli görüldü.
+
+### 21.7 Önerilen yedek katman planı (ileride, öncelik sırasıyla)
+
+> Hiçbiri acil değil. Sistem çalışıyor. Yapılırsa **tek seferde değil, adım adım**
+> (§0.2) ve her adımda preview/cron doğrulaması ile.
+
+| # | İş | Yeni zincir | Tahmini süre | Neden |
+|---|---|---|---|---|
+| 1 | **pytefas → TEFAS 2. yedek** | borsapy `Fund()` → pytefas → prices.json snapshot | ~1 saat | Resmi API, en temiz kazanım. `tefas_fiyat_toplu()` içine borsapy başarısız olanlar için pytefas denemesi. `requirements.txt`'e `pytefas`. 6 istek/dk limitine dikkat (kütüphane yönetiyor). |
+| 2 | **TCMB EVDS → kur 3. yedek** | borsapy `FX()` → TCMB XML → EVDS | ~45 dk | Resmi, ücretsiz key (5 dk kayıt). Yeni GitHub Secret `EVDS_API_KEY`. `kur_cek()` içine 3. katman. Günlük veri olduğu için `onceki = guncel` kabul (TCMB XML ile aynı mantık, §8.3). |
+| 3 | **doviz.com → altın 2. yedek** | borsapy `FX("gram-altin")` → doviz.com v12 → snapshot | ~1.5 saat | Altın için başka seçenek yok. borsa-mcp'nin `dovizcom_auth.py` token mantığı (JS regex + yedek token) ve `dovizcom_legacy_provider.py` endpoint'i örnek alınır. **Kırılgan** — token/JS değişirse sessizce 401 alır, `kaynak_durumu`'na `"dovizcom"` yazılıp log'da izlenmeli. |
+| 4 | **isyatirimhisse → hisse 2. yedek** | borsapy `Ticker()` → yfinance `.IS` → isyatirimhisse | ~1 saat | En düşük öncelik; borsapy TradingView'i hiç çökmedi. Scraping + IP engeli riski; sadece borsapy+yfinance ikisi de boşsa, istek sayısı az (3 hisse). |
+
+**Yapılırsa unutma:** §8.1 ve §15.3 kaynak hiyerarşisi tabloları güncellenmeli;
+her yeni katman `prices.json.kaynak_durumu`'na kendi etiketini yazmalı (§14.3.2).
+
+### 21.8 Yan bulgu — kullanıcının ev ağı DNS filtresi
+
+Araştırma sırasında `api.canlidoviz.com` ve `goldapi.gramvey.com` yerel DNS'te
+`192.168.1.1` (ev router'ı) olarak çözümlendi → router/ISP bazı finans
+domainlerini engelliyor/yönlendiriyor. İlk curl probe'ları bu yüzden router'ın
+boş HTML sayfasını döndürdü (yanıltıcı "HTTP 200 text/html"). Public DNS
+(`dig @1.1.1.1`) ile düzeltildi: iki host public DNS'te de yok (gerçekten ölü),
+`api.doviz.com` ise CloudFront'a çözümlendi (canlı).
+
+**Dashboard'u etkilemez** (GitHub Actions bulutta çalışıyor). Ama **lokal test
+yaparken** bu domainlere erişilemeyeceği bilinmeli — "çalışmıyor" sanılmasın.
+Doktrin: lokal'den bir API "erişilemiyor" görünürse önce `dig +short host`
+ile IP'ye bak; `192.168.x.x` / `10.x.x.x` dönüyorsa sorun ağda, API'de değil.
+
+### 21.9 Kaynaklar
+
+- borsa-mcp: `https://github.com/saidsurucu/borsa-mcp` (providers: `dovizcom_auth.py`, `dovizcom_legacy_provider.py`, `tefas_provider.py`, `tcmb_provider.py`, `kap_provider.py`, `btcturk_provider.py`)
+- borsapy: `https://github.com/saidsurucu/borsapy` · issues: `/issues`
+- pytefas: `https://github.com/mirzazad/pytefas` · tefas-crawler: `https://github.com/burakyilmaz321/tefas-crawler` · Tefas-API: `https://github.com/eneshenderson/Tefas-API`
+- isyatirimhisse: `https://github.com/urazakgul/isyatirimhisse` · tvdatafeed: `https://github.com/rongardF/tvdatafeed`
+- evds: `https://github.com/fatihmete/evds` · tcmb-py: `https://github.com/kaymal/tcmb-py` · EVDS seriler: `https://evds3.tcmb.gov.tr/tumSeriler`
+- Gramvey (ölü): `https://github.com/ahmetilhn/altin-fiyatlari-api` · hasfiyat: `https://github.com/ykpkilic/hasfiyat-altin-api-sdk`
