@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-09-15T17:23:27+03:00",
+  "olusturma_tarihi": "2026-09-15T18:35:56+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -114,10 +114,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 244502.78636700002,
+        "guncel_tl": 244419.87435600001,
         "onceki_tl": 249839.466282,
-        "gunluk_kazanc_tl": -5336.679914999986,
-        "gunluk_yuzde": -2.136043594079865,
+        "gunluk_kazanc_tl": -5419.591925999994,
+        "gunluk_yuzde": -2.169229708441166,
         "fiyat_eksik": false
       },
       {
