@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-09-21T23:07:08+03:00",
+  "olusturma_tarihi": "2026-09-22T10:31:14+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -10,10 +10,10 @@
         "kod_orjinal": "KPC",
         "adet": 21941.0,
         "maliyet": 21.93,
-        "guncel_tl": 455598.765402,
-        "onceki_tl": 456297.037727,
-        "gunluk_kazanc_tl": -698.2723250000272,
-        "gunluk_yuzde": -0.15303021217897972,
+        "guncel_tl": 456393.534245,
+        "onceki_tl": 455598.765402,
+        "gunluk_kazanc_tl": 794.768842999998,
+        "gunluk_yuzde": 0.17444490708808869,
         "fiyat_eksik": false
       },
       {
@@ -23,10 +23,10 @@
         "kod_orjinal": "ZBJ",
         "adet": 2686.0,
         "maliyet": 2.75966,
-        "guncel_tl": 14349.482263999998,
-        "onceki_tl": 14306.388079999999,
-        "gunluk_kazanc_tl": 43.094183999999586,
-        "gunluk_yuzde": 0.30122336790405024,
+        "guncel_tl": 14362.555025999998,
+        "onceki_tl": 14349.482263999998,
+        "gunluk_kazanc_tl": 13.072761999999784,
+        "gunluk_yuzde": 0.0911026736678629,
         "fiyat_eksik": false
       },
       {
@@ -36,10 +36,10 @@
         "kod_orjinal": "HBF",
         "adet": 4515.0,
         "maliyet": 29.8066,
-        "guncel_tl": 233207.80476,
-        "onceki_tl": 230710.8111,
-        "gunluk_kazanc_tl": 2496.9936600000074,
-        "gunluk_yuzde": 1.0823045734591532,
+        "guncel_tl": 231973.08771000002,
+        "onceki_tl": 233207.80476,
+        "gunluk_kazanc_tl": -1234.7170499999775,
+        "gunluk_yuzde": -0.5294492829134324,
         "fiyat_eksik": false
       },
       {
@@ -49,10 +49,10 @@
         "kod_orjinal": "TFF",
         "adet": 6751.0,
         "maliyet": 26.76218258,
-        "guncel_tl": 299589.606321,
-        "onceki_tl": 297704.207294,
-        "gunluk_kazanc_tl": 1885.3990270000068,
-        "gunluk_yuzde": 0.6333128591421171,
+        "guncel_tl": 305865.646467,
+        "onceki_tl": 299589.606321,
+        "gunluk_kazanc_tl": 6276.040145999985,
+        "gunluk_yuzde": 2.0948791325141705,
         "fiyat_eksik": false
       },
       {
@@ -62,10 +62,10 @@
         "kod_orjinal": "NAU",
         "adet": 12121.0,
         "maliyet": 1.954833,
-        "guncel_tl": 38099.163556,
-        "onceki_tl": 37604.675240000004,
-        "gunluk_kazanc_tl": 494.4883159999954,
-        "gunluk_yuzde": 1.3149649952940143,
+        "guncel_tl": 37852.30727,
+        "onceki_tl": 38099.163556,
+        "gunluk_kazanc_tl": -246.856286000002,
+        "gunluk_yuzde": -0.647930985773902,
         "fiyat_eksik": false
       },
       {
@@ -75,10 +75,10 @@
         "kod_orjinal": "MPP",
         "adet": 26014.0,
         "maliyet": 18.1055,
-        "guncel_tl": 574200.856682,
-        "onceki_tl": 573092.4001419999,
-        "gunluk_kazanc_tl": 1108.4565400000429,
-        "gunluk_yuzde": 0.19341672297964363,
+        "guncel_tl": 583389.911972,
+        "onceki_tl": 574200.856682,
+        "gunluk_kazanc_tl": 9189.055290000048,
+        "gunluk_yuzde": 1.6003207210624326,
         "fiyat_eksik": false
       },
       {
@@ -88,10 +88,10 @@
         "kod_orjinal": "FFC",
         "adet": 10201424.0,
         "maliyet": null,
-        "guncel_tl": 1023876.1211839999,
-        "onceki_tl": 1027038.562624,
-        "gunluk_kazanc_tl": -3162.4414400000824,
-        "gunluk_yuzde": -0.30791847113513454,
+        "guncel_tl": 1042942.58264,
+        "onceki_tl": 1023876.1211839999,
+        "gunluk_kazanc_tl": 19066.461456000106,
+        "gunluk_yuzde": 1.8621844050774272,
         "fiyat_eksik": false
       },
       {
@@ -101,10 +101,10 @@
         "kod_orjinal": "GHU",
         "adet": 763846.0,
         "maliyet": null,
-        "guncel_tl": 237058.078408,
-        "onceki_tl": 237402.572954,
-        "gunluk_kazanc_tl": -344.4945460000017,
-        "gunluk_yuzde": -0.1451098620008437,
+        "guncel_tl": 237260.497598,
+        "onceki_tl": 237058.078408,
+        "gunluk_kazanc_tl": 202.41918999998597,
+        "gunluk_yuzde": 0.08538801603360796,
         "fiyat_eksik": false
       },
       {
@@ -114,10 +114,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 277032.63336000004,
-        "onceki_tl": 259193.598048,
-        "gunluk_kazanc_tl": 17839.03531200002,
-        "gunluk_yuzde": 6.882513860815504,
+        "guncel_tl": 273063.17973900004,
+        "onceki_tl": 276930.982314,
+        "gunluk_kazanc_tl": -3867.8025749999797,
+        "gunluk_yuzde": -1.3966666144326336,
         "fiyat_eksik": false
       },
       {
@@ -140,10 +140,10 @@
         "kod_orjinal": "KEZ",
         "adet": 1932825.0,
         "maliyet": null,
-        "guncel_tl": 1008157.65435,
-        "onceki_tl": 1006856.8631249999,
-        "gunluk_kazanc_tl": 1300.7912250000518,
-        "gunluk_yuzde": 0.12919326198589565,
+        "guncel_tl": 1009785.093,
+        "onceki_tl": 1008157.65435,
+        "gunluk_kazanc_tl": 1627.4386500000255,
+        "gunluk_yuzde": 0.16142699933665644,
         "fiyat_eksik": false
       },
       {
@@ -153,10 +153,10 @@
         "kod_orjinal": "HVT",
         "adet": 55105.0,
         "maliyet": 4.61,
-        "guncel_tl": 269573.88042,
-        "onceki_tl": 268745.32164,
-        "gunluk_kazanc_tl": 828.5587800000212,
-        "gunluk_yuzde": 0.308306308345685,
+        "guncel_tl": 269796.50461999996,
+        "onceki_tl": 269573.88042,
+        "gunluk_kazanc_tl": 222.624199999962,
+        "gunluk_yuzde": 0.08258374277697464,
         "fiyat_eksik": false
       }
     ],
@@ -181,10 +181,10 @@
         "kod_orjinal": "HES",
         "adet": 686312.0,
         "maliyet": null,
-        "guncel_tl": 486793.55216799997,
-        "onceki_tl": 493921.58859999996,
-        "gunluk_kazanc_tl": -7128.0364319999935,
-        "gunluk_yuzde": -1.4431514225171072,
+        "guncel_tl": 493526.9592,
+        "onceki_tl": 486793.55216799997,
+        "gunluk_kazanc_tl": 6733.407032000017,
+        "gunluk_yuzde": 1.383216150257515,
         "fiyat_eksik": false
       },
       {
@@ -194,10 +194,10 @@
         "kod_orjinal": "FFC",
         "adet": 7299919.0,
         "maliyet": null,
-        "guncel_tl": 732663.670354,
-        "onceki_tl": 734926.645244,
-        "gunluk_kazanc_tl": -2262.9748900000704,
-        "gunluk_yuzde": -0.3079184711351361,
+        "guncel_tl": 746307.218965,
+        "onceki_tl": 732663.670354,
+        "gunluk_kazanc_tl": 13643.548611000064,
+        "gunluk_yuzde": 1.8621844050774254,
         "fiyat_eksik": false
       },
       {
@@ -207,10 +207,10 @@
         "kod_orjinal": "24ayar",
         "adet": 301.86,
         "maliyet": null,
-        "guncel_tl": 2072536.3479600002,
-        "onceki_tl": 2074276.57086,
-        "gunluk_kazanc_tl": -1740.2228999999352,
-        "gunluk_yuzde": -0.08389541319836798,
+        "guncel_tl": 2056543.2014400002,
+        "onceki_tl": 2072536.3479600002,
+        "gunluk_kazanc_tl": -15993.146519999951,
+        "gunluk_yuzde": -0.7716702549386901,
         "fiyat_eksik": false
       },
       {
@@ -220,10 +220,10 @@
         "kod_orjinal": "IJC",
         "adet": 12034.0,
         "maliyet": 16.61,
-        "guncel_tl": 185948.86257199998,
-        "onceki_tl": 185953.591934,
-        "gunluk_kazanc_tl": -4.72936200001277,
-        "gunluk_yuzde": -0.002543302310444936,
+        "guncel_tl": 188672.445588,
+        "onceki_tl": 185948.86257199998,
+        "gunluk_kazanc_tl": 2723.5830160000187,
+        "gunluk_yuzde": 1.4646946361102042,
         "fiyat_eksik": false
       },
       {
@@ -233,10 +233,10 @@
         "kod_orjinal": "TFF",
         "adet": 2433.0,
         "maliyet": 41.08,
-        "guncel_tl": 107969.413743,
-        "onceki_tl": 107289.932802,
-        "gunluk_kazanc_tl": 679.4809410000016,
-        "gunluk_yuzde": 0.6333128591421164,
+        "guncel_tl": 110231.242461,
+        "onceki_tl": 107969.413743,
+        "gunluk_kazanc_tl": 2261.8287180000043,
+        "gunluk_yuzde": 2.0948791325141802,
         "fiyat_eksik": false
       },
       {
@@ -246,10 +246,10 @@
         "kod_orjinal": "KPC",
         "adet": 24672.0,
         "maliyet": 21.99,
-        "guncel_tl": 512307.22118399997,
-        "onceki_tl": 513092.40758400003,
-        "gunluk_kazanc_tl": -785.1864000000642,
-        "gunluk_yuzde": -0.15303021217898627,
+        "guncel_tl": 513200.91504,
+        "onceki_tl": 512307.22118399997,
+        "gunluk_kazanc_tl": 893.6938560000272,
+        "gunluk_yuzde": 0.17444490708809443,
         "fiyat_eksik": false
       }
     ]
