@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-09-23T18:35:55+03:00",
+  "olusturma_tarihi": "2026-09-23T22:12:23+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -114,10 +114,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 271136.872692,
+        "guncel_tl": 270873.07968,
         "onceki_tl": 275310.61467000004,
-        "gunluk_kazanc_tl": -4173.741978000035,
-        "gunluk_yuzde": -1.5160120081105022,
+        "gunluk_kazanc_tl": -4437.534990000015,
+        "gunluk_yuzde": -1.6118285142470978,
         "fiyat_eksik": false
       },
       {
@@ -151,12 +151,12 @@
         "tip": "fon",
         "kod": "HVT",
         "kod_orjinal": "HVT",
-        "adet": 55105.0,
+        "adet": 38751.0,
         "maliyet": 4.61,
-        "guncel_tl": 270084.20782500005,
-        "onceki_tl": 269796.50461999996,
-        "gunluk_kazanc_tl": 287.7032050000853,
-        "gunluk_yuzde": 0.10663711355538366,
+        "guncel_tl": 189928.920015,
+        "onceki_tl": 189726.60104399998,
+        "gunluk_kazanc_tl": 202.3189710000297,
+        "gunluk_yuzde": 0.1066371135553677,
         "fiyat_eksik": false
       }
     ],
