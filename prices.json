@@ -1,12 +1,12 @@
 {
-  "son_guncelleme": "2026-09-24T12:31:03+03:00",
+  "son_guncelleme": "2026-09-24T14:35:32+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
     "btc_kaynak": "borsapy",
     "hisse_kaynak": "yok",
     "altin_kaynak": "borsapy",
-    "fon_kaynak": "borsapy"
+    "fon_kaynak": "onceki_snapshot"
   },
   "kurlar": {
     "usd_try": {
@@ -34,60 +34,60 @@
       "onceki": 0.312255,
       "yilbasi": 0.319144
     },
-    "HBF": {
-      "guncel": 51.076882,
-      "onceki": 51.007104,
-      "yilbasi": 51.904464
-    },
-    "HES": {
-      "guncel": 0.720236,
-      "onceki": 0.719774,
-      "yilbasi": 0.801649
-    },
     "HVT": {
       "guncel": 4.907479,
       "onceki": 4.901265,
       "yilbasi": 4.667388
     },
+    "HBF": {
+      "guncel": 51.076882,
+      "onceki": 51.076882,
+      "yilbasi": 51.904464
+    },
+    "HES": {
+      "guncel": 0.720236,
+      "onceki": 0.720236,
+      "yilbasi": 0.801649
+    },
     "IJC": {
       "guncel": 15.843827,
-      "onceki": 15.862281,
+      "onceki": 15.843827,
       "yilbasi": 16.488548
     },
     "KEZ": {
       "guncel": 0.525873,
-      "onceki": 0.522897,
+      "onceki": 0.525873,
       "yilbasi": 0.512718
     },
     "KPC": {
       "guncel": 20.967209,
-      "onceki": 20.888503,
+      "onceki": 20.967209,
       "yilbasi": 21.685601
     },
     "MPP": {
       "guncel": 22.624103,
-      "onceki": 22.783287,
+      "onceki": 22.624103,
       "yilbasi": 22.672514
     },
     "NAU": {
       "guncel": 3.110589,
-      "onceki": 3.098534,
+      "onceki": 3.110589,
       "yilbasi": 3.229706
     },
     "TFF": {
       "guncel": 46.253058,
-      "onceki": 46.187412,
+      "onceki": 46.253058,
       "yilbasi": 38.596631
     },
     "ZBJ": {
       "guncel": 5.359513,
-      "onceki": 5.353304,
+      "onceki": 5.359513,
       "yilbasi": 4.637761
     }
   },
   "kripto": {
     "BTC": {
-      "guncel": 4066666.0,
+      "guncel": 4077525.0,
       "onceki": 4122360.0,
       "yilbasi": 3720444.0
     }
