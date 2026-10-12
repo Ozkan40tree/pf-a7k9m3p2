@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-10-12T12:32:51+03:00",
+  "olusturma_tarihi": "2026-10-12T14:31:13+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -23,10 +23,10 @@
         "kod_orjinal": "ZBJ",
         "adet": 2686.0,
         "maliyet": 2.75966,
-        "guncel_tl": 14610.284806000001,
+        "guncel_tl": 14656.419542000001,
         "onceki_tl": 14610.284806000001,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": 46.134735999999975,
+        "gunluk_yuzde": 0.3157689026093033,
         "fiyat_eksik": false
       },
       {
@@ -49,10 +49,10 @@
         "kod_orjinal": "TFF",
         "adet": 6751.0,
         "maliyet": 26.76218258,
-        "guncel_tl": 319950.521056,
+        "guncel_tl": 318047.91373,
         "onceki_tl": 319950.521056,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": -1902.6073260000558,
+        "gunluk_yuzde": -0.5946567362104866,
         "fiyat_eksik": false
       },
       {
@@ -75,10 +75,10 @@
         "kod_orjinal": "FFC",
         "adet": 10201424.0,
         "maliyet": null,
-        "guncel_tl": 1067925.870016,
+        "guncel_tl": 1064253.357376,
         "onceki_tl": 1067925.870016,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": -3672.512640000088,
+        "gunluk_yuzde": -0.34389209430286255,
         "fiyat_eksik": false
       },
       {
@@ -89,9 +89,9 @@
         "adet": 763846.0,
         "maliyet": null,
         "guncel_tl": 230415.67359199998,
-        "onceki_tl": 230415.67359199998,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "onceki_tl": 228386.898616,
+        "gunluk_kazanc_tl": 2028.774975999986,
+        "gunluk_yuzde": 0.8883061980762225,
         "fiyat_eksik": false
       },
       {
@@ -101,10 +101,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 270055.334493,
+        "guncel_tl": 269920.544943,
         "onceki_tl": 270143.440833,
-        "gunluk_kazanc_tl": -88.10633999999845,
-        "gunluk_yuzde": -0.03261465084190769,
+        "gunluk_kazanc_tl": -222.89588999998523,
+        "gunluk_yuzde": -0.08251019877168785,
         "fiyat_eksik": false
       },
       {
@@ -168,10 +168,10 @@
         "kod_orjinal": "FFC",
         "adet": 7299919.0,
         "maliyet": null,
-        "guncel_tl": 764184.720596,
+        "guncel_tl": 761556.749756,
         "onceki_tl": 764184.720596,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": -2627.9708399999654,
+        "gunluk_yuzde": -0.3438920943028498,
         "fiyat_eksik": false
       },
       {
@@ -207,10 +207,10 @@
         "kod_orjinal": "TFF",
         "adet": 2433.0,
         "maliyet": 41.08,
-        "guncel_tl": 115307.305248,
+        "guncel_tl": 114621.62259,
         "onceki_tl": 115307.305248,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": -685.6826580000052,
+        "gunluk_yuzde": -0.5946567362104738,
         "fiyat_eksik": false
       },
       {
