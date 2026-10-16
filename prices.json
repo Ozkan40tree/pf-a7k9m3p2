@@ -1,5 +1,5 @@
 {
-  "son_guncelleme": "2026-10-16T12:31:13+03:00",
+  "son_guncelleme": "2026-10-16T14:33:12+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
@@ -24,30 +24,20 @@
   },
   "hisseler": {},
   "fonlar_ve_emeklilik": {
-    "FFC": {
-      "guncel": 0.099435,
-      "onceki": 0.101263,
-      "yilbasi": 0.099452
-    },
-    "IJC": {
-      "guncel": 14.245548,
-      "onceki": 14.791967,
-      "yilbasi": 16.488548
+    "GHU": {
+      "guncel": 0.296782,
+      "onceki": 0.296585,
+      "yilbasi": 0.319144
     },
     "KEZ": {
       "guncel": 0.507802,
       "onceki": 0.507591,
       "yilbasi": 0.512718
     },
-    "ZBJ": {
-      "guncel": 5.476906,
-      "onceki": 5.471206,
-      "yilbasi": 4.637761
-    },
-    "GHU": {
-      "guncel": 0.296585,
-      "onceki": 0.296585,
-      "yilbasi": 0.319144
+    "FFC": {
+      "guncel": 0.099435,
+      "onceki": 0.099435,
+      "yilbasi": 0.099452
     },
     "HBF": {
       "guncel": 49.594026,
@@ -59,6 +49,11 @@
       "onceki": 0.669317,
       "yilbasi": 0.801649
     },
+    "IJC": {
+      "guncel": 14.245548,
+      "onceki": 14.245548,
+      "yilbasi": 16.488548
+    },
     "KPC": {
       "guncel": 19.966487,
       "onceki": 19.966487,
@@ -68,11 +63,16 @@
       "guncel": 44.746137,
       "onceki": 44.746137,
       "yilbasi": 38.596631
+    },
+    "ZBJ": {
+      "guncel": 5.476906,
+      "onceki": 5.476906,
+      "yilbasi": 4.637761
     }
   },
   "kripto": {
     "BTC": {
-      "guncel": 4054379.0,
+      "guncel": 4086690.0,
       "onceki": 4059313.0,
       "yilbasi": 3720444.0
     }
