@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-10-19T10:34:51+03:00",
+  "olusturma_tarihi": "2026-10-19T12:34:46+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -21,12 +21,12 @@
         "tip": "fon",
         "kod": "ZBJ",
         "kod_orjinal": "ZBJ",
-        "adet": 2686.0,
-        "maliyet": 2.75966,
-        "guncel_tl": 14754.89636,
-        "onceki_tl": 14710.969516,
-        "gunluk_kazanc_tl": 43.92684400000144,
-        "gunluk_yuzde": 0.29859924563248913,
+        "adet": 50143.0,
+        "maliyet": 5.36,
+        "guncel_tl": 275448.53618,
+        "onceki_tl": 275448.53618,
+        "gunluk_kazanc_tl": 0.0,
+        "gunluk_yuzde": 0.0,
         "fiyat_eksik": false
       },
       {
@@ -56,17 +56,17 @@
         "fiyat_eksik": false
       },
       {
-        "tip_orjinal": "Nakit",
-        "tip": "nakit",
-        "kod": "TL",
-        "kod_orjinal": "TL",
-        "adet": 660000.0,
-        "maliyet": 1.954833,
-        "guncel_tl": 660000.0,
-        "onceki_tl": 660000.0,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
-        "fiyat_eksik": false
+        "tip_orjinal": "YurtdisiFonu",
+        "tip": "yurtdisifonu",
+        "kod": "KTJ",
+        "kod_orjinal": "KTJ",
+        "adet": 107012.0,
+        "maliyet": 2.8,
+        "guncel_tl": null,
+        "onceki_tl": null,
+        "gunluk_kazanc_tl": null,
+        "gunluk_yuzde": null,
+        "fiyat_eksik": true
       },
       {
         "tip_orjinal": "Emeklilik",
@@ -75,10 +75,10 @@
         "kod_orjinal": "FFC",
         "adet": 10201424.0,
         "maliyet": null,
-        "guncel_tl": 1014378.59544,
+        "guncel_tl": 996862.750432,
         "onceki_tl": 1014378.59544,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": -17515.845007999917,
+        "gunluk_yuzde": -1.7267561723739044,
         "fiyat_eksik": false
       },
       {
@@ -101,10 +101,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 270397.831452,
+        "guncel_tl": 269844.14228100004,
         "onceki_tl": 266890.081353,
-        "gunluk_kazanc_tl": 3507.750098999997,
-        "gunluk_yuzde": 1.3143051555971836,
+        "gunluk_kazanc_tl": 2954.060928000021,
+        "gunluk_yuzde": 1.1068455272014608,
         "fiyat_eksik": false
       },
       {
@@ -127,10 +127,10 @@
         "kod_orjinal": "KEZ",
         "adet": 1932825.0,
         "maliyet": null,
-        "guncel_tl": 981492.40065,
+        "guncel_tl": 962558.44695,
         "onceki_tl": 981492.40065,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": -18933.953699999955,
+        "gunluk_yuzde": -1.9290983493566345,
         "fiyat_eksik": false
       }
     ],
@@ -155,10 +155,10 @@
         "kod_orjinal": "HES",
         "adet": 686312.0,
         "maliyet": null,
-        "guncel_tl": 456763.97060799995,
+        "guncel_tl": 441938.945096,
         "onceki_tl": 456763.97060799995,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": -14825.025511999964,
+        "gunluk_yuzde": -3.245664383788048,
         "fiyat_eksik": false
       },
       {
@@ -168,10 +168,10 @@
         "kod_orjinal": "FFC",
         "adet": 7299919.0,
         "maliyet": null,
-        "guncel_tl": 725867.445765,
+        "guncel_tl": 713333.484842,
         "onceki_tl": 725867.445765,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": -12533.960923000006,
+        "gunluk_yuzde": -1.7267561723739135,
         "fiyat_eksik": false
       },
       {
@@ -194,10 +194,10 @@
         "kod_orjinal": "IJC",
         "adet": 12034.0,
         "maliyet": 16.61,
-        "guncel_tl": 171430.92463199998,
+        "guncel_tl": 171100.880148,
         "onceki_tl": 171430.92463199998,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": -330.04448399998364,
+        "gunluk_yuzde": -0.1925233062287154,
         "fiyat_eksik": false
       },
       {
