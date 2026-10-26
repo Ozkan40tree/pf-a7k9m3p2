@@ -1,12 +1,12 @@
 {
-  "son_guncelleme": "2026-10-26T12:31:14+03:00",
+  "son_guncelleme": "2026-10-26T14:32:51+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
     "btc_kaynak": "borsapy",
     "hisse_kaynak": "yok",
     "altin_kaynak": "borsapy",
-    "fon_kaynak": "onceki_snapshot"
+    "fon_kaynak": "borsapy"
   },
   "kurlar": {
     "usd_try": {
@@ -24,25 +24,40 @@
   },
   "hisseler": {},
   "fonlar_ve_emeklilik": {
-    "FFC": {
-      "guncel": 0.094573,
-      "onceki": 0.095075,
-      "yilbasi": 0.099452
-    },
-    "GHU": {
-      "guncel": 0.273514,
-      "onceki": 0.277492,
-      "yilbasi": 0.319144
-    },
     "HES": {
       "guncel": 0.602802,
       "onceki": 0.608485,
       "yilbasi": 0.801649
     },
+    "KPC": {
+      "guncel": 18.261456,
+      "onceki": 18.429838,
+      "yilbasi": 21.685601
+    },
     "KTJ": {
       "guncel": 2.627394,
       "onceki": 2.650893,
       "yilbasi": 2.698068
+    },
+    "TFF": {
+      "guncel": 44.058145,
+      "onceki": 44.530218,
+      "yilbasi": 38.596631
+    },
+    "ZBJ": {
+      "guncel": 5.529299,
+      "onceki": 5.514817,
+      "yilbasi": 4.637761
+    },
+    "FFC": {
+      "guncel": 0.094573,
+      "onceki": 0.094573,
+      "yilbasi": 0.099452
+    },
+    "GHU": {
+      "guncel": 0.273514,
+      "onceki": 0.273514,
+      "yilbasi": 0.319144
     },
     "HBF": {
       "guncel": 49.179582,
@@ -58,26 +73,11 @@
       "guncel": 0.482092,
       "onceki": 0.482092,
       "yilbasi": 0.512718
-    },
-    "KPC": {
-      "guncel": 18.429838,
-      "onceki": 18.429838,
-      "yilbasi": 21.685601
-    },
-    "TFF": {
-      "guncel": 44.530218,
-      "onceki": 44.530218,
-      "yilbasi": 38.596631
-    },
-    "ZBJ": {
-      "guncel": 5.514817,
-      "onceki": 5.514817,
-      "yilbasi": 4.637761
     }
   },
   "kripto": {
     "BTC": {
-      "guncel": 4000240.0,
+      "guncel": 3987671.0,
       "onceki": 3983366.0,
       "yilbasi": 3720444.0
     }
