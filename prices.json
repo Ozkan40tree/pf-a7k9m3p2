@@ -1,5 +1,5 @@
 {
-  "son_guncelleme": "2026-10-27T12:33:17+03:00",
+  "son_guncelleme": "2026-10-27T14:32:16+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
@@ -24,6 +24,11 @@
   },
   "hisseler": {},
   "fonlar_ve_emeklilik": {
+    "FFC": {
+      "guncel": 0.095339,
+      "onceki": 0.094573,
+      "yilbasi": 0.099452
+    },
     "GHU": {
       "guncel": 0.273797,
       "onceki": 0.273514,
@@ -34,10 +39,10 @@
       "onceki": 18.261456,
       "yilbasi": 21.685601
     },
-    "FFC": {
-      "guncel": 0.095339,
-      "onceki": 0.095339,
-      "yilbasi": 0.099452
+    "KTJ": {
+      "guncel": 2.66155,
+      "onceki": 2.627394,
+      "yilbasi": 2.698068
     },
     "HBF": {
       "guncel": 48.618399,
@@ -59,11 +64,6 @@
       "onceki": 0.479798,
       "yilbasi": 0.512718
     },
-    "KTJ": {
-      "guncel": 2.66155,
-      "onceki": 2.66155,
-      "yilbasi": 2.698068
-    },
     "TFF": {
       "guncel": 44.400037,
       "onceki": 44.400037,
@@ -77,7 +77,7 @@
   },
   "kripto": {
     "BTC": {
-      "guncel": 3954446.0,
+      "guncel": 3968970.0,
       "onceki": 3975100.0,
       "yilbasi": 3720444.0
     }
