@@ -2683,6 +2683,31 @@
         "toplam": 3767314.7564040003
       },
       "genel_toplam": 7751018.986966001
+    },
+    "2026-10-28": {
+      "ozkan": {
+        "kategoriler": {
+          "hissefonu": 401217.799433,
+          "fon": 277815.937639,
+          "altinfonu": 218796.29047500002,
+          "yurtdisifonu": 594321.85335,
+          "emeklilik": 2116853.115405,
+          "kripto": 263325.588141,
+          "alacak": 135000.0
+        },
+        "toplam": 4007330.584443
+      },
+      "derya": {
+        "kategoriler": {
+          "nakit": 0.0,
+          "emeklilik": 1112820.073024,
+          "altin": 1961800.5162600002,
+          "yurtdisifonu": 278269.226526,
+          "hissefonu": 451157.447136
+        },
+        "toplam": 3804047.262946
+      },
+      "genel_toplam": 7811377.847389
     }
   }
 }
