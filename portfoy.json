@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-10-30T16:31:51+03:00",
+  "olusturma_tarihi": "2026-10-30T18:35:41+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -8,25 +8,12 @@
         "tip": "hissefonu",
         "kod": "KPC",
         "kod_orjinal": "KPC",
-        "adet": 21941.0,
-        "maliyet": 21.93,
-        "guncel_tl": 402433.177246,
-        "onceki_tl": 401217.799433,
-        "gunluk_kazanc_tl": 1215.3778129999992,
-        "gunluk_yuzde": 0.3029222070201193,
-        "fiyat_eksik": false
-      },
-      {
-        "tip_orjinal": "Fon",
-        "tip": "fon",
-        "kod": "ZBJ",
-        "kod_orjinal": "ZBJ",
-        "adet": 50143.0,
-        "maliyet": 5.36,
-        "guncel_tl": 278363.69977099996,
-        "onceki_tl": 277815.937639,
-        "gunluk_kazanc_tl": 547.7621319999453,
-        "gunluk_yuzde": 0.19716728156601265,
+        "adet": 6532.0,
+        "maliyet": 21.99,
+        "guncel_tl": 119807.370392,
+        "onceki_tl": 119445.543316,
+        "gunluk_kazanc_tl": 361.8270760000014,
+        "gunluk_yuzde": 0.3029222070201207,
         "fiyat_eksik": false
       },
       {
@@ -101,10 +88,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 252305.65479,
+        "guncel_tl": 253599.371466,
         "onceki_tl": 254780.52243,
-        "gunluk_kazanc_tl": -2474.8676400000113,
-        "gunluk_yuzde": -0.9713723860818174,
+        "gunluk_kazanc_tl": -1181.1509640000004,
+        "gunluk_yuzde": -0.46359547140206414,
         "fiyat_eksik": false
       },
       {
@@ -248,6 +235,31 @@
       "ay": "2026-07",
       "gerceklesen": 31.75,
       "beklenti": 23.69
+    },
+    {
+      "ay": "2026-08",
+      "gerceklesen": 31.51,
+      "beklenti": 23.69
+    },
+    {
+      "ay": "2026-09",
+      "gerceklesen": 29.73,
+      "beklenti": 23.7
+    },
+    {
+      "ay": "2026-10",
+      "gerceklesen": null,
+      "beklenti": 23.89
+    },
+    {
+      "ay": "2026-11",
+      "gerceklesen": null,
+      "beklenti": null
+    },
+    {
+      "ay": "2026-12",
+      "gerceklesen": null,
+      "beklenti": null
     }
   ]
 }
