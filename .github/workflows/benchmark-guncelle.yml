@@ -18,6 +18,11 @@ on:
 permissions:
   contents: write
 
+# Repo'ya yazan tum workflow'lar ayni kilidi paylasir (portfoy-guncelle.yml ile ortak).
+concurrency:
+  group: repo-yazma
+  cancel-in-progress: false
+
 jobs:
   guncelle:
     runs-on: ubuntu-latest
@@ -58,5 +63,19 @@ jobs:
             echo "Degisiklik yok, commit atlaniyor."
           else
             TZ='Europe/Istanbul' git commit -m "Benchmark guncelleme $(TZ='Europe/Istanbul' date '+%Y-%m-%d %H:%M')"
-            git push origin main
+            # Push reddedilirse: uzaktakini cek, ustune tasi, 3 kez dene (portfoy-guncelle.yml ile ayni mantik).
+            for i in 1 2 3; do
+              if git push origin HEAD:main; then echo "Push basarili (deneme $i)"; exit 0; fi
+              echo "Push reddedildi (deneme $i/3), uzak degisiklikler cekiliyor..."
+              git fetch --deepen=50 origin main
+              if git rebase -X theirs origin/main; then
+                for f in *.json; do
+                  python -c "import json,sys; json.load(open(sys.argv[1]))" "$f" || { echo "BOZUK JSON: $f - push iptal"; exit 1; }
+                done
+              else
+                git rebase --abort; echo "Rebase basarisiz"
+              fi
+              sleep $((i * 5))
+            done
+            echo "Push 3 denemede basarisiz"; exit 1
           fi

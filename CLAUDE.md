@@ -725,6 +725,15 @@ git status
 Python `http.server` cache header göndermiyor, ama tarayıcı yine de cache'leyebilir. JS değişiklikleri yansımayabilir.
 **Pratik:** `Cmd+Shift+R` (hard refresh) ya da JSON'lara cache-busting eklenmiş (`?t=Date.now()`).
 
+**12.6.12 — İki workflow aynı anda push → "Run failed" maili (31 Eki 2026):**
+- **Ne oldu:** 26–30 Eki arası birkaç "Run failed: Portfoy Fiyat Guncelleme … No jobs were run" maili geldi. "No jobs were run" GitHub'ın genel metni, yanıltıcı. Gerçekte fiyat çekme başarılıydı, **son adım `git push` reddedildi**.
+- **Sebep:** GitHub'ın kendi `schedule` cron'u saatlerce gecikiyor (18:35 TR işi 23:04'te başladı) ve 23:xx'teki benchmark işiyle çakışıyor. Benchmark bizim işimiz çalışırken push yapınca bizim push "non-fast-forward" ile reddediliyordu (28 Eki 23:42 ve 30 Eki 23:14 commit saatleri bunu doğruladı). cron-job.org tetiklemeleri (workflow_dispatch) hiç düşmedi. **Veri kaybı yok:** bir sonraki iş aynı veriyi yazıyor.
+- **Çözüm (iki katman, iki workflow'da):**
+  1. `concurrency: group: repo-yazma, cancel-in-progress: false` → repoya yazan işler sıraya girer. (GitHub bir grupta en fazla 1 bekleyen iş tutar; daha yenisi gelirse eski bekleyen **iptal** olur. İptal "failed" sayılmaz, mail gelmez; sonraki iş zaten aynı veriyi çeker.)
+  2. Push 3 denemeli: reddedilirse `git fetch --deepen=50` + `git rebase -X theirs origin/main` (çakışmada **yeni çekilen veri kazanır**), sonra tüm `*.json` dosyaları parse edilir; bozuksa push iptal. Lokal sahte repoyla (shallow clone + çakışan `prices.json`) test edildi: 2. denemede başarılı, yeni veri kazandı, diğer işin dosyası korundu.
+- **Doktrin:** Cron'la repoya yazan birden fazla workflow varsa hepsi aynı concurrency grubunu paylaşmalı, push'lar da tekrar denemeli olmalı. Hata mailinde "No jobs were run" yazsa bile önce hangi **adımın** düştüğüne bak (public repo: `api.github.com/repos/<repo>/actions/runs/<id>/jobs` giriş gerektirmez).
+- **Zararsız uyarılar (aynı maillerde):** "Node.js 20 deprecated" (GitHub altyapısı), "Egress is over the account limit" (pip cache yüklenemedi, paketler baştan indirildi; iş sadece yavaşladı).
+
 ### 12.7 Mimari kararlar
 
 **Privacy modu nasıl çalışır:**

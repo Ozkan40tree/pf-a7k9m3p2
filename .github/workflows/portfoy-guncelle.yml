@@ -21,6 +21,12 @@ on:
 permissions:
   contents: write
 
+# Repo'ya yazan tum workflow'lar ayni kilidi paylasir (benchmark-guncelle.yml ile ortak).
+# Ayni anda iki is push yapip birbirini reddetmesin diye siraya girerler.
+concurrency:
+  group: repo-yazma
+  cancel-in-progress: false
+
 jobs:
   guncelle:
     runs-on: ubuntu-latest
@@ -87,5 +93,21 @@ jobs:
             echo "=== Commit'lenecek dosyalar: ==="
             git diff --cached --name-only
             TZ='Europe/Istanbul' git commit -m "Otomatik guncelleme $(TZ='Europe/Istanbul' date '+%Y-%m-%d %H:%M')"
-            git push origin main
+            # Push reddedilirse (arada baska bir is push yaptiysa): uzaktakini cek,
+            # commit'i ustune tasi, 3 kez dene. Cakismada YENI veri kazanir (-X theirs).
+            # Tasima sonrasi JSON bozulduysa push iptal edilir.
+            for i in 1 2 3; do
+              if git push origin HEAD:main; then echo "Push basarili (deneme $i)"; exit 0; fi
+              echo "Push reddedildi (deneme $i/3), uzak degisiklikler cekiliyor..."
+              git fetch --deepen=50 origin main
+              if git rebase -X theirs origin/main; then
+                for f in *.json; do
+                  python -c "import json,sys; json.load(open(sys.argv[1]))" "$f" || { echo "BOZUK JSON: $f - push iptal"; exit 1; }
+                done
+              else
+                git rebase --abort; echo "Rebase basarisiz"
+              fi
+              sleep $((i * 5))
+            done
+            echo "Push 3 denemede basarisiz"; exit 1
           fi
