@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-11-02T20:17:34+03:00",
+  "olusturma_tarihi": "2026-11-02T20:49:30+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -88,10 +88,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 253963.763508,
+        "guncel_tl": 252198.34915800003,
         "onceki_tl": 257067.736716,
-        "gunluk_kazanc_tl": -3103.9732080000103,
-        "gunluk_yuzde": -1.2074534314001362,
+        "gunluk_kazanc_tl": -4869.387557999988,
+        "gunluk_yuzde": -1.8942040802963644,
         "fiyat_eksik": false
       },
       {
@@ -118,6 +118,71 @@
         "onceki_tl": 929076.1194750001,
         "gunluk_kazanc_tl": -20795.26417500002,
         "gunluk_yuzde": -2.2382734567272005,
+        "fiyat_eksik": false
+      },
+      {
+        "tip_orjinal": "Hisse",
+        "tip": "hisse",
+        "kod": "ARDYZ",
+        "kod_orjinal": "ARDYZ",
+        "adet": 3370.0,
+        "maliyet": 51.43,
+        "guncel_tl": 170185.0,
+        "onceki_tl": 170185.0,
+        "gunluk_kazanc_tl": 0.0,
+        "gunluk_yuzde": 0.0,
+        "fiyat_eksik": false
+      },
+      {
+        "tip_orjinal": "Hisse",
+        "tip": "hisse",
+        "kod": "TRGYO",
+        "kod_orjinal": "TRGYO",
+        "adet": 1869.0,
+        "maliyet": 85.53,
+        "guncel_tl": 160640.55000000002,
+        "onceki_tl": 159332.25,
+        "gunluk_kazanc_tl": 1308.3000000000175,
+        "gunluk_yuzde": 0.8211143695014772,
+        "fiyat_eksik": false
+      },
+      {
+        "tip_orjinal": "Hisse",
+        "tip": "hisse",
+        "kod": "TUPRS",
+        "kod_orjinal": "TUPRS",
+        "adet": 208.0,
+        "maliyet": 350.75,
+        "guncel_tl": 70096.0,
+        "onceki_tl": 71448.0,
+        "gunluk_kazanc_tl": -1352.0,
+        "gunluk_yuzde": -1.8922852983988356,
+        "fiyat_eksik": false
+      },
+      {
+        "tip_orjinal": "Hisse",
+        "tip": "hisse",
+        "kod": "GLYHO",
+        "kod_orjinal": "GLYHO",
+        "adet": 2569.0,
+        "maliyet": 15.42,
+        "guncel_tl": 41232.450000000004,
+        "onceki_tl": 40281.92,
+        "gunluk_kazanc_tl": 950.5300000000061,
+        "gunluk_yuzde": 2.3596938775510354,
+        "fiyat_eksik": false
+      },
+      {
+        "tip_orjinal": "Hisse",
+        "tip": "hisse",
+        "kod": "AYDEM",
+        "kod_orjinal": "AYDEM",
+        "adet": 1942.0,
+        "maliyet": 21.0,
+        "guncel_tl": 40005.200000000004,
+        "onceki_tl": 40082.880000000005,
+        "gunluk_kazanc_tl": -77.68000000000029,
+        "gunluk_yuzde": -0.1937984496124038,
         "fiyat_eksik": false
       }
     ],
