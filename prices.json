@@ -1,5 +1,5 @@
 {
-  "son_guncelleme": "2026-11-06T12:36:51+03:00",
+  "son_guncelleme": "2026-11-06T14:33:23+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
@@ -24,51 +24,51 @@
   },
   "hisseler": {
     "ARDYZ": {
-      "guncel": 55.3,
+      "guncel": 56.25,
       "onceki": 53.1,
       "yilbasi": 50.5
     },
     "AYDEM": {
-      "guncel": 22.34,
+      "guncel": 23.18,
       "onceki": 22.7,
       "yilbasi": 20.6
     },
     "GLYHO": {
-      "guncel": 16.06,
+      "guncel": 16.07,
       "onceki": 16.35,
       "yilbasi": 16.05
     },
     "TRGYO": {
-      "guncel": 89.15,
+      "guncel": 88.95,
       "onceki": 89.65,
       "yilbasi": 99.95
     },
     "TUPRS": {
-      "guncel": 331.25,
+      "guncel": 333.75,
       "onceki": 331.75,
       "yilbasi": 337.0
     }
   },
   "fonlar_ve_emeklilik": {
+    "FFC": {
+      "guncel": 0.090759,
+      "onceki": 0.093324,
+      "yilbasi": 0.099452
+    },
     "HBF": {
       "guncel": 49.775434,
       "onceki": 49.09565,
       "yilbasi": 51.904464
     },
-    "FFC": {
-      "guncel": 0.093324,
-      "onceki": 0.093324,
-      "yilbasi": 0.099452
+    "HES": {
+      "guncel": 0.627668,
+      "onceki": 0.624325,
+      "yilbasi": 0.801649
     },
     "GHU": {
       "guncel": 0.280298,
       "onceki": 0.280298,
       "yilbasi": 0.319144
-    },
-    "HES": {
-      "guncel": 0.624325,
-      "onceki": 0.624325,
-      "yilbasi": 0.801649
     },
     "IJC": {
       "guncel": 13.799011,
@@ -98,7 +98,7 @@
   },
   "kripto": {
     "BTC": {
-      "guncel": 3814890.0,
+      "guncel": 3807680.0,
       "onceki": 3809078.0,
       "yilbasi": 3720444.0
     }
