@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-11-06T16:31:27+03:00",
+  "olusturma_tarihi": "2026-11-06T18:14:23+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -88,10 +88,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 249162.559737,
+        "guncel_tl": 248471.05647,
         "onceki_tl": 250450.687578,
-        "gunluk_kazanc_tl": -1288.1278410000086,
-        "gunluk_yuzde": -0.5143239387589367,
+        "gunluk_kazanc_tl": -1979.6311080000014,
+        "gunluk_yuzde": -0.7904274997781621,
         "fiyat_eksik": false
       },
       {
@@ -127,10 +127,10 @@
         "kod_orjinal": "ARDYZ",
         "adet": 3370.0,
         "maliyet": 51.43,
-        "guncel_tl": 194786.0,
+        "guncel_tl": 196808.0,
         "onceki_tl": 178947.0,
-        "gunluk_kazanc_tl": 15839.0,
-        "gunluk_yuzde": 8.851224105461393,
+        "gunluk_kazanc_tl": 17861.0,
+        "gunluk_yuzde": 9.981167608286253,
         "fiyat_eksik": false
       },
       {
@@ -140,10 +140,10 @@
         "kod_orjinal": "TRGYO",
         "adet": 2525.0,
         "maliyet": 85.52,
-        "guncel_tl": 225482.5,
+        "guncel_tl": 227123.75,
         "onceki_tl": 226366.25,
-        "gunluk_kazanc_tl": -883.75,
-        "gunluk_yuzde": -0.39040713887339656,
+        "gunluk_kazanc_tl": 757.5,
+        "gunluk_yuzde": 0.33463469046291133,
         "fiyat_eksik": false
       },
       {
@@ -153,10 +153,10 @@
         "kod_orjinal": "TUPRS",
         "adet": 208.0,
         "maliyet": 350.75,
-        "guncel_tl": 69680.0,
+        "guncel_tl": 70668.0,
         "onceki_tl": 69004.0,
-        "gunluk_kazanc_tl": 676.0,
-        "gunluk_yuzde": 0.9796533534287867,
+        "gunluk_kazanc_tl": 1664.0,
+        "gunluk_yuzde": 2.4114544084400906,
         "fiyat_eksik": false
       },
       {
@@ -166,10 +166,10 @@
         "kod_orjinal": "GLYHO",
         "adet": 2569.0,
         "maliyet": 15.42,
-        "guncel_tl": 41720.56,
+        "guncel_tl": 42003.15,
         "onceki_tl": 42003.15,
-        "gunluk_kazanc_tl": -282.5900000000038,
-        "gunluk_yuzde": -0.672782874617746,
+        "gunluk_kazanc_tl": 0.0,
+        "gunluk_yuzde": 0.0,
         "fiyat_eksik": false
       },
       {
@@ -179,10 +179,10 @@
         "kod_orjinal": "AYDEM",
         "adet": 1942.0,
         "maliyet": 21.0,
-        "guncel_tl": 44355.28,
+        "guncel_tl": 43695.0,
         "onceki_tl": 44083.4,
-        "gunluk_kazanc_tl": 271.8799999999974,
-        "gunluk_yuzde": 0.6167400881057209,
+        "gunluk_kazanc_tl": -388.40000000000146,
+        "gunluk_yuzde": -0.8810572687224701,
         "fiyat_eksik": false
       }
     ],
