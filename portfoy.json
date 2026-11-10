@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-11-10T16:32:38+03:00",
+  "olusturma_tarihi": "2026-11-10T18:35:51+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -88,10 +88,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 242999.98151100002,
+        "guncel_tl": 242648.14791000003,
         "onceki_tl": 248211.27426900002,
-        "gunluk_kazanc_tl": -5211.292757999996,
-        "gunluk_yuzde": -2.0995391016575,
+        "gunluk_kazanc_tl": -5563.126358999987,
+        "gunluk_yuzde": -2.2412867325965724,
         "fiyat_eksik": false
       },
       {
@@ -127,11 +127,11 @@
         "kod_orjinal": "ARDYZ",
         "adet": 3370.0,
         "maliyet": 51.43,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 188046.0,
+        "onceki_tl": 208940.0,
+        "gunluk_kazanc_tl": -20894.0,
+        "gunluk_yuzde": -10.0,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "Hisse",
@@ -140,11 +140,11 @@
         "kod_orjinal": "TRGYO",
         "adet": 2525.0,
         "maliyet": 85.52,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 219801.25,
+        "onceki_tl": 232552.5,
+        "gunluk_kazanc_tl": -12751.25,
+        "gunluk_yuzde": -5.483170466883822,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "Hisse",
@@ -153,11 +153,11 @@
         "kod_orjinal": "TUPRS",
         "adet": 208.0,
         "maliyet": 350.75,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 68900.0,
+        "onceki_tl": 69108.0,
+        "gunluk_kazanc_tl": -208.0,
+        "gunluk_yuzde": -0.3009781790820165,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "Hisse",
@@ -166,11 +166,11 @@
         "kod_orjinal": "GLYHO",
         "adet": 2569.0,
         "maliyet": 15.42,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 40102.09,
+        "onceki_tl": 40641.58,
+        "gunluk_kazanc_tl": -539.4900000000052,
+        "gunluk_yuzde": -1.3274336283185968,
+        "fiyat_eksik": false
       },
       {
         "tip_orjinal": "Hisse",
@@ -179,11 +179,11 @@
         "kod_orjinal": "AYDEM",
         "adet": 1942.0,
         "maliyet": 21.0,
-        "guncel_tl": null,
-        "onceki_tl": null,
-        "gunluk_kazanc_tl": null,
-        "gunluk_yuzde": null,
-        "fiyat_eksik": true
+        "guncel_tl": 44005.72,
+        "onceki_tl": 45986.56,
+        "gunluk_kazanc_tl": -1980.8399999999965,
+        "gunluk_yuzde": -4.307432432432425,
+        "fiyat_eksik": false
       }
     ],
     "derya": [
