@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-11-20T14:31:23+03:00",
+  "olusturma_tarihi": "2026-11-20T16:31:15+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -75,10 +75,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 204990.774933,
+        "guncel_tl": 203872.35042300003,
         "onceki_tl": 205364.04336,
-        "gunluk_kazanc_tl": -373.2684270000027,
-        "gunluk_yuzde": -0.18175938732647023,
+        "gunluk_kazanc_tl": -1491.6929369999852,
+        "gunluk_yuzde": -0.7263651964550923,
         "fiyat_eksik": false
       },
       {
@@ -114,10 +114,10 @@
         "kod_orjinal": "ARDYZ",
         "adet": 3415.0,
         "maliyet": 51.24,
-        "guncel_tl": 157773.0,
+        "guncel_tl": 156270.4,
         "onceki_tl": 164807.9,
-        "gunluk_kazanc_tl": -7034.899999999994,
-        "gunluk_yuzde": -4.268545379196018,
+        "gunluk_kazanc_tl": -8537.5,
+        "gunluk_yuzde": -5.180273518441774,
         "fiyat_eksik": false
       },
       {
@@ -127,10 +127,10 @@
         "kod_orjinal": "TRGYO",
         "adet": 1197.0,
         "maliyet": 85.5,
-        "guncel_tl": 99470.7,
+        "guncel_tl": 99769.95,
         "onceki_tl": 100787.40000000001,
-        "gunluk_kazanc_tl": -1316.7000000000116,
-        "gunluk_yuzde": -1.3064133016627193,
+        "gunluk_kazanc_tl": -1017.4500000000116,
+        "gunluk_yuzde": -1.0095011876484676,
         "fiyat_eksik": false
       },
       {
@@ -140,10 +140,10 @@
         "kod_orjinal": "TCKRC",
         "adet": 2130.0,
         "maliyet": 130.97,
-        "guncel_tl": 262203.0,
+        "guncel_tl": 263907.0,
         "onceki_tl": 266250.0,
-        "gunluk_kazanc_tl": -4047.0,
-        "gunluk_yuzde": -1.52,
+        "gunluk_kazanc_tl": -2343.0,
+        "gunluk_yuzde": -0.88,
         "fiyat_eksik": false
       },
       {
