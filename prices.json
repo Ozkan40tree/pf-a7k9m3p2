@@ -1,5 +1,5 @@
 {
-  "son_guncelleme": "2026-11-23T22:23:55+03:00",
+  "son_guncelleme": "2026-11-24T00:35:26+03:00",
   "kaynak": "borsapy + tefas-crawler (yedek: yfinance, TCMB, CoinGecko)",
   "kaynak_durumu": {
     "kur_kaynak": "borsapy",
@@ -10,17 +10,17 @@
   },
   "kurlar": {
     "usd_try": {
-      "guncel": 50.5752,
-      "onceki": 50.4651
+      "guncel": 50.5953,
+      "onceki": 50.5752
     },
     "eur_try": {
-      "guncel": 55.6072,
-      "onceki": 55.5458
+      "guncel": 55.2006,
+      "onceki": 55.6072
     }
   },
   "gram_altin_tl": {
-    "guncel": 5731.947,
-    "onceki": 5701.584
+    "guncel": 5912.37,
+    "onceki": 5731.947
   },
   "hisseler": {
     "ARDYZ": {
@@ -88,7 +88,7 @@
   },
   "kripto": {
     "BTC": {
-      "guncel": 3109204.0,
+      "guncel": 3104942.0,
       "onceki": 3098110.0,
       "yilbasi": 3720444.0
     }
