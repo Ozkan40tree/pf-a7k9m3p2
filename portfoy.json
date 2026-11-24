@@ -1,5 +1,5 @@
 {
-  "olusturma_tarihi": "2026-11-24T12:33:56+03:00",
+  "olusturma_tarihi": "2026-11-24T14:31:15+03:00",
   "milat": "2026-06-01",
   "portfoyler": {
     "ozkan": [
@@ -11,9 +11,9 @@
         "adet": 6532.0,
         "maliyet": 21.99,
         "guncel_tl": 118079.71518,
-        "onceki_tl": 118079.71518,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "onceki_tl": 118798.960232,
+        "gunluk_kazanc_tl": -719.2450519999984,
+        "gunluk_yuzde": -0.6054304268281472,
         "fiyat_eksik": false
       },
       {
@@ -23,10 +23,10 @@
         "kod_orjinal": "TFF",
         "adet": 6751.0,
         "maliyet": 31.12,
-        "guncel_tl": 265959.817118,
+        "guncel_tl": 270174.97949399997,
         "onceki_tl": 265959.817118,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": 4215.162375999964,
+        "gunluk_yuzde": 1.5848869282872897,
         "fiyat_eksik": false
       },
       {
@@ -36,10 +36,10 @@
         "kod_orjinal": "KTJ",
         "adet": 107012.0,
         "maliyet": 2.8,
-        "guncel_tl": 262776.312936,
+        "guncel_tl": 265582.809648,
         "onceki_tl": 262776.312936,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": 2806.496711999993,
+        "gunluk_yuzde": 1.0680173873523844,
         "fiyat_eksik": false
       },
       {
@@ -49,10 +49,10 @@
         "kod_orjinal": "FFC",
         "adet": 10201424.0,
         "maliyet": null,
-        "guncel_tl": 881821.291984,
+        "guncel_tl": 891175.9977920001,
         "onceki_tl": 881821.291984,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": 9354.705808000057,
+        "gunluk_yuzde": 1.0608391851089245,
         "fiyat_eksik": false
       },
       {
@@ -62,10 +62,10 @@
         "kod_orjinal": "GHU",
         "adet": 763846.0,
         "maliyet": null,
-        "guncel_tl": 207623.27279800002,
+        "guncel_tl": 207423.145146,
         "onceki_tl": 207623.27279800002,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": -200.12765200002468,
+        "gunluk_yuzde": -0.09638979739748735,
         "fiyat_eksik": false
       },
       {
@@ -75,10 +75,10 @@
         "kod_orjinal": "BTC",
         "adet": 0.065751,
         "maliyet": 3631243.0,
-        "guncel_tl": 199584.201705,
+        "guncel_tl": 199424.29527300003,
         "onceki_tl": 203820.01262700002,
-        "gunluk_kazanc_tl": -4235.810922000004,
-        "gunluk_yuzde": -2.0782114903268765,
+        "gunluk_kazanc_tl": -4395.717353999993,
+        "gunluk_yuzde": -2.1566662161111516,
         "fiyat_eksik": false
       },
       {
@@ -114,10 +114,10 @@
         "kod_orjinal": "ARDYZ",
         "adet": 3415.0,
         "maliyet": 51.24,
-        "guncel_tl": 159412.2,
+        "guncel_tl": 158319.4,
         "onceki_tl": 165969.0,
-        "gunluk_kazanc_tl": -6556.799999999988,
-        "gunluk_yuzde": -3.9506172839506104,
+        "gunluk_kazanc_tl": -7649.600000000006,
+        "gunluk_yuzde": -4.609053497942391,
         "fiyat_eksik": false
       },
       {
@@ -127,10 +127,10 @@
         "kod_orjinal": "TRGYO",
         "adet": 1197.0,
         "maliyet": 85.5,
-        "guncel_tl": 96298.65000000001,
+        "guncel_tl": 96717.59999999999,
         "onceki_tl": 96777.45,
-        "gunluk_kazanc_tl": -478.79999999998836,
-        "gunluk_yuzde": -0.494743351886197,
+        "gunluk_kazanc_tl": -59.85000000000582,
+        "gunluk_yuzde": -0.06184291898578214,
         "fiyat_eksik": false
       },
       {
@@ -140,10 +140,10 @@
         "kod_orjinal": "TCKRC",
         "adet": 2130.0,
         "maliyet": 130.97,
-        "guncel_tl": 251766.0,
+        "guncel_tl": 251340.0,
         "onceki_tl": 252405.0,
-        "gunluk_kazanc_tl": -639.0,
-        "gunluk_yuzde": -0.25316455696202533,
+        "gunluk_kazanc_tl": -1065.0,
+        "gunluk_yuzde": -0.42194092827004215,
         "fiyat_eksik": false
       },
       {
@@ -153,10 +153,10 @@
         "kod_orjinal": "MPARK",
         "adet": 306.0,
         "maliyet": 466.97,
-        "guncel_tl": 129973.5,
+        "guncel_tl": 129132.0,
         "onceki_tl": 131427.0,
-        "gunluk_kazanc_tl": -1453.5,
-        "gunluk_yuzde": -1.1059371362048895,
+        "gunluk_kazanc_tl": -2295.0,
+        "gunluk_yuzde": -1.7462165308498252,
         "fiyat_eksik": false
       }
     ],
@@ -181,10 +181,10 @@
         "kod_orjinal": "HES",
         "adet": 686312.0,
         "maliyet": null,
-        "guncel_tl": 416558.44102400006,
+        "guncel_tl": 415292.19538399996,
         "onceki_tl": 416558.44102400006,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": -1266.2456400000956,
+        "gunluk_yuzde": -0.3039779092910377,
         "fiyat_eksik": false
       },
       {
@@ -194,10 +194,10 @@
         "kod_orjinal": "FFC",
         "adet": 7299919.0,
         "maliyet": null,
-        "guncel_tl": 631012.298279,
+        "guncel_tl": 637706.324002,
         "onceki_tl": 631012.298279,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": 6694.025723000057,
+        "gunluk_yuzde": 1.0608391851089274,
         "fiyat_eksik": false
       },
       {
@@ -233,10 +233,10 @@
         "kod_orjinal": "TFF",
         "adet": 2433.0,
         "maliyet": 41.08,
-        "guncel_tl": 95849.538594,
+        "guncel_tl": 97368.645402,
         "onceki_tl": 95849.538594,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "gunluk_kazanc_tl": 1519.1068079999968,
+        "gunluk_yuzde": 1.5848869282873002,
         "fiyat_eksik": false
       },
       {
@@ -247,9 +247,9 @@
         "adet": 24672.0,
         "maliyet": 21.99,
         "guncel_tl": 445998.58128,
-        "onceki_tl": 445998.58128,
-        "gunluk_kazanc_tl": 0.0,
-        "gunluk_yuzde": 0.0,
+        "onceki_tl": 448715.23987199995,
+        "gunluk_kazanc_tl": -2716.6585919999634,
+        "gunluk_yuzde": -0.6054304268281404,
         "fiyat_eksik": false
       }
     ]
